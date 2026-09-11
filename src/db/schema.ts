@@ -1,17 +1,17 @@
-import { sqliteTable, text, integer, real } from "drizzle-orm/sqlite-core";
+import { pgTable, serial, text, integer, real, timestamp } from "drizzle-orm/pg-core";
 
 // ---------- Admins ----------
-export const admins = sqliteTable("admins", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const admins = pgTable("admins", {
+  id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(), // hashed
   name: text("name").notNull(),
-  createdAt: text("created_at").default(new Date().toISOString()),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 // ---------- Students ----------
-export const students = sqliteTable("students", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const students = pgTable("students", {
+  id: serial("id").primaryKey(),
   roll: text("roll").notNull().unique(),
   name: text("name").notNull(),
   className: text("class_name").notNull(), // e.g. "Class 9"
@@ -21,35 +21,35 @@ export const students = sqliteTable("students", {
   phone: text("phone").default(""),
   address: text("address").default(""),
   password: text("password").notNull(), // hashed, for student login
-  createdAt: text("created_at").default(new Date().toISOString()),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 // ---------- Results ----------
-export const results = sqliteTable("results", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const results = pgTable("results", {
+  id: serial("id").primaryKey(),
   studentId: integer("student_id").notNull().references(() => students.id, { onDelete: "cascade" }),
   examName: text("exam_name").notNull(), // e.g. "Half Yearly 2026"
   subject: text("subject").notNull(),
   marks: real("marks").notNull(),
   fullMarks: real("full_marks").notNull().default(100),
   grade: text("grade").default(""),
-  createdAt: text("created_at").default(new Date().toISOString()),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 // ---------- Notices ----------
-export const notices = sqliteTable("notices", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const notices = pgTable("notices", {
+  id: serial("id").primaryKey(),
   title: text("title").notNull(),
   content: text("content").notNull(),
   date: text("date").notNull(),
-  createdAt: text("created_at").default(new Date().toISOString()),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 // ---------- Attendance ----------
-export const attendance = sqliteTable("attendance", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const attendance = pgTable("attendance", {
+  id: serial("id").primaryKey(),
   studentId: integer("student_id").notNull().references(() => students.id, { onDelete: "cascade" }),
   date: text("date").notNull(), // YYYY-MM-DD
   status: text("status").notNull(), // "present" | "absent" | "late"
-  createdAt: text("created_at").default(new Date().toISOString()),
+  createdAt: timestamp("created_at").defaultNow(),
 });

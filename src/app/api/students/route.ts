@@ -43,7 +43,8 @@ export async function POST(req: NextRequest) {
     const { password: _pw, ...safe } = inserted[0];
     return NextResponse.json({ student: safe }, { status: 201 });
   } catch (e: any) {
-    if (String(e?.message).includes("UNIQUE")) {
+    // Postgres unique-violation error code
+    if (e?.code === "23505") {
       return NextResponse.json({ error: "এই রোল নাম্বার ইতিমধ্যে ব্যবহৃত হয়েছে" }, { status: 409 });
     }
     return NextResponse.json({ error: "সমস্যা হয়েছে" }, { status: 500 });

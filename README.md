@@ -9,7 +9,7 @@
 ## টেকনোলজি
 
 - **Next.js 16** (App Router, TypeScript, Tailwind CSS)
-- **Drizzle ORM** + **libSQL/SQLite** ডাটাবেস — লোকালি একটি ফাইল (`school.db`), প্রোডাকশনে বিনামূল্যে **Turso** ক্লাউড ডাটাবেস (SQLite-compatible, Vercel-এর সাথে নিখুঁতভাবে কাজ করে)
+- **Drizzle ORM** + **Supabase (Postgres)** ডাটাবেস — লোকাল এবং প্রোডাকশন দুই জায়গাতেই একই Supabase ডাটাবেস ব্যবহার হয়
 - JWT + httpOnly cookie ভিত্তিক লগইন (অ্যাডমিন ও স্টুডেন্ট আলাদা রোল), পাসওয়ার্ড bcrypt দিয়ে হ্যাশ করা
 
 ## ডেমো লগইন (seed data)
@@ -23,15 +23,30 @@
 
 ---
 
+## ০. একটি ফ্রি Supabase প্রজেক্ট তৈরি করুন
+
+1. https://supabase.com -এ গিয়ে ফ্রি অ্যাকাউন্ট খুলুন এবং একটি নতুন প্রজেক্ট বানান
+2. প্রজেক্ট তৈরি হলে: **Project Settings → Database → Connection string → URI** থেকে কানেকশন স্ট্রিং কপি করুন
+   - Vercel/সার্ভারলেসের জন্য **Transaction pooler** (পোর্ট `6543`) ব্যবহার করুন
+   - `[YOUR-PASSWORD]` জায়গায় আপনার ডাটাবেস পাসওয়ার্ড বসান
+3. প্রজেক্ট রুটে `.env` ফাইল বানিয়ে (`.env.example` কপি করে) তাতে বসান:
+
+```bash
+DATABASE_URL="postgresql://postgres.xxxxxxxx:[YOUR-PASSWORD]@aws-0-xx-xxxx-1.pooler.supabase.com:6543/postgres"
+JWT_SECRET="যেকোনো লম্বা র‍্যান্ডম স্ট্রিং"
+```
+
+---
+
 ## ১. নিজের কম্পিউটারে চালানো (Local Setup)
 
-প্রয়োজন: [Node.js](https://nodejs.org) ১৮ বা তার উপরে।
+প্রয়োজন: [Node.js](https://nodejs.org) ১৮ বা তার উপরে, এবং উপরের ধাপ ০ অনুযায়ী `.env` ফাইল।
 
 ```bash
 # ১. ডিপেন্ডেন্সি ইনস্টল করুন
 npm install
 
-# ২. ডাটাবেস স্কিমা তৈরি করুন (school.db ফাইল তৈরি হবে)
+# ২. Supabase ডাটাবেসে স্কিমা (টেবিলগুলো) পুশ করুন
 npm run db:push
 
 # ৩. ডেমো ডাটা যোগ করুন (admin + sample student + notice)
@@ -43,13 +58,13 @@ npm run dev
 
 এরপর ব্রাউজারে খুলুন: **http://localhost:3000**
 
-ডাটাবেস ব্রাউজ করে দেখতে চাইলে: `npm run db:studio`
+ডাটাবেস ব্রাউজ করে দেখতে চাইলে: `npm run db:studio`, অথবা সরাসরি Supabase ড্যাশবোর্ডের **Table Editor**-এ।
 
 ---
 
 ## ২. Vercel-এ হোস্ট করা (Deployment)
 
-লোকাল SQLite ফাইল (`school.db`) Vercel-এর সার্ভারলেস এনভায়রনমেন্টে persist করে না। তাই প্রোডাকশনে ব্যবহার করতে হবে **Turso** — SQLite-compatible একটি cloud database, ফ্রি টায়ারে পাওয়া যায়, কোড প্রায় একই থাকে।
+যেহেতু ডাটাবেস এখন Supabase-এ (ক্লাউডে), স্থানীয় ফাইলের কোনো persist সমস্যা নেই — একই `DATABASE_URL` লোকাল এবং প্রোডাকশন দুই জায়গাতেই কাজ করবে।
 
 ### ধাপ ১ — GitHub-এ কোড পুশ করুন
 
@@ -61,40 +76,15 @@ git remote add origin <your-github-repo-url>
 git push -u origin main
 ```
 
-### ধাপ ২ — একটি ফ্রি Turso ডাটাবেস তৈরি করুন
-
-1. https://turso.tech -এ গিয়ে ফ্রি অ্যাকাউন্ট খুলুন
-2. Turso CLI ইনস্টল করুন অথবা তাদের ড্যাশবোর্ড থেকে সরাসরি একটি ডাটাবেস তৈরি করুন
-3. ডাটাবেস তৈরি হলে দুটি জিনিস পাবেন:
-   - **Database URL** (এরকম: `libsql://your-db-name.turso.io`)
-   - **Auth Token** (একটি লম্বা সিক্রেট স্ট্রিং)
-
-CLI দিয়ে করলে:
-```bash
-turso db create school-website
-turso db show school-website --url
-turso auth token create school-website
-```
-
-### ধাপ ৩ — Turso ডাটাবেসে স্কিমা পুশ করুন
-
-লোকাল টার্মিনালে env var হিসেবে বসিয়ে:
-
-```bash
-TURSO_DATABASE_URL="libsql://your-db-name.turso.io" TURSO_AUTH_TOKEN="your-token" npm run db:push
-TURSO_DATABASE_URL="libsql://your-db-name.turso.io" TURSO_AUTH_TOKEN="your-token" npm run db:seed
-```
-
-### ধাপ ৪ — Vercel-এ ইমপোর্ট করুন
+### ধাপ ২ — Vercel-এ ইমপোর্ট করুন
 
 1. https://vercel.com -এ গিয়ে "Add New Project" → আপনার GitHub রিপো সিলেক্ট করুন
 2. **Environment Variables** সেকশনে যোগ করুন:
-   - `TURSO_DATABASE_URL` = আপনার Turso database URL
-   - `TURSO_AUTH_TOKEN` = আপনার Turso auth token
+   - `DATABASE_URL` = আপনার Supabase Postgres কানেকশন স্ট্রিং (Transaction pooler, পোর্ট 6543)
    - `JWT_SECRET` = যেকোনো লম্বা র‍্যান্ডম স্ট্রিং (না দিলে একটি ডিফল্ট ভ্যালু ব্যবহৃত হবে, যা প্রোডাকশনের জন্য নিরাপদ নয়)
 3. **Deploy** চাপুন
 
-ব্যস! কিছুক্ষণের মধ্যে ওয়েবসাইট লাইভ হয়ে যাবে, এবং Turso-তে সংরক্ষিত ডাটা প্রতিটি ভিজিটের সাথে persist থাকবে।
+ব্যস! কিছুক্ষণের মধ্যে ওয়েবসাইট লাইভ হয়ে যাবে, এবং Supabase-এ সংরক্ষিত ডাটা প্রতিটি ভিজিটের সাথে persist থাকবে।
 
 ---
 
@@ -104,7 +94,7 @@ TURSO_DATABASE_URL="libsql://your-db-name.turso.io" TURSO_AUTH_TOKEN="your-token
 src/
   db/
     schema.ts        # ডাটাবেস টেবিল (students, admins, results, notices, attendance)
-    client.ts         # ডাটাবেস কানেকশন (local file অথবা Turso)
+    client.ts         # ডাটাবেস কানেকশন (Supabase Postgres)
     seed.ts             # ডেমো ডাটা তৈরির স্ক্রিপ্ট
   lib/
     auth.ts              # JWT সেশন, পাসওয়ার্ড হ্যাশিং
