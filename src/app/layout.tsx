@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "উদয়ন উচ্চ বিদ্যালয় | Udayan High School",
-  description: "স্কুলের অফিসিয়াল ওয়েবসাইট — নোটিশ, রেজাল্ট ও শিক্ষার্থী তথ্য",
+  title: "Ex-Students Association of Jalalpur Secondary School (ESAS)",
+  description: "ESAS-এর অফিসিয়াল ওয়েবসাইট — নোটিশ, রেজাল্ট ও সদস্য তথ্য",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

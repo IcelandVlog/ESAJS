@@ -41,8 +41,8 @@ async function main() {
   const existingNotice = await db.select().from(notices);
   if (existingNotice.length === 0) {
     await db.insert(notices).values({
-      title: "স্কুল ওয়েবসাইটে স্বাগতম",
-      content: "আমাদের নতুন ডাইনামিক ওয়েবসাইট চালু হয়েছে। এখানে নোটিশ, রেজাল্ট ও অ্যাটেনডেন্স দেখা যাবে।",
+      title: "ESAS ওয়েবসাইটে স্বাগতম",
+      content: "Ex-Students Association of Jalalpur Secondary School-এর নতুন ডাইনামিক ওয়েবসাইট চালু হয়েছে। এখানে নোটিশ, রেজাল্ট ও অ্যাটেনডেন্স দেখা যাবে।",
       date: new Date().toISOString().slice(0, 10),
     });
     console.log("✅ Sample notice created.");

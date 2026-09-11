@@ -17,12 +17,12 @@ export default async function Home() {
         <section className="bg-pine text-paper">
           <div className="max-w-5xl mx-auto px-6 py-16 grid gap-8 sm:grid-cols-[1.3fr_1fr] items-center">
             <div>
-              <p className="text-gold tracking-wide text-sm mb-3">প্রতিষ্ঠিত ১৯৮৫</p>
+              <p className="text-gold tracking-wide text-sm mb-3">ESAS</p>
               <h1 className="font-display text-4xl sm:text-5xl leading-tight mb-4">
-                শিক্ষার আলোয় গড়ি আগামীর প্রজন্ম
+                Ex-Students Association of Jalalpur Secondary School
               </h1>
               <p className="text-paper/80 max-w-md leading-relaxed">
-                নোটিশ, রুটিন, রেজাল্ট ও অ্যাটেনডেন্স — সবকিছু এখন এক জায়গায়। শিক্ষার্থীরা নিজের
+                নোটিশ, রেজাল্ট ও সদস্য তথ্য — সবকিছু এখন এক জায়গায়। প্রাক্তন শিক্ষার্থীরা নিজের
                 রোল দিয়ে লগইন করে নিজের তথ্য দেখতে পারবে, আর প্রশাসন সহজে সব পরিচালনা করতে পারবে।
               </p>
               <Link
@@ -40,15 +40,15 @@ export default async function Home() {
                 </div>
                 <div>
                   <dt className="font-display text-3xl text-gold">১২০০+</dt>
-                  <dd className="text-sm text-paper/70 mt-1">শিক্ষার্থী</dd>
+                  <dd className="text-sm text-paper/70 mt-1">প্রাক্তন শিক্ষার্থী</dd>
                 </div>
                 <div>
                   <dt className="font-display text-3xl text-gold">৬০+</dt>
-                  <dd className="text-sm text-paper/70 mt-1">শিক্ষক-কর্মচারী</dd>
+                  <dd className="text-sm text-paper/70 mt-1">সক্রিয় সদস্য</dd>
                 </div>
                 <div>
-                  <dt className="font-display text-3xl text-gold">A+</dt>
-                  <dd className="text-sm text-paper/70 mt-1">গড় ফলাফল</dd>
+                  <dt className="font-display text-3xl text-gold">২০+</dt>
+                  <dd className="text-sm text-paper/70 mt-1">ব্যাচ</dd>
                 </div>
               </dl>
             </div>

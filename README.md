@@ -1,4 +1,4 @@
-# উদয়ন উচ্চ বিদ্যালয় — School Website (Next.js + Database)
+# Ex-Students Association of Jalalpur Secondary School (ESAS) — Website (Next.js + Database)
 
 একটি সম্পূর্ণ ডাইনামিক স্কুল ওয়েবসাইট, ডাটাবেসসহ। এতে আছে:
 

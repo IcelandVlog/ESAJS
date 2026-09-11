@@ -6,11 +6,13 @@ export default function SiteHeader() {
       <div className="max-w-5xl mx-auto px-6 py-5 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3">
           <span className="w-11 h-11 rounded-full bg-gold text-pine-dark flex items-center justify-center font-display text-lg font-semibold shrink-0">
-            উ
+            E
           </span>
           <span>
-            <span className="block font-display text-xl leading-tight">উদয়ন উচ্চ বিদ্যালয়</span>
-            <span className="block text-xs tracking-wide text-paper/70">Udayan High School</span>
+            <span className="block font-display text-lg leading-tight">
+              Ex-Students Association of Jalalpur Secondary School
+            </span>
+            <span className="block text-xs tracking-wide text-paper/70">ESAS · জালালপুর মাধ্যমিক বিদ্যালয়</span>
           </span>
         </Link>
         <nav className="flex items-center gap-6 text-sm">
