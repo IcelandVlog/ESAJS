@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+:root {
+  --paper: #FAF7EF;
+  --ink: #1C1B17;
+  --pine: #0B4A38;
+  --pine-dark: #073527;
+  --clay: #C0392B;
+  --gold: #C99A3E;
+  --line: #E4DCC8;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-pine: var(--pine);
+  --color-pine-dark: var(--pine-dark);
+  --color-clay: var(--clay);
+  --color-gold: var(--gold);
+  --color-line: var(--line);
+}
+
+body {
+  font-family: "Noto Sans Bengali", system-ui, sans-serif;
+}
+
+.font-display {
+  font-family: "Fraunces", "Noto Sans Bengali", serif;
+}

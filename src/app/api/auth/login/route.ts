@@ -1,0 +1,54 @@
+import { NextRequest, NextResponse } from "next/server";
+import { db } from "@/db/client";
+import { admins, students } from "@/db/schema";
+import { eq } from "drizzle-orm";
+import { verifyPassword, signSession, COOKIE_NAME } from "@/lib/auth";
+
+export async function POST(req: NextRequest) {
+  const body = await req.json();
+  const { role, identifier, password } = body as {
+    role: "admin" | "student";
+    identifier: string; // username for admin, roll for student
+    password: string;
+  };
+
+  if (!role || !identifier || !password) {
+    return NextResponse.json({ error: "সব ফিল্ড পূরণ করুন" }, { status: 400 });
+  }
+
+  if (role === "admin") {
+    const [admin] = await db.select().from(admins).where(eq(admins.username, identifier));
+    if (!admin || !(await verifyPassword(password, admin.password))) {
+      return NextResponse.json({ error: "ভুল ইউজারনেম বা পাসওয়ার্ড" }, { status: 401 });
+    }
+    const token = signSession({ role: "admin", id: admin.id, name: admin.name });
+    const res = NextResponse.json({ ok: true, role: "admin", name: admin.name });
+    res.cookies.set(COOKIE_NAME, token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7,
+    });
+    return res;
+  }
+
+  if (role === "student") {
+    const [student] = await db.select().from(students).where(eq(students.roll, identifier));
+    if (!student || !(await verifyPassword(password, student.password))) {
+      return NextResponse.json({ error: "ভুল রোল বা পাসওয়ার্ড" }, { status: 401 });
+    }
+    const token = signSession({ role: "student", id: student.id, name: student.name });
+    const res = NextResponse.json({ ok: true, role: "student", name: student.name });
+    res.cookies.set(COOKIE_NAME, token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7,
+    });
+    return res;
+  }
+
+  return NextResponse.json({ error: "Invalid role" }, { status: 400 });
+}
