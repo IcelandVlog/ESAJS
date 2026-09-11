@@ -17,7 +17,7 @@ export default async function Home() {
         <section className="bg-pine text-paper">
           <div className="max-w-5xl mx-auto px-6 py-16 grid gap-8 sm:grid-cols-[1.3fr_1fr] items-center">
             <div>
-              <p className="text-gold tracking-wide text-sm mb-3">ESAS</p>
+              <p className="text-gold tracking-wide text-sm mb-3">ESAJS</p>
               <h1 className="font-display text-4xl sm:text-5xl leading-tight mb-4">
                 Ex-Students Association of Jalalpur Secondary School
               </h1>

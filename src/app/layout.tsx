@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Ex-Students Association of Jalalpur Secondary School (ESAS)",
-  description: "ESAS-এর অফিসিয়াল ওয়েবসাইট — নোটিশ, রেজাল্ট ও সদস্য তথ্য",
+  title: "Ex-Students Association of Jalalpur Secondary School (ESAJS)",
+  description: "ESAJS-এর অফিসিয়াল ওয়েবসাইট — নোটিশ, রেজাল্ট ও সদস্য তথ্য",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

@@ -1,4 +1,4 @@
-# Ex-Students Association of Jalalpur Secondary School (ESAS) — Website (Next.js + Database)
+# Ex-Students Association of Jalalpur Secondary School (ESAJS) — Website (Next.js + Database)
 
 একটি সম্পূর্ণ ডাইনামিক স্কুল ওয়েবসাইট, ডাটাবেসসহ। এতে আছে:
 

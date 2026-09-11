@@ -12,7 +12,7 @@ export default function SiteHeader() {
             <span className="block font-display text-lg leading-tight">
               Ex-Students Association of Jalalpur Secondary School
             </span>
-            <span className="block text-xs tracking-wide text-paper/70">ESAS · জালালপুর মাধ্যমিক বিদ্যালয়</span>
+            <span className="block text-xs tracking-wide text-paper/70">ESAJS · জালালপুর মাধ্যমিক বিদ্যালয়</span>
           </span>
         </Link>
         <nav className="flex items-center gap-6 text-sm">
