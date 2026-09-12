@@ -1,0 +1,270 @@
+export type Lang = "bn" | "en";
+
+export const dictionaries = {
+  bn: {
+    // Nav / header
+    "nav.home": "হোম",
+    "nav.notices": "নোটিশ",
+    "nav.contact": "যোগাযোগ",
+    "nav.login": "লগইন",
+    "nav.logout": "লগআউট",
+    "school.shortName": "ESAJS",
+    "school.fullName": "জালালপুর মাধ্যমিক বিদ্যালয়",
+    "school.assocName": "প্রাক্তন শিক্ষার্থী সংসদ",
+
+    // Language gate (first-visit modal)
+    "gate.title": "স্বাগতম",
+    "gate.studentQuestion": "আপনি কি এই স্কুলের শিক্ষার্থী?",
+    "gate.yes": "হ্যাঁ",
+    "gate.no": "না",
+    "gate.chooseLanguage": "ভাষা নির্বাচন করুন",
+    "gate.continue": "প্রবেশ করুন",
+    "gate.selectLanguageFirst": "চালিয়ে যেতে একটি ভাষা নির্বাচন করুন",
+
+    // Homepage hero
+    "hero.eyebrow": "জালালপুর মাধ্যমিক বিদ্যালয়",
+    "hero.title": "স্বাগতম ESAJS-এ",
+    "hero.subtitle": "এক্স-স্টুডেন্টস অ্যাসোসিয়েশন অব জালালপুর সেকেন্ডারি স্কুল-এর অফিসিয়াল ওয়েবসাইট",
+    "hero.studentLogin": "স্টুডেন্ট লগইন",
+    "hero.viewNotices": "নোটিশ দেখুন",
+
+    // Notices section
+    "notices.title": "নোটিশ বোর্ড",
+    "notices.count": "টি নোটিশ",
+    "notices.empty": "এখনো কোনো নোটিশ যুক্ত করা হয়নি।",
+
+    // Footer
+    "footer.rights": "সর্বস্বত্ব সংরক্ষিত।",
+    "footer.location": "বাংলাদেশ",
+
+    // Login page
+    "login.title": "লগইন করুন",
+    "login.subtitle": "আপনার তথ্য দিয়ে লগইন করুন",
+    "login.roleAdmin": "অ্যাডমিন",
+    "login.roleStudent": "শিক্ষার্থী",
+    "login.username": "ইউজারনেম",
+    "login.roll": "রোল নাম্বার",
+    "login.password": "পাসওয়ার্ড",
+    "login.submit": "লগইন করুন",
+    "login.loading": "লগইন হচ্ছে...",
+    "login.backHome": "← হোমে ফিরে যান",
+    "login.error": "লগইন ব্যর্থ হয়েছে",
+
+    // Dashboard header (shared)
+    "dash.welcome": "স্বাগতম",
+    "dash.adminPanel": "অ্যাডমিন প্যানেল",
+    "dash.studentPortal": "শিক্ষার্থী পোর্টাল",
+    "dash.backHome": "← হোমে ফিরুন",
+
+    // Admin dashboard tabs
+    "admin.tab.students": "শিক্ষার্থী",
+    "admin.tab.results": "রেজাল্ট",
+    "admin.tab.notices": "নোটিশ",
+    "admin.tab.attendance": "অ্যাটেনডেন্স",
+    "admin.add": "যোগ করুন",
+    "admin.edit": "সম্পাদনা",
+    "admin.delete": "মুছুন",
+    "admin.save": "সংরক্ষণ",
+    "admin.cancel": "বাতিল",
+    "admin.loading": "লোড হচ্ছে...",
+    "admin.saving": "সংরক্ষণ হচ্ছে...",
+    "admin.error": "সমস্যা হয়েছে",
+    "admin.selectPlaceholder": "নির্বাচন করুন",
+
+    "admin.addNewStudent": "+ নতুন শিক্ষার্থী",
+    "admin.addNewResult": "+ নতুন রেজাল্ট",
+    "admin.addNewNotice": "+ নতুন নোটিশ",
+    "admin.addNewEntry": "+ এন্ট্রি যুক্ত করুন",
+
+    "admin.studentList": "শিক্ষার্থী তালিকা",
+    "admin.resultList": "রেজাল্ট তালিকা",
+    "admin.noticeList": "নোটিশ তালিকা",
+    "admin.attendanceList": "অ্যাটেনডেন্স",
+
+    "admin.noStudents": "কোনো শিক্ষার্থী যুক্ত করা হয়নি",
+    "admin.noResults": "কোনো রেজাল্ট যুক্ত করা হয়নি",
+    "admin.noNotices": "কোনো নোটিশ যুক্ত করা হয়নি",
+    "admin.noEntries": "কোনো এন্ট্রি নেই",
+
+    "admin.confirmDeleteStudent": "এই শিক্ষার্থীকে মুছে ফেলতে চান? এর সাথে সম্পর্কিত রেজাল্ট ও অ্যাটেনডেন্সও মুছে যাবে।",
+    "admin.confirmDeleteResult": "এই রেজাল্টটি মুছে ফেলতে চান?",
+    "admin.confirmDeleteNotice": "এই নোটিশটি মুছে ফেলতে চান?",
+
+    "admin.field.roll": "রোল",
+    "admin.field.name": "নাম",
+    "admin.field.class": "শ্রেণি",
+    "admin.field.section": "শাখা",
+    "admin.field.fatherName": "পিতার নাম",
+    "admin.field.motherName": "মাতার নাম",
+    "admin.field.phone": "ফোন",
+    "admin.field.address": "ঠিকানা",
+    "admin.field.passwordForLogin": "পাসওয়ার্ড (লগইনের জন্য)",
+    "admin.field.student": "শিক্ষার্থী",
+    "admin.field.examName": "পরীক্ষার নাম",
+    "admin.field.subject": "বিষয়",
+    "admin.field.marksObtained": "প্রাপ্ত নম্বর",
+    "admin.field.fullMarks": "পূর্ণমান",
+    "admin.field.grade": "গ্রেড",
+    "admin.field.title": "শিরোনাম",
+    "admin.field.content": "বিস্তারিত",
+    "admin.field.date": "তারিখ",
+    "admin.field.status": "অবস্থা",
+    "admin.col.exam": "পরীক্ষা",
+
+    "admin.status.present": "উপস্থিত",
+    "admin.status.absent": "অনুপস্থিত",
+    "admin.status.late": "দেরি",
+
+    // Student dashboard
+    "student.dashboardTitle": "শিক্ষার্থী ড্যাশবোর্ড",
+    "student.name": "নাম",
+    "student.myResults": "আমার রেজাল্ট",
+    "student.myAttendance": "আমার অ্যাটেনডেন্স",
+    "student.rollLabel": "রোল",
+    "student.classLabel": "শ্রেণি",
+    "student.attendanceRate": "উপস্থিতির হার",
+    "student.noData": "তথ্য নেই",
+    "student.noResultsYet": "এখনো কোনো রেজাল্ট যুক্ত করা হয়নি।",
+    "student.noAttendanceYet": "এখনো কোনো অ্যাটেনডেন্স রেকর্ড নেই।",
+    "student.table.subject": "বিষয়",
+    "student.table.marksObtained": "প্রাপ্ত নম্বর",
+    "student.table.fullMarks": "পূর্ণমান",
+    "student.table.grade": "গ্রেড",
+    "student.table.date": "তারিখ",
+    "student.table.status": "অবস্থা",
+  },
+  en: {
+    // Nav / header
+    "nav.home": "Home",
+    "nav.notices": "Notices",
+    "nav.contact": "Contact",
+    "nav.login": "Login",
+    "nav.logout": "Logout",
+    "school.shortName": "ESAJS",
+    "school.fullName": "Jalalpur Secondary School",
+    "school.assocName": "Ex-Students Association",
+
+    // Language gate (first-visit modal)
+    "gate.title": "Welcome",
+    "gate.studentQuestion": "Are you a student of this school?",
+    "gate.yes": "Yes",
+    "gate.no": "No",
+    "gate.chooseLanguage": "Select your language",
+    "gate.continue": "Continue",
+    "gate.selectLanguageFirst": "Please select a language to continue",
+
+    // Homepage hero
+    "hero.eyebrow": "Jalalpur Secondary School",
+    "hero.title": "Welcome to ESAJS",
+    "hero.subtitle": "Official website of the Ex-Students Association of Jalalpur Secondary School",
+    "hero.studentLogin": "Student Login",
+    "hero.viewNotices": "View Notices",
+
+    // Notices section
+    "notices.title": "Notice Board",
+    "notices.count": "notices",
+    "notices.empty": "No notices have been posted yet.",
+
+    // Footer
+    "footer.rights": "All rights reserved.",
+    "footer.location": "Bangladesh",
+
+    // Login page
+    "login.title": "Login",
+    "login.subtitle": "Sign in with your details",
+    "login.roleAdmin": "Admin",
+    "login.roleStudent": "Student",
+    "login.username": "Username",
+    "login.roll": "Roll Number",
+    "login.password": "Password",
+    "login.submit": "Login",
+    "login.loading": "Signing in...",
+    "login.backHome": "← Back to home",
+    "login.error": "Login failed",
+
+    // Dashboard header (shared)
+    "dash.welcome": "Welcome",
+    "dash.adminPanel": "Admin Panel",
+    "dash.studentPortal": "Student Portal",
+    "dash.backHome": "← Back to home",
+
+    // Admin dashboard tabs
+    "admin.tab.students": "Students",
+    "admin.tab.results": "Results",
+    "admin.tab.notices": "Notices",
+    "admin.tab.attendance": "Attendance",
+    "admin.add": "Add",
+    "admin.edit": "Edit",
+    "admin.delete": "Delete",
+    "admin.save": "Save",
+    "admin.cancel": "Cancel",
+    "admin.loading": "Loading...",
+    "admin.saving": "Saving...",
+    "admin.error": "Something went wrong",
+    "admin.selectPlaceholder": "Select",
+
+    "admin.addNewStudent": "+ New Student",
+    "admin.addNewResult": "+ New Result",
+    "admin.addNewNotice": "+ New Notice",
+    "admin.addNewEntry": "+ Add Entry",
+
+    "admin.studentList": "Student List",
+    "admin.resultList": "Result List",
+    "admin.noticeList": "Notice List",
+    "admin.attendanceList": "Attendance",
+
+    "admin.noStudents": "No students added yet",
+    "admin.noResults": "No results added yet",
+    "admin.noNotices": "No notices added yet",
+    "admin.noEntries": "No entries yet",
+
+    "admin.confirmDeleteStudent": "Delete this student? Their related results and attendance will also be deleted.",
+    "admin.confirmDeleteResult": "Delete this result?",
+    "admin.confirmDeleteNotice": "Delete this notice?",
+
+    "admin.field.roll": "Roll",
+    "admin.field.name": "Name",
+    "admin.field.class": "Class",
+    "admin.field.section": "Section",
+    "admin.field.fatherName": "Father's Name",
+    "admin.field.motherName": "Mother's Name",
+    "admin.field.phone": "Phone",
+    "admin.field.address": "Address",
+    "admin.field.passwordForLogin": "Password (for login)",
+    "admin.field.student": "Student",
+    "admin.field.examName": "Exam Name",
+    "admin.field.subject": "Subject",
+    "admin.field.marksObtained": "Marks Obtained",
+    "admin.field.fullMarks": "Full Marks",
+    "admin.field.grade": "Grade",
+    "admin.field.title": "Title",
+    "admin.field.content": "Content",
+    "admin.field.date": "Date",
+    "admin.field.status": "Status",
+    "admin.col.exam": "Exam",
+
+    "admin.status.present": "Present",
+    "admin.status.absent": "Absent",
+    "admin.status.late": "Late",
+
+    // Student dashboard
+    "student.dashboardTitle": "Student Dashboard",
+    "student.name": "Name",
+    "student.myResults": "My Results",
+    "student.myAttendance": "My Attendance",
+    "student.rollLabel": "Roll",
+    "student.classLabel": "Class",
+    "student.attendanceRate": "Attendance Rate",
+    "student.noData": "No data",
+    "student.noResultsYet": "No results have been added yet.",
+    "student.noAttendanceYet": "No attendance records yet.",
+    "student.table.subject": "Subject",
+    "student.table.marksObtained": "Marks Obtained",
+    "student.table.fullMarks": "Full Marks",
+    "student.table.grade": "Grade",
+    "student.table.date": "Date",
+    "student.table.status": "Status",
+  },
+} as const satisfies Record<Lang, Record<string, string>>;
+
+export type DictKey = keyof (typeof dictionaries)["bn"];

@@ -1,13 +1,23 @@
 @import "tailwindcss";
 
 :root {
-  --paper: #FAF7EF;
-  --ink: #1C1B17;
-  --pine: #0B4A38;
-  --pine-dark: #073527;
+  --paper: #F7F8FA;
+  --ink: #10172A;
+  /* pine/pine-dark repointed to the ESAJS navy brand so existing
+     admin/student dashboard screens inherit the new look for free */
+  --pine: #101f3d;
+  --pine-dark: #050c1c;
   --clay: #C0392B;
-  --gold: #C99A3E;
-  --line: #E4DCC8;
+  /* gold repointed to the logo's red accent */
+  --gold: #E11D2E;
+  --line: #E2E5EC;
+
+  /* ESAJS brand: navy header/hero + blue-to-pink gradient accents */
+  --navy-950: #050c1c;
+  --navy-900: #0a1830;
+  --navy-800: #101f3d;
+  --brand-blue: #3b5bfd;
+  --brand-pink: #d6249f;
 }
 
 @theme inline {
@@ -18,6 +28,12 @@
   --color-clay: var(--clay);
   --color-gold: var(--gold);
   --color-line: var(--line);
+
+  --color-navy-950: var(--navy-950);
+  --color-navy-900: var(--navy-900);
+  --color-navy-800: var(--navy-800);
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-pink: var(--brand-pink);
 }
 
 body {
@@ -26,4 +42,9 @@ body {
 
 .font-display {
   font-family: "Fraunces", "Noto Sans Bengali", serif;
+}
+
+.font-hero {
+  font-family: system-ui, "Noto Sans Bengali", sans-serif;
+  letter-spacing: 0.02em;
 }

@@ -14,7 +14,7 @@ export default async function AdminPage() {
 
   return (
     <>
-      <DashboardHeader title="অ্যাডমিন প্যানেল" name={session.name} />
+      <DashboardHeader role="admin" name={session.name} />
       <main className="flex-1 max-w-5xl mx-auto w-full px-6 py-10">
         <AdminDashboard />
       </main>

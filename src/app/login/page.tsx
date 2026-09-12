@@ -1,17 +1,26 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const { t } = useLanguage();
   const [role, setRole] = useState<"admin" | "student">("student");
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get("role") === "admin") setRole("admin");
+    if (searchParams.get("role") === "student") setRole("student");
+  }, [searchParams]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -25,14 +34,14 @@ export default function LoginPage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error || "লগইন ব্যর্থ হয়েছে");
+        setError(data.error || t("login.error"));
         setLoading(false);
         return;
       }
       router.push(role === "admin" ? "/admin" : "/student");
       router.refresh();
     } catch {
-      setError("নেটওয়ার্ক সমস্যা হয়েছে");
+      setError(t("login.error"));
       setLoading(false);
     }
   }
@@ -42,10 +51,8 @@ export default function LoginPage() {
       <SiteHeader />
       <main className="flex-1 flex items-center justify-center px-6 py-16 bg-paper">
         <div className="w-full max-w-sm">
-          <h1 className="font-display text-2xl text-pine-dark mb-2 text-center">লগইন করুন</h1>
-          <p className="text-center text-ink/60 text-sm mb-8">
-            আপনি কি হিসেবে প্রবেশ করছেন তা বেছে নিন
-          </p>
+          <h1 className="font-display text-2xl text-pine-dark mb-2 text-center">{t("login.title")}</h1>
+          <p className="text-center text-ink/60 text-sm mb-8">{t("login.subtitle")}</p>
 
           <div className="flex mb-6 border border-line rounded-lg overflow-hidden">
             <button
@@ -55,7 +62,7 @@ export default function LoginPage() {
                 role === "student" ? "bg-pine text-paper" : "bg-white text-ink/70"
               }`}
             >
-              শিক্ষার্থী
+              {t("login.roleStudent")}
             </button>
             <button
               type="button"
@@ -64,14 +71,14 @@ export default function LoginPage() {
                 role === "admin" ? "bg-pine text-paper" : "bg-white text-ink/70"
               }`}
             >
-              অ্যাডমিন
+              {t("login.roleAdmin")}
             </button>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4 bg-white border border-line rounded-lg p-6">
             <div>
               <label className="block text-sm text-ink/70 mb-1.5">
-                {role === "student" ? "রোল নাম্বার" : "ইউজারনেম"}
+                {role === "student" ? t("login.roll") : t("login.username")}
               </label>
               <input
                 type="text"
@@ -79,11 +86,11 @@ export default function LoginPage() {
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
                 className="w-full border border-line rounded px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-pine/40"
-                placeholder={role === "student" ? "যেমনঃ 101" : "যেমনঃ admin"}
+                placeholder={role === "student" ? "101" : "admin"}
               />
             </div>
             <div>
-              <label className="block text-sm text-ink/70 mb-1.5">পাসওয়ার্ড</label>
+              <label className="block text-sm text-ink/70 mb-1.5">{t("login.password")}</label>
               <input
                 type="password"
                 required
@@ -103,16 +110,26 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full bg-pine text-paper py-2.5 rounded font-medium hover:bg-pine-dark transition-colors disabled:opacity-60"
             >
-              {loading ? "লগইন হচ্ছে..." : "লগইন"}
+              {loading ? t("login.loading") : t("login.submit")}
             </button>
           </form>
 
-          <p className="text-xs text-ink/40 text-center mt-6">
-            ডেমো — শিক্ষার্থী: roll 101 / student123 &nbsp;•&nbsp; অ্যাডমিন: admin / admin123
+          <p className="text-center mt-6">
+            <Link href="/" className="text-sm text-ink/50 hover:text-pine-dark transition-colors">
+              {t("login.backHome")}
+            </Link>
           </p>
         </div>
       </main>
       <SiteFooter />
     </>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginForm />
+    </Suspense>
   );
 }
