@@ -12,7 +12,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   const { id } = await params;
   const body = await req.json();
   const updateData: Record<string, unknown> = {};
-  for (const field of ["roll", "name", "className", "section", "fatherName", "motherName", "phone", "address"]) {
+  for (const field of ["roll", "name", "className", "section", "fatherName", "motherName", "phone", "address", "batch", "approved"]) {
     if (body[field] !== undefined) updateData[field] = body[field];
   }
   if (body.password) {

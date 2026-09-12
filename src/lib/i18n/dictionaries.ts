@@ -49,6 +49,29 @@ export const dictionaries = {
     "login.loading": "লগইন হচ্ছে...",
     "login.backHome": "← হোমে ফিরে যান",
     "login.error": "লগইন ব্যর্থ হয়েছে",
+    "login.newHere": "নতুন? রেজিস্ট্রেশন করুন",
+    "login.haveAccount": "ইতিমধ্যে অ্যাকাউন্ট আছে?",
+
+    // Registration page
+    "register.title": "রেজিস্ট্রেশন করুন",
+    "register.subtitle": "শিক্ষার্থী/প্রাক্তন শিক্ষার্থী হিসেবে অ্যাকাউন্ট তৈরি করুন",
+    "register.name": "পূর্ণ নাম",
+    "register.batch": "ব্যাচ (পাশের সাল)",
+    "register.contact": "মোবাইল নম্বর / ইমেইল",
+    "register.password": "পাসওয়ার্ড",
+    "register.passwordHint": "অন্তত ৬ অক্ষর, একটি বড় হাতের অক্ষর, একটি সংখ্যা ও একটি বিশেষ চিহ্ন থাকতে হবে",
+    "register.confirmPassword": "পাসওয়ার্ড নিশ্চিত করুন",
+    "register.passwordMismatch": "পাসওয়ার্ড মিলছে না",
+    "register.captchaRequired": "চালিয়ে যেতে reCAPTCHA যাচাই করুন",
+    "register.submit": "Registration",
+    "register.submitting": "রেজিস্ট্রেশন হচ্ছে...",
+    "register.loginPrompt": "ইতিমধ্যে অ্যাকাউন্ট আছে?",
+    "register.loginLink": "লগইন করুন",
+    "register.pendingNotice": "আপনার রেজিস্ট্রেশন সফল হয়েছে। অ্যাডমিন অনুমোদনের পর আপনি লগইন করতে পারবেন।",
+
+    // Admin login (hidden route)
+    "adminLogin.link": "অ্যাডমিন লগইন",
+    "adminLogin.title": "অ্যাডমিন লগইন",
 
     // Dashboard header (shared)
     "dash.welcome": "স্বাগতম",
@@ -61,6 +84,7 @@ export const dictionaries = {
     "admin.tab.results": "রেজাল্ট",
     "admin.tab.notices": "নোটিশ",
     "admin.tab.attendance": "অ্যাটেনডেন্স",
+    "admin.tab.pending": "পেন্ডিং রেজিস্ট্রেশন",
     "admin.add": "যোগ করুন",
     "admin.edit": "সম্পাদনা",
     "admin.delete": "মুছুন",
@@ -114,6 +138,14 @@ export const dictionaries = {
     "admin.status.present": "উপস্থিত",
     "admin.status.absent": "অনুপস্থিত",
     "admin.status.late": "দেরি",
+
+    "admin.pendingList": "পেন্ডিং রেজিস্ট্রেশন",
+    "admin.noPending": "নতুন কোনো পেন্ডিং রেজিস্ট্রেশন নেই",
+    "admin.approve": "অনুমোদন করুন",
+    "admin.reject": "প্রত্যাখ্যান করুন",
+    "admin.confirmRejectRegistration": "এই রেজিস্ট্রেশনটি প্রত্যাখ্যান করে মুছে ফেলতে চান?",
+    "admin.field.batch": "ব্যাচ",
+    "admin.field.contact": "মোবাইল/ইমেইল",
 
     // Student dashboard
     "student.dashboardTitle": "শিক্ষার্থী ড্যাশবোর্ড",
@@ -181,6 +213,29 @@ export const dictionaries = {
     "login.loading": "Signing in...",
     "login.backHome": "← Back to home",
     "login.error": "Login failed",
+    "login.newHere": "New here? Register",
+    "login.haveAccount": "Already have an account?",
+
+    // Registration page
+    "register.title": "Registration",
+    "register.subtitle": "Create your account as a student / alumnus",
+    "register.name": "Full Name",
+    "register.batch": "Batch (Passing Year)",
+    "register.contact": "Mobile Number / Email",
+    "register.password": "Password",
+    "register.passwordHint": "At least 6 characters, one uppercase letter, one number and one special character",
+    "register.confirmPassword": "Confirm Password",
+    "register.passwordMismatch": "Passwords do not match",
+    "register.captchaRequired": "Please verify the reCAPTCHA to continue",
+    "register.submit": "Registration",
+    "register.submitting": "Registering...",
+    "register.loginPrompt": "Already have an account?",
+    "register.loginLink": "Login",
+    "register.pendingNotice": "Your registration was successful. You can log in once an admin approves your account.",
+
+    // Admin login (hidden route)
+    "adminLogin.link": "Admin Login",
+    "adminLogin.title": "Admin Login",
 
     // Dashboard header (shared)
     "dash.welcome": "Welcome",
@@ -193,6 +248,7 @@ export const dictionaries = {
     "admin.tab.results": "Results",
     "admin.tab.notices": "Notices",
     "admin.tab.attendance": "Attendance",
+    "admin.tab.pending": "Pending Registrations",
     "admin.add": "Add",
     "admin.edit": "Edit",
     "admin.delete": "Delete",
@@ -246,6 +302,14 @@ export const dictionaries = {
     "admin.status.present": "Present",
     "admin.status.absent": "Absent",
     "admin.status.late": "Late",
+
+    "admin.pendingList": "Pending Registrations",
+    "admin.noPending": "No pending registrations",
+    "admin.approve": "Approve",
+    "admin.reject": "Reject",
+    "admin.confirmRejectRegistration": "Reject and delete this registration?",
+    "admin.field.batch": "Batch",
+    "admin.field.contact": "Mobile/Email",
 
     // Student dashboard
     "student.dashboardTitle": "Student Dashboard",

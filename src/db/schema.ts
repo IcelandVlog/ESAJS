@@ -1,4 +1,4 @@
-import { pgTable, serial, text, integer, real, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, integer, real, timestamp, boolean } from "drizzle-orm/pg-core";
 
 // ---------- Admins ----------
 export const admins = pgTable("admins", {
@@ -21,6 +21,8 @@ export const students = pgTable("students", {
   phone: text("phone").default(""),
   address: text("address").default(""),
   password: text("password").notNull(), // hashed, for student login
+  batch: text("batch").default(""), // pass-out year / alumni batch, for self-registered members
+  approved: boolean("approved").notNull().default(true), // self-registered members start as false, pending admin approval
   createdAt: timestamp("created_at").defaultNow(),
 });
 

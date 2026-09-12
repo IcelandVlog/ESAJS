@@ -14,6 +14,8 @@ type Student = {
   motherName: string;
   phone: string;
   address: string;
+  batch: string | null;
+  approved: boolean;
 };
 
 type Result = {
@@ -42,6 +44,7 @@ type Attendance = {
 
 const TABS = [
   { key: "students", labelKey: "admin.tab.students" },
+  { key: "pending", labelKey: "admin.tab.pending" },
   { key: "results", labelKey: "admin.tab.results" },
   { key: "notices", labelKey: "admin.tab.notices" },
   { key: "attendance", labelKey: "admin.tab.attendance" },
@@ -81,25 +84,38 @@ export default function AdminDashboard() {
 
   return (
     <div>
-      <div className="flex gap-1 border-b border-line mb-8">
-        {TABS.map((tabItem) => (
-          <button
-            key={tabItem.key}
-            onClick={() => setTab(tabItem.key)}
-            className={`px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors ${
-              tab === tabItem.key ? "border-pine text-pine-dark" : "border-transparent text-ink/50 hover:text-ink"
-            }`}
-          >
-            {t(tabItem.labelKey as DictKey)}
-          </button>
-        ))}
+      <div className="flex gap-1 border-b border-line mb-8 flex-wrap">
+        {TABS.map((tabItem) => {
+          const pendingCount = students.filter((s) => !s.approved).length;
+          return (
+            <button
+              key={tabItem.key}
+              onClick={() => setTab(tabItem.key)}
+              className={`px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors ${
+                tab === tabItem.key ? "border-pine text-pine-dark" : "border-transparent text-ink/50 hover:text-ink"
+              }`}
+            >
+              {t(tabItem.labelKey as DictKey)}
+              {tabItem.key === "pending" && pendingCount > 0 && (
+                <span className="ml-1.5 inline-flex items-center justify-center bg-clay text-white text-xs rounded-full w-5 h-5">
+                  {pendingCount}
+                </span>
+              )}
+            </button>
+          );
+        })}
       </div>
 
       {loading ? (
         <p className="text-ink/50">{t("admin.loading")}</p>
       ) : (
         <>
-          {tab === "students" && <StudentsTab students={students} onChange={loadAll} />}
+          {tab === "students" && (
+            <StudentsTab students={students.filter((s) => s.approved)} onChange={loadAll} />
+          )}
+          {tab === "pending" && (
+            <PendingTab students={students.filter((s) => !s.approved)} onChange={loadAll} />
+          )}
           {tab === "results" && <ResultsTab results={results} students={students} studentName={studentName} onChange={loadAll} />}
           {tab === "notices" && <NoticesTab notices={notices} onChange={loadAll} />}
           {tab === "attendance" && (
@@ -218,6 +234,83 @@ function StudentsTab({ students, onChange }: { students: Student[]; onChange: ()
               <tr>
                 <td colSpan={5} className="px-4 py-6 text-center text-ink/50">
                   {t("admin.noStudents")}
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- Pending Registrations ---------------- */
+function PendingTab({ students, onChange }: { students: Student[]; onChange: () => void }) {
+  const { t } = useLanguage();
+  const [busyId, setBusyId] = useState<number | null>(null);
+
+  async function approve(id: number) {
+    setBusyId(id);
+    await fetch(`/api/students/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ approved: true }),
+    });
+    setBusyId(null);
+    onChange();
+  }
+
+  async function reject(id: number) {
+    if (!confirm(t("admin.confirmRejectRegistration"))) return;
+    setBusyId(id);
+    await fetch(`/api/students/${id}`, { method: "DELETE" });
+    setBusyId(null);
+    onChange();
+  }
+
+  return (
+    <div>
+      <h2 className="font-display text-xl text-pine-dark mb-4">
+        {t("admin.pendingList")} ({students.length})
+      </h2>
+      <div className="bg-white border border-line rounded-lg overflow-x-auto">
+        <table className="w-full text-sm min-w-[600px]">
+          <thead>
+            <tr className="text-left text-ink/50 border-b border-line">
+              <th className="px-4 py-2.5 font-normal">{t("admin.field.name")}</th>
+              <th className="px-4 py-2.5 font-normal">{t("admin.field.batch")}</th>
+              <th className="px-4 py-2.5 font-normal">{t("admin.field.contact")}</th>
+              <th className="px-4 py-2.5 font-normal"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {students.map((s) => (
+              <tr key={s.id} className="border-b border-line last:border-0">
+                <td className="px-4 py-2.5">{s.name}</td>
+                <td className="px-4 py-2.5">{s.batch || "-"}</td>
+                <td className="px-4 py-2.5">{s.phone || s.roll}</td>
+                <td className="px-4 py-2.5 text-right space-x-3">
+                  <button
+                    disabled={busyId === s.id}
+                    onClick={() => approve(s.id)}
+                    className="text-pine-dark hover:underline text-xs font-medium disabled:opacity-50"
+                  >
+                    {t("admin.approve")}
+                  </button>
+                  <button
+                    disabled={busyId === s.id}
+                    onClick={() => reject(s.id)}
+                    className="text-clay hover:underline text-xs disabled:opacity-50"
+                  >
+                    {t("admin.reject")}
+                  </button>
+                </td>
+              </tr>
+            ))}
+            {students.length === 0 && (
+              <tr>
+                <td colSpan={4} className="px-4 py-6 text-center text-ink/50">
+                  {t("admin.noPending")}
                 </td>
               </tr>
             )}

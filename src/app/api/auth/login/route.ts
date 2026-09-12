@@ -38,6 +38,12 @@ export async function POST(req: NextRequest) {
     if (!student || !(await verifyPassword(password, student.password))) {
       return NextResponse.json({ error: "ভুল রোল বা পাসওয়ার্ড" }, { status: 401 });
     }
+    if (!student.approved) {
+      return NextResponse.json(
+        { error: "আপনার অ্যাকাউন্ট এখনো অ্যাডমিন কর্তৃক অনুমোদিত হয়নি। অনুগ্রহ করে অপেক্ষা করুন।" },
+        { status: 403 }
+      );
+    }
     const token = signSession({ role: "student", id: student.id, name: student.name });
     const res = NextResponse.json({ ok: true, role: "student", name: student.name });
     res.cookies.set(COOKIE_NAME, token, {

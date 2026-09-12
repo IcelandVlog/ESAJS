@@ -51,31 +51,17 @@ function LoginForm() {
       <SiteHeader />
       <main className="flex-1 flex items-center justify-center px-6 py-16 bg-paper">
         <div className="w-full max-w-sm">
-          <h1 className="font-display text-2xl text-pine-dark mb-2 text-center">{t("login.title")}</h1>
-          <p className="text-center text-ink/60 text-sm mb-8">{t("login.subtitle")}</p>
+          <h1 className="font-display text-2xl text-pine-dark mb-2 text-center">
+            {role === "admin" ? t("adminLogin.title") : t("login.title")}
+          </h1>
+          {role !== "admin" && (
+            <p className="text-center text-ink/60 text-sm mb-8">{t("login.subtitle")}</p>
+          )}
 
-          <div className="flex mb-6 border border-line rounded-lg overflow-hidden">
-            <button
-              type="button"
-              onClick={() => setRole("student")}
-              className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
-                role === "student" ? "bg-pine text-paper" : "bg-white text-ink/70"
-              }`}
-            >
-              {t("login.roleStudent")}
-            </button>
-            <button
-              type="button"
-              onClick={() => setRole("admin")}
-              className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
-                role === "admin" ? "bg-pine text-paper" : "bg-white text-ink/70"
-              }`}
-            >
-              {t("login.roleAdmin")}
-            </button>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-4 bg-white border border-line rounded-lg p-6">
+          <form
+            onSubmit={handleSubmit}
+            className={`space-y-4 bg-white border border-line rounded-lg p-6 ${role !== "admin" ? "" : "mt-8"}`}
+          >
             <div>
               <label className="block text-sm text-ink/70 mb-1.5">
                 {role === "student" ? t("login.roll") : t("login.username")}
@@ -114,11 +100,28 @@ function LoginForm() {
             </button>
           </form>
 
-          <p className="text-center mt-6">
-            <Link href="/" className="text-sm text-ink/50 hover:text-pine-dark transition-colors">
+          {role === "student" && (
+            <p className="text-center mt-5 text-sm text-ink/60">
+              <Link href="/register" className="text-pine-dark font-medium hover:underline">
+                {t("login.newHere")}
+              </Link>
+            </p>
+          )}
+
+          <div className="flex items-center justify-between mt-6 text-xs text-ink/40">
+            <Link href="/" className="hover:text-pine-dark transition-colors">
               {t("login.backHome")}
             </Link>
-          </p>
+            {role === "student" ? (
+              <button onClick={() => setRole("admin")} className="hover:text-pine-dark transition-colors">
+                {t("adminLogin.link")}
+              </button>
+            ) : (
+              <button onClick={() => setRole("student")} className="hover:text-pine-dark transition-colors">
+                {t("login.roleStudent")}
+              </button>
+            )}
+          </div>
         </div>
       </main>
       <SiteFooter />
