@@ -208,7 +208,7 @@ function StudentsTab({ students, onChange }: { students: Student[]; onChange: ()
         </h2>
         <button
           onClick={() => (open ? setOpen(false) : startAdd())}
-          className="bg-pine text-paper text-sm px-4 py-2 rounded hover:bg-pine-dark transition-colors"
+          className="bg-pine text-on-navy text-sm px-4 py-2 rounded hover:bg-pine-dark transition-colors"
         >
           {open ? t("admin.cancel") : t("admin.addNewStudent")}
         </button>
@@ -249,7 +249,7 @@ function StudentsTab({ students, onChange }: { students: Student[]; onChange: ()
           />
           {error && <p className="sm:col-span-2 text-clay text-sm">{error}</p>}
           <div className="sm:col-span-2">
-            <button disabled={saving} className="bg-pine text-paper px-5 py-2 rounded text-sm hover:bg-pine-dark disabled:opacity-60">
+            <button disabled={saving} className="bg-pine text-on-navy px-5 py-2 rounded text-sm hover:bg-pine-dark disabled:opacity-60">
               {saving ? t("admin.saving") : t("admin.save")}
             </button>
           </div>
@@ -429,7 +429,7 @@ function ResultsTab({
         </h2>
         <button
           onClick={() => setOpen((o) => !o)}
-          className="bg-pine text-paper text-sm px-4 py-2 rounded hover:bg-pine-dark transition-colors"
+          className="bg-pine text-on-navy text-sm px-4 py-2 rounded hover:bg-pine-dark transition-colors"
         >
           {open ? t("admin.cancel") : t("admin.addNewResult")}
         </button>
@@ -460,7 +460,7 @@ function ResultsTab({
           <Field label={t("admin.field.grade")} value={form.grade} onChange={(v) => setForm({ ...form, grade: v })} placeholder="A+" />
           {error && <p className="sm:col-span-2 text-clay text-sm">{error}</p>}
           <div className="sm:col-span-2">
-            <button disabled={saving} className="bg-pine text-paper px-5 py-2 rounded text-sm hover:bg-pine-dark disabled:opacity-60">
+            <button disabled={saving} className="bg-pine text-on-navy px-5 py-2 rounded text-sm hover:bg-pine-dark disabled:opacity-60">
               {saving ? t("admin.saving") : t("admin.save")}
             </button>
           </div>
@@ -548,7 +548,7 @@ function NoticesTab({ notices, onChange }: { notices: Notice[]; onChange: () => 
         </h2>
         <button
           onClick={() => setOpen((o) => !o)}
-          className="bg-pine text-paper text-sm px-4 py-2 rounded hover:bg-pine-dark transition-colors"
+          className="bg-pine text-on-navy text-sm px-4 py-2 rounded hover:bg-pine-dark transition-colors"
         >
           {open ? t("admin.cancel") : t("admin.addNewNotice")}
         </button>
@@ -569,7 +569,7 @@ function NoticesTab({ notices, onChange }: { notices: Notice[]; onChange: () => 
           </div>
           <Field label={t("admin.field.date")} value={form.date} onChange={(v) => setForm({ ...form, date: v })} type="date" required />
           {error && <p className="text-clay text-sm">{error}</p>}
-          <button disabled={saving} className="bg-pine text-paper px-5 py-2 rounded text-sm hover:bg-pine-dark disabled:opacity-60">
+          <button disabled={saving} className="bg-pine text-on-navy px-5 py-2 rounded text-sm hover:bg-pine-dark disabled:opacity-60">
             {saving ? t("admin.saving") : t("admin.save")}
           </button>
         </form>
@@ -654,7 +654,7 @@ function AttendanceTab({
         </h2>
         <button
           onClick={() => setOpen((o) => !o)}
-          className="bg-pine text-paper text-sm px-4 py-2 rounded hover:bg-pine-dark transition-colors"
+          className="bg-pine text-on-navy text-sm px-4 py-2 rounded hover:bg-pine-dark transition-colors"
         >
           {open ? t("admin.cancel") : t("admin.addNewEntry")}
         </button>
@@ -693,7 +693,7 @@ function AttendanceTab({
           </div>
           {error && <p className="sm:col-span-3 text-clay text-sm">{error}</p>}
           <div className="sm:col-span-3">
-            <button disabled={saving} className="bg-pine text-paper px-5 py-2 rounded text-sm hover:bg-pine-dark disabled:opacity-60">
+            <button disabled={saving} className="bg-pine text-on-navy px-5 py-2 rounded text-sm hover:bg-pine-dark disabled:opacity-60">
               {saving ? t("admin.saving") : t("admin.save")}
             </button>
           </div>

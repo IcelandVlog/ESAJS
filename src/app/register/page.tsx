@@ -146,7 +146,7 @@ export default function RegisterPage() {
               <p className="text-ink/70 text-sm">{t("register.pendingNotice")}</p>
               <Link
                 href="/login"
-                className="inline-block bg-pine text-paper px-5 py-2 rounded text-sm hover:bg-pine-dark transition-colors"
+                className="inline-block bg-pine text-on-navy px-5 py-2 rounded text-sm hover:bg-pine-dark transition-colors"
               >
                 {t("register.loginLink")}
               </Link>

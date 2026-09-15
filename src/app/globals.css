@@ -37,6 +37,12 @@ button:disabled,
   --navy-800: #101f3d;
   --brand-blue: #3b5bfd;
   --brand-pink: #d6249f;
+
+  /* Fixed light text color for content sitting on the navy brand surfaces
+     (header, footer, bg-pine buttons). Those surfaces intentionally stay
+     navy in both themes, so their text must NOT flip with --paper (which
+     turns near-black in dark mode and would go invisible on navy). */
+  --on-navy: #F7F8FA;
 }
 
 /* Dark mode — toggled via a "dark" class on <html>, see ThemeContext.
@@ -88,6 +94,7 @@ textarea {
   --color-clay: var(--clay);
   --color-gold: var(--gold);
   --color-line: var(--line);
+  --color-on-navy: var(--on-navy);
 
   --color-navy-950: var(--navy-950);
   --color-navy-900: var(--navy-900);

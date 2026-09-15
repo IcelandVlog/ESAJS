@@ -21,10 +21,10 @@ export default function DashboardHeader({
   }
 
   return (
-    <header className="bg-pine text-paper border-b-4 border-gold">
+    <header className="bg-pine text-on-navy border-b-4 border-gold">
       <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
         <div>
-          <Link href="/" className="text-xs text-paper/60 hover:text-gold">
+          <Link href="/" className="text-xs text-on-navy/60 hover:text-gold">
             {t("dash.backHome")}
           </Link>
           <h1 className="font-display text-xl mt-0.5">
@@ -32,7 +32,7 @@ export default function DashboardHeader({
           </h1>
         </div>
         <div className="flex items-center gap-4 text-sm">
-          <span className="text-paper/80">{name}</span>
+          <span className="text-on-navy/80">{name}</span>
           <button
             onClick={handleLogout}
             className="border border-paper/40 rounded px-3 py-1.5 hover:bg-gold hover:text-pine-dark hover:border-gold transition-colors"
