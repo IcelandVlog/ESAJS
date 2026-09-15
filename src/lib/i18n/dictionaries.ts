@@ -28,6 +28,7 @@ export const dictionaries = {
     "hero.subtitle": "এক্স-স্টুডেন্টস অ্যাসোসিয়েশন অব জালালপুর সেকেন্ডারি স্কুল-এর অফিসিয়াল ওয়েবসাইট",
     "hero.studentLogin": "স্টুডেন্ট লগইন",
     "hero.viewNotices": "নোটিশ দেখুন",
+    "hero.reunionCard": "REUNION CARD",
 
     // Notices section
     "notices.title": "নোটিশ বোর্ড",
@@ -202,6 +203,7 @@ export const dictionaries = {
     "hero.subtitle": "Official website of the Ex-Students Association of Jalalpur Secondary School",
     "hero.studentLogin": "Student Login",
     "hero.viewNotices": "View Notices",
+    "hero.reunionCard": "REUNION CARD",
 
     // Notices section
     "notices.title": "Notice Board",
