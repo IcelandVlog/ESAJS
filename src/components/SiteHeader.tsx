@@ -5,16 +5,17 @@ import Link from "next/link";
 import Image from "next/image";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import ThemeToggle from "@/components/ThemeToggle";
+import DefaultAvatar from "@/components/DefaultAvatar";
 
 export default function SiteHeader() {
   const { lang, setLang, t } = useLanguage();
-  const [sessionName, setSessionName] = useState<string | null>(null);
+  const [session, setSession] = useState<{ name: string; photoUrl: string | null } | null>(null);
 
   useEffect(() => {
     fetch("/api/me")
       .then((res) => res.json())
-      .then((data) => setSessionName(data.session?.name ?? null))
-      .catch(() => setSessionName(null));
+      .then((data) => setSession(data.session ?? null))
+      .catch(() => setSession(null));
   }, []);
 
   return (
@@ -67,12 +68,26 @@ export default function SiteHeader() {
 
           <ThemeToggle className="text-white" />
 
-          <Link
-            href={sessionName ? "/profile" : "/login"}
-            className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-brand-blue to-brand-pink hover:opacity-90 transition-opacity"
-          >
-            {sessionName ? `${t("nav.profile")} · ${sessionName}` : t("nav.login")}
-          </Link>
+          {session ? (
+            <Link
+              href="/profile"
+              aria-label={t("nav.profile")}
+              className="inline-flex items-center justify-center w-10 h-10 rounded-full overflow-hidden ring-2 ring-white/25 hover:ring-white/60 transition-all shrink-0"
+            >
+              {session.photoUrl ? (
+                <Image src={session.photoUrl} alt={session.name} width={40} height={40} className="w-full h-full object-cover" unoptimized />
+              ) : (
+                <DefaultAvatar className="w-full h-full" />
+              )}
+            </Link>
+          ) : (
+            <Link
+              href="/login"
+              className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-brand-blue to-brand-pink hover:opacity-90 transition-opacity"
+            >
+              {t("nav.login")}
+            </Link>
+          )}
         </div>
       </div>
     </header>

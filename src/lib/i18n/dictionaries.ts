@@ -89,6 +89,11 @@ export const dictionaries = {
     "profile.loggedInAs": "আপনি লগইন করে আছেন",
     "profile.goToAdmin": "অ্যাডমিন প্যানেলে যান",
     "profile.goToStudent": "স্টুডেন্ট পোর্টালে যান",
+    "profile.changePhoto": "ছবি পরিবর্তন করুন",
+    "profile.removePhoto": "ছবি সরিয়ে ফেলুন",
+    "profile.uploading": "আপলোড হচ্ছে...",
+    "profile.invalidImage": "সঠিক একটি ছবি নির্বাচন করুন",
+    "profile.uploadFailed": "ছবি আপলোড করা যায়নি, আবার চেষ্টা করুন",
 
     // Admin dashboard tabs
     "admin.tab.students": "শিক্ষার্থী",
@@ -265,6 +270,11 @@ export const dictionaries = {
     "profile.loggedInAs": "You're logged in as",
     "profile.goToAdmin": "Go to Admin Panel",
     "profile.goToStudent": "Go to Student Portal",
+    "profile.changePhoto": "Change photo",
+    "profile.removePhoto": "Remove photo",
+    "profile.uploading": "Uploading...",
+    "profile.invalidImage": "Please select a valid image",
+    "profile.uploadFailed": "Couldn't upload the photo, please try again",
 
     // Admin dashboard tabs
     "admin.tab.students": "Students",
