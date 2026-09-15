@@ -72,7 +72,7 @@ function LoginForm() {
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
                 className="w-full border border-line rounded px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-pine/40"
-                placeholder={role === "student" ? "101" : "admin"}
+                placeholder={role === "student" ? "101 / 01XXXXXXXXX / name@email.com" : "admin"}
               />
             </div>
             <div>
