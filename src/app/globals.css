@@ -1,5 +1,22 @@
 @import "tailwindcss";
 
+/* Tailwind's preflight resets <button> cursor to "default" — restore the
+   normal pointer cursor on every clickable control across the site. */
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]),
+a,
+select,
+input[type="checkbox"],
+input[type="radio"],
+input[type="submit"],
+input[type="button"] {
+  cursor: pointer;
+}
+button:disabled,
+[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
 :root {
   --paper: #F7F8FA;
   --ink: #10172A;
