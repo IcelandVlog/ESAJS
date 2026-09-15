@@ -82,6 +82,8 @@ git push -u origin main
 2. **Environment Variables** সেকশনে যোগ করুন:
    - `DATABASE_URL` = আপনার Supabase Postgres কানেকশন স্ট্রিং (Transaction pooler, পোর্ট 6543)
    - `JWT_SECRET` = যেকোনো লম্বা র‍্যান্ডম স্ট্রিং (না দিলে একটি ডিফল্ট ভ্যালু ব্যবহৃত হবে, যা প্রোডাকশনের জন্য নিরাপদ নয়)
+   - `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` ও `RECAPTCHA_SECRET_KEY` = আপনার লোকাল `.env` ফাইলে যে reCAPTCHA কী আছে, ঠিক সেগুলোই। এই দুটো `.env` ফাইলে থাকলেও `.env` গিটে পুশ হয় না (gitignore করা), তাই Vercel-এ আলাদাভাবে যোগ না করলে লাইভ সাইটে "reCAPTCHA not configured yet" দেখাবে।
+   - ⚠️ `NEXT_PUBLIC_` দিয়ে শুরু হওয়া ভ্যারিয়েবল বিল্ড-টাইমে কোডের ভেতর বসে যায় (রানটাইমে না) — তাই এই ভ্যারিয়েবল যোগ/পরিবর্তনের পর অবশ্যই Vercel-এ নতুন করে **Redeploy** করতে হবে, নাহলে পুরনো বিল্ডই লাইভ থেকে যাবে।
 3. **Deploy** চাপুন
 
 ব্যস! কিছুক্ষণের মধ্যে ওয়েবসাইট লাইভ হয়ে যাবে, এবং Supabase-এ সংরক্ষিত ডাটা প্রতিটি ভিজিটের সাথে persist থাকবে।

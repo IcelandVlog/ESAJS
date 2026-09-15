@@ -67,6 +67,17 @@ textarea {
   color: var(--ink);
 }
 
+/* Muted/hint text (password rules, "reCAPTCHA not configured yet", timestamps,
+   etc.) uses low-opacity ink (e.g. text-ink/40, text-ink/50) for a subtle look
+   in light mode. Against the dark surfaces that same low opacity is too faint
+   to read comfortably, so bump it up specifically in dark mode. */
+.dark .text-ink\/40 {
+  color: color-mix(in srgb, var(--ink) 65%, transparent);
+}
+.dark .text-ink\/50 {
+  color: color-mix(in srgb, var(--ink) 75%, transparent);
+}
+
 @theme inline {
   --color-paper: var(--paper);
   --color-ink: var(--ink);
