@@ -29,6 +29,7 @@ export const dictionaries = {
     "hero.studentLogin": "স্টুডেন্ট লগইন",
     "hero.viewNotices": "নোটিশ দেখুন",
     "hero.reunionCard": "REUNION CARD",
+    "hero.register": "রেজিস্ট্রেশন করুন",
 
     // Notices section
     "notices.title": "নোটিশ বোর্ড",
@@ -204,6 +205,7 @@ export const dictionaries = {
     "hero.studentLogin": "Student Login",
     "hero.viewNotices": "View Notices",
     "hero.reunionCard": "REUNION CARD",
+    "hero.register": "Register",
 
     // Notices section
     "notices.title": "Notice Board",

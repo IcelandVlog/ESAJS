@@ -42,7 +42,7 @@ export default function HomeView({ notices }: { notices: Notice[] }) {
             <p className="text-white/85 max-w-xl mx-auto leading-relaxed mb-8">{t("hero.subtitle")}</p>
             <div className="flex flex-wrap items-center justify-center gap-4">
               <Link
-                href={loggedIn ? "/profile" : "/login?role=student"}
+                href={loggedIn ? "/profile" : "/register"}
                 className="inline-flex items-center gap-2 rounded-full px-6 py-3 font-bold uppercase tracking-wide text-white bg-gradient-to-r from-brand-blue to-blue-600 hover:opacity-90 transition-opacity shadow-lg shadow-black/30"
               >
                 {loggedIn && (
@@ -52,7 +52,7 @@ export default function HomeView({ notices }: { notices: Notice[] }) {
                     <line x1="6" y1="15" x2="10" y2="15" />
                   </svg>
                 )}
-                {loggedIn ? t("hero.reunionCard") : t("hero.studentLogin")}
+                {loggedIn ? t("hero.reunionCard") : t("hero.register")}
               </Link>
               <a
                 href="#notices"
