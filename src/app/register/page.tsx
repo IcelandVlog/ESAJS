@@ -6,6 +6,7 @@ import Link from "next/link";
 import Script from "next/script";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
+import PasswordInput from "@/components/PasswordInput";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 const PASSWORD_RULE = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{6,}$/;
@@ -194,12 +195,10 @@ export default function RegisterPage() {
 
               <div>
                 <label className="block text-sm text-ink/70 mb-1.5">{t("register.password")}</label>
-                <input
-                  type="password"
+                <PasswordInput
                   required
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full border border-line rounded px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-pine/40"
+                  onChange={setPassword}
                   placeholder="••••••••"
                 />
                 <p className="text-xs text-ink/50 mt-1">{t("register.passwordHint")}</p>
@@ -207,12 +206,10 @@ export default function RegisterPage() {
 
               <div>
                 <label className="block text-sm text-ink/70 mb-1.5">{t("register.confirmPassword")}</label>
-                <input
-                  type="password"
+                <PasswordInput
                   required
                   value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full border border-line rounded px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-pine/40"
+                  onChange={setConfirmPassword}
                   placeholder="••••••••"
                 />
               </div>

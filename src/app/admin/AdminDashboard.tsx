@@ -131,26 +131,54 @@ export default function AdminDashboard() {
 function StudentsTab({ students, onChange }: { students: Student[]; onChange: () => void }) {
   const { t } = useLanguage();
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const currentYear = new Date().getFullYear();
+  const batchYears = Array.from({ length: currentYear - 1960 + 1 }, (_, i) => currentYear - i);
+  const emptyForm = {
     roll: "",
     name: "",
     className: "",
     section: "",
+    batch: "",
     fatherName: "",
     motherName: "",
     phone: "",
     address: "",
     password: "",
-  });
+  };
+  const [form, setForm] = useState(emptyForm);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+
+  function startAdd() {
+    setForm(emptyForm);
+    setEditingId(null);
+    setOpen(true);
+  }
+
+  function startEdit(s: Student) {
+    setForm({
+      roll: s.roll,
+      name: s.name,
+      className: s.className,
+      section: s.section,
+      batch: s.batch || "",
+      fatherName: s.fatherName,
+      motherName: s.motherName,
+      phone: s.phone,
+      address: s.address,
+      password: "",
+    });
+    setEditingId(s.id);
+    setOpen(true);
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setSaving(true);
-    const res = await fetch("/api/students", {
-      method: "POST",
+    const res = await fetch(editingId ? `/api/students/${editingId}` : "/api/students", {
+      method: editingId ? "PUT" : "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
     });
@@ -160,7 +188,8 @@ function StudentsTab({ students, onChange }: { students: Student[]; onChange: ()
       setError(data.error || t("admin.error"));
       return;
     }
-    setForm({ roll: "", name: "", className: "", section: "", fatherName: "", motherName: "", phone: "", address: "", password: "" });
+    setForm(emptyForm);
+    setEditingId(null);
     setOpen(false);
     onChange();
   }
@@ -178,7 +207,7 @@ function StudentsTab({ students, onChange }: { students: Student[]; onChange: ()
           {t("admin.studentList")} ({students.length})
         </h2>
         <button
-          onClick={() => setOpen((o) => !o)}
+          onClick={() => (open ? setOpen(false) : startAdd())}
           className="bg-pine text-paper text-sm px-4 py-2 rounded hover:bg-pine-dark transition-colors"
         >
           {open ? t("admin.cancel") : t("admin.addNewStudent")}
@@ -191,11 +220,33 @@ function StudentsTab({ students, onChange }: { students: Student[]; onChange: ()
           <Field label={t("admin.field.name")} value={form.name} onChange={(v) => setForm({ ...form, name: v })} required />
           <Field label={t("admin.field.class")} value={form.className} onChange={(v) => setForm({ ...form, className: v })} required placeholder="Class 9" />
           <Field label={t("admin.field.section")} value={form.section} onChange={(v) => setForm({ ...form, section: v })} placeholder="A" />
+          <div>
+            <label className="block text-sm text-ink/70 mb-1.5">{t("admin.field.batch")}</label>
+            <select
+              required
+              value={form.batch}
+              onChange={(e) => setForm({ ...form, batch: e.target.value })}
+              className="w-full border border-line rounded px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-pine/40"
+            >
+              <option value="">{t("admin.selectPlaceholder")}</option>
+              {batchYears.map((y) => (
+                <option key={y} value={y}>
+                  {y}
+                </option>
+              ))}
+            </select>
+          </div>
           <Field label={t("admin.field.fatherName")} value={form.fatherName} onChange={(v) => setForm({ ...form, fatherName: v })} />
           <Field label={t("admin.field.motherName")} value={form.motherName} onChange={(v) => setForm({ ...form, motherName: v })} />
           <Field label={t("admin.field.phone")} value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} />
           <Field label={t("admin.field.address")} value={form.address} onChange={(v) => setForm({ ...form, address: v })} />
-          <Field label={t("admin.field.passwordForLogin")} value={form.password} onChange={(v) => setForm({ ...form, password: v })} required type="password" />
+          <Field
+            label={editingId ? t("admin.leaveBlankToKeep") : t("admin.field.passwordForLogin")}
+            value={form.password}
+            onChange={(v) => setForm({ ...form, password: v })}
+            required={!editingId}
+            type="password"
+          />
           {error && <p className="sm:col-span-2 text-clay text-sm">{error}</p>}
           <div className="sm:col-span-2">
             <button disabled={saving} className="bg-pine text-paper px-5 py-2 rounded text-sm hover:bg-pine-dark disabled:opacity-60">
@@ -212,6 +263,7 @@ function StudentsTab({ students, onChange }: { students: Student[]; onChange: ()
               <th className="px-4 py-2.5 font-normal">{t("admin.field.roll")}</th>
               <th className="px-4 py-2.5 font-normal">{t("admin.field.name")}</th>
               <th className="px-4 py-2.5 font-normal">{t("admin.field.class")}</th>
+              <th className="px-4 py-2.5 font-normal">{t("admin.field.batch")}</th>
               <th className="px-4 py-2.5 font-normal">{t("admin.field.phone")}</th>
               <th className="px-4 py-2.5 font-normal"></th>
             </tr>
@@ -222,8 +274,12 @@ function StudentsTab({ students, onChange }: { students: Student[]; onChange: ()
                 <td className="px-4 py-2.5">{s.roll}</td>
                 <td className="px-4 py-2.5">{s.name}</td>
                 <td className="px-4 py-2.5">{s.className} {s.section}</td>
+                <td className="px-4 py-2.5">{s.batch || "-"}</td>
                 <td className="px-4 py-2.5">{s.phone || "-"}</td>
-                <td className="px-4 py-2.5 text-right">
+                <td className="px-4 py-2.5 text-right space-x-3">
+                  <button onClick={() => startEdit(s)} className="text-heading hover:underline text-xs font-medium">
+                    {t("admin.edit")}
+                  </button>
                   <button onClick={() => remove(s.id)} className="text-clay hover:underline text-xs">
                     {t("admin.delete")}
                   </button>

@@ -49,6 +49,22 @@ button:disabled,
   --surface: #111a2e;
   --heading: #EDF1FA;
   --line: #26314a;
+  color-scheme: dark;
+}
+:root:not(.dark) {
+  color-scheme: light;
+}
+
+/* Native <select>/<option> popups, and text inputs, don't inherit the page
+   background automatically — set it explicitly so they match light/dark mode
+   instead of defaulting to the browser's plain white box with (in dark mode)
+   near-invisible light text on top of it. */
+select,
+select option,
+input,
+textarea {
+  background-color: var(--surface);
+  color: var(--ink);
 }
 
 @theme inline {

@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, useMemo, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
+import PasswordInput from "@/components/PasswordInput";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 function LoginForm() {
@@ -13,9 +14,17 @@ function LoginForm() {
   const { t } = useLanguage();
   const [role, setRole] = useState<"admin" | "student">("student");
   const [identifier, setIdentifier] = useState("");
+  const [batch, setBatch] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const currentYear = new Date().getFullYear();
+  const batchYears = useMemo(() => {
+    const years: number[] = [];
+    for (let y = currentYear; y >= 1960; y--) years.push(y);
+    return years;
+  }, [currentYear]);
 
   useEffect(() => {
     if (searchParams.get("role") === "admin") setRole("admin");
@@ -30,7 +39,7 @@ function LoginForm() {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role, identifier, password }),
+        body: JSON.stringify({ role, identifier, password, batch: role === "student" ? batch : undefined }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -75,16 +84,29 @@ function LoginForm() {
                 placeholder={role === "student" ? "01XXXXXXXXX / name@email.com" : "admin"}
               />
             </div>
+
+            {role === "student" && (
+              <div>
+                <label className="block text-sm text-ink/70 mb-1.5">{t("login.batch")}</label>
+                <select
+                  required
+                  value={batch}
+                  onChange={(e) => setBatch(e.target.value)}
+                  className="w-full border border-line rounded px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-pine/40"
+                >
+                  <option value="">{t("admin.selectPlaceholder")}</option>
+                  {batchYears.map((y) => (
+                    <option key={y} value={y}>
+                      {y}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             <div>
               <label className="block text-sm text-ink/70 mb-1.5">{t("login.password")}</label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full border border-line rounded px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-pine/40"
-                placeholder="••••••••"
-              />
+              <PasswordInput value={password} onChange={setPassword} required placeholder="••••••••" />
             </div>
 
             {error && (

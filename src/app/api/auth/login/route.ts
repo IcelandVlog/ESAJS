@@ -6,10 +6,11 @@ import { verifyPassword, signSession, COOKIE_NAME } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  const { role, identifier, password } = body as {
+  const { role, identifier, password, batch } = body as {
     role: "admin" | "student";
-    identifier: string; // username for admin, roll for student
+    identifier: string; // username for admin, roll/mobile/email for student
     password: string;
+    batch?: string;
   };
 
   if (!role || !identifier || !password) {
@@ -34,9 +35,15 @@ export async function POST(req: NextRequest) {
   }
 
   if (role === "student") {
+    if (!batch) {
+      return NextResponse.json({ error: "ব্যাচ নির্বাচন করুন" }, { status: 400 });
+    }
     const [student] = await db.select().from(students).where(eq(students.roll, identifier));
     if (!student || !(await verifyPassword(password, student.password))) {
-      return NextResponse.json({ error: "ভুল রোল বা পাসওয়ার্ড" }, { status: 401 });
+      return NextResponse.json({ error: "ভুল তথ্য বা পাসওয়ার্ড" }, { status: 401 });
+    }
+    if ((student.batch || "") !== batch) {
+      return NextResponse.json({ error: "ভুল ব্যাচ নির্বাচন করা হয়েছে" }, { status: 401 });
     }
     if (!student.approved) {
       return NextResponse.json(
