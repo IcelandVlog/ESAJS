@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function SiteHeader() {
   const { lang, setLang, t } = useLanguage();
@@ -54,6 +55,8 @@ export default function SiteHeader() {
               EN
             </button>
           </div>
+
+          <ThemeToggle className="text-white" />
 
           <Link
             href="/login"

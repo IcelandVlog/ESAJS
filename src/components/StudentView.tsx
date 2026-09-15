@@ -43,7 +43,7 @@ export default function StudentView({
     <>
       <DashboardHeader role="student" name={student.name} />
       <main className="flex-1 max-w-5xl mx-auto w-full px-6 py-10 space-y-10">
-        <section className="bg-white border border-line rounded-lg p-6 grid sm:grid-cols-4 gap-6">
+        <section className="bg-surface border border-line rounded-lg p-6 grid sm:grid-cols-4 gap-6">
           <Info label={t("student.name")} value={student.name} />
           <Info label={t("student.rollLabel")} value={student.roll} />
           <Info label={t("student.classLabel")} value={`${student.className} ${student.section}`} />
@@ -54,7 +54,7 @@ export default function StudentView({
         </section>
 
         <section>
-          <h2 className="font-display text-2xl text-pine-dark mb-4 border-b border-line pb-3">
+          <h2 className="font-display text-2xl text-heading mb-4 border-b border-line pb-3">
             {t("student.myResults")}
           </h2>
           {examGroups.length === 0 ? (
@@ -62,8 +62,8 @@ export default function StudentView({
           ) : (
             <div className="space-y-6">
               {examGroups.map(([exam, rows]) => (
-                <div key={exam} className="bg-white border border-line rounded-lg overflow-hidden">
-                  <div className="bg-pine/5 px-5 py-3 font-medium text-pine-dark">{exam}</div>
+                <div key={exam} className="bg-surface border border-line rounded-lg overflow-hidden">
+                  <div className="bg-pine/5 px-5 py-3 font-medium text-heading">{exam}</div>
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="text-left text-ink/50 border-b border-line">
@@ -91,13 +91,13 @@ export default function StudentView({
         </section>
 
         <section>
-          <h2 className="font-display text-2xl text-pine-dark mb-4 border-b border-line pb-3">
+          <h2 className="font-display text-2xl text-heading mb-4 border-b border-line pb-3">
             {t("student.myAttendance")}
           </h2>
           {myAttendance.length === 0 ? (
             <p className="text-ink/60">{t("student.noAttendanceYet")}</p>
           ) : (
-            <div className="bg-white border border-line rounded-lg overflow-hidden">
+            <div className="bg-surface border border-line rounded-lg overflow-hidden">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="text-left text-ink/50 border-b border-line">
@@ -129,7 +129,7 @@ function Info({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <p className="text-xs text-ink/50 mb-1">{label}</p>
-      <p className="font-medium text-pine-dark">{value}</p>
+      <p className="font-medium text-heading">{value}</p>
     </div>
   );
 }
@@ -137,7 +137,7 @@ function Info({ label, value }: { label: string; value: string }) {
 function StatusBadge({ status }: { status: string }) {
   const { t } = useLanguage();
   const map: Record<string, { key: "admin.status.present" | "admin.status.absent" | "admin.status.late"; cls: string }> = {
-    present: { key: "admin.status.present", cls: "bg-pine/10 text-pine-dark" },
+    present: { key: "admin.status.present", cls: "bg-pine/10 text-heading" },
     absent: { key: "admin.status.absent", cls: "bg-clay/10 text-clay" },
     late: { key: "admin.status.late", cls: "bg-gold/15 text-gold" },
   };

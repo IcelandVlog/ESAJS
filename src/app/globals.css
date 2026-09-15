@@ -20,6 +20,8 @@ button:disabled,
 :root {
   --paper: #F7F8FA;
   --ink: #10172A;
+  --surface: #FFFFFF;
+  --heading: #101f3d;
   /* pine/pine-dark repointed to the ESAJS navy brand so existing
      admin/student dashboard screens inherit the new look for free */
   --pine: #101f3d;
@@ -37,9 +39,23 @@ button:disabled,
   --brand-pink: #d6249f;
 }
 
+/* Dark mode — toggled via a "dark" class on <html>, see ThemeContext.
+   Only page-content tokens (background/text/border/card/heading) flip;
+   the navy header, footer, and brand buttons stay the same in both modes
+   by design, so --pine/--pine-dark/--navy-* are intentionally untouched. */
+.dark {
+  --paper: #0a0f1c;
+  --ink: #E4E8F1;
+  --surface: #111a2e;
+  --heading: #EDF1FA;
+  --line: #26314a;
+}
+
 @theme inline {
   --color-paper: var(--paper);
   --color-ink: var(--ink);
+  --color-surface: var(--surface);
+  --color-heading: var(--heading);
   --color-pine: var(--pine);
   --color-pine-dark: var(--pine-dark);
   --color-clay: var(--clay);
@@ -55,6 +71,7 @@ button:disabled,
 
 body {
   font-family: "Noto Sans Bengali", system-ui, sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .font-display {

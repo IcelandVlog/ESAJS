@@ -136,12 +136,12 @@ export default function RegisterPage() {
       <SiteHeader />
       <main className="flex-1 flex items-center justify-center px-6 py-16 bg-paper">
         <div className="w-full max-w-md">
-          <h1 className="font-display text-2xl text-pine-dark mb-2 text-center">{t("register.title")}</h1>
+          <h1 className="font-display text-2xl text-heading mb-2 text-center">{t("register.title")}</h1>
           <p className="text-center text-ink/60 text-sm mb-8">{t("register.subtitle")}</p>
 
           {done ? (
-            <div className="bg-white border border-line rounded-lg p-6 text-center space-y-4">
-              <p className="text-pine-dark font-medium">{t("register.title")} ✓</p>
+            <div className="bg-surface border border-line rounded-lg p-6 text-center space-y-4">
+              <p className="text-heading font-medium">{t("register.title")} ✓</p>
               <p className="text-ink/70 text-sm">{t("register.pendingNotice")}</p>
               <Link
                 href="/login"
@@ -151,7 +151,7 @@ export default function RegisterPage() {
               </Link>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-4 bg-white border border-line rounded-lg p-6">
+            <form onSubmit={handleSubmit} className="space-y-4 bg-surface border border-line rounded-lg p-6">
               <div>
                 <label className="block text-sm text-ink/70 mb-1.5">{t("register.name")}</label>
                 <input
@@ -239,7 +239,7 @@ export default function RegisterPage() {
 
           <p className="text-center mt-6 text-sm text-ink/60">
             {t("register.loginPrompt")}{" "}
-            <Link href="/login" className="text-pine-dark font-medium hover:underline">
+            <Link href="/login" className="text-heading font-medium hover:underline">
               {t("register.loginLink")}
             </Link>
           </p>

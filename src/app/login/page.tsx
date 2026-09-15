@@ -51,7 +51,7 @@ function LoginForm() {
       <SiteHeader />
       <main className="flex-1 flex items-center justify-center px-6 py-16 bg-paper">
         <div className="w-full max-w-sm">
-          <h1 className="font-display text-2xl text-pine-dark mb-2 text-center">
+          <h1 className="font-display text-2xl text-heading mb-2 text-center">
             {role === "admin" ? t("adminLogin.title") : t("login.title")}
           </h1>
           {role !== "admin" && (
@@ -60,7 +60,7 @@ function LoginForm() {
 
           <form
             onSubmit={handleSubmit}
-            className={`space-y-4 bg-white border border-line rounded-lg p-6 ${role !== "admin" ? "" : "mt-8"}`}
+            className={`space-y-4 bg-surface border border-line rounded-lg p-6 ${role !== "admin" ? "" : "mt-8"}`}
           >
             <div>
               <label className="block text-sm text-ink/70 mb-1.5">
@@ -102,22 +102,22 @@ function LoginForm() {
 
           {role === "student" && (
             <p className="text-center mt-5 text-sm text-ink/60">
-              <Link href="/register" className="text-pine-dark font-medium hover:underline">
+              <Link href="/register" className="text-heading font-medium hover:underline">
                 {t("login.newHere")}
               </Link>
             </p>
           )}
 
           <div className="flex items-center justify-between mt-6 text-xs text-ink/40">
-            <Link href="/" className="hover:text-pine-dark transition-colors">
+            <Link href="/" className="hover:text-heading transition-colors">
               {t("login.backHome")}
             </Link>
             {role === "student" ? (
-              <button onClick={() => setRole("admin")} className="hover:text-pine-dark transition-colors">
+              <button onClick={() => setRole("admin")} className="hover:text-heading transition-colors">
                 {t("adminLogin.link")}
               </button>
             ) : (
-              <button onClick={() => setRole("student")} className="hover:text-pine-dark transition-colors">
+              <button onClick={() => setRole("student")} className="hover:text-heading transition-colors">
                 {t("login.roleStudent")}
               </button>
             )}

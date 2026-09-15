@@ -92,7 +92,7 @@ export default function AdminDashboard() {
               key={tabItem.key}
               onClick={() => setTab(tabItem.key)}
               className={`px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors ${
-                tab === tabItem.key ? "border-pine text-pine-dark" : "border-transparent text-ink/50 hover:text-ink"
+                tab === tabItem.key ? "border-pine text-heading" : "border-transparent text-ink/50 hover:text-ink"
               }`}
             >
               {t(tabItem.labelKey as DictKey)}
@@ -174,7 +174,7 @@ function StudentsTab({ students, onChange }: { students: Student[]; onChange: ()
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
-        <h2 className="font-display text-xl text-pine-dark">
+        <h2 className="font-display text-xl text-heading">
           {t("admin.studentList")} ({students.length})
         </h2>
         <button
@@ -186,7 +186,7 @@ function StudentsTab({ students, onChange }: { students: Student[]; onChange: ()
       </div>
 
       {open && (
-        <form onSubmit={submit} className="bg-white border border-line rounded-lg p-5 mb-6 grid sm:grid-cols-2 gap-4">
+        <form onSubmit={submit} className="bg-surface border border-line rounded-lg p-5 mb-6 grid sm:grid-cols-2 gap-4">
           <Field label={t("admin.field.roll")} value={form.roll} onChange={(v) => setForm({ ...form, roll: v })} required />
           <Field label={t("admin.field.name")} value={form.name} onChange={(v) => setForm({ ...form, name: v })} required />
           <Field label={t("admin.field.class")} value={form.className} onChange={(v) => setForm({ ...form, className: v })} required placeholder="Class 9" />
@@ -205,7 +205,7 @@ function StudentsTab({ students, onChange }: { students: Student[]; onChange: ()
         </form>
       )}
 
-      <div className="bg-white border border-line rounded-lg overflow-x-auto">
+      <div className="bg-surface border border-line rounded-lg overflow-x-auto">
         <table className="w-full text-sm min-w-[600px]">
           <thead>
             <tr className="text-left text-ink/50 border-b border-line">
@@ -270,10 +270,10 @@ function PendingTab({ students, onChange }: { students: Student[]; onChange: () 
 
   return (
     <div>
-      <h2 className="font-display text-xl text-pine-dark mb-4">
+      <h2 className="font-display text-xl text-heading mb-4">
         {t("admin.pendingList")} ({students.length})
       </h2>
-      <div className="bg-white border border-line rounded-lg overflow-x-auto">
+      <div className="bg-surface border border-line rounded-lg overflow-x-auto">
         <table className="w-full text-sm min-w-[600px]">
           <thead>
             <tr className="text-left text-ink/50 border-b border-line">
@@ -293,7 +293,7 @@ function PendingTab({ students, onChange }: { students: Student[]; onChange: () 
                   <button
                     disabled={busyId === s.id}
                     onClick={() => approve(s.id)}
-                    className="text-pine-dark hover:underline text-xs font-medium disabled:opacity-50"
+                    className="text-heading hover:underline text-xs font-medium disabled:opacity-50"
                   >
                     {t("admin.approve")}
                   </button>
@@ -368,7 +368,7 @@ function ResultsTab({
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
-        <h2 className="font-display text-xl text-pine-dark">
+        <h2 className="font-display text-xl text-heading">
           {t("admin.resultList")} ({results.length})
         </h2>
         <button
@@ -380,7 +380,7 @@ function ResultsTab({
       </div>
 
       {open && (
-        <form onSubmit={submit} className="bg-white border border-line rounded-lg p-5 mb-6 grid sm:grid-cols-2 gap-4">
+        <form onSubmit={submit} className="bg-surface border border-line rounded-lg p-5 mb-6 grid sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm text-ink/70 mb-1.5">{t("admin.field.student")}</label>
             <select
@@ -411,7 +411,7 @@ function ResultsTab({
         </form>
       )}
 
-      <div className="bg-white border border-line rounded-lg overflow-x-auto">
+      <div className="bg-surface border border-line rounded-lg overflow-x-auto">
         <table className="w-full text-sm min-w-[600px]">
           <thead>
             <tr className="text-left text-ink/50 border-b border-line">
@@ -487,7 +487,7 @@ function NoticesTab({ notices, onChange }: { notices: Notice[]; onChange: () => 
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
-        <h2 className="font-display text-xl text-pine-dark">
+        <h2 className="font-display text-xl text-heading">
           {t("admin.noticeList")} ({notices.length})
         </h2>
         <button
@@ -499,7 +499,7 @@ function NoticesTab({ notices, onChange }: { notices: Notice[]; onChange: () => 
       </div>
 
       {open && (
-        <form onSubmit={submit} className="bg-white border border-line rounded-lg p-5 mb-6 space-y-4">
+        <form onSubmit={submit} className="bg-surface border border-line rounded-lg p-5 mb-6 space-y-4">
           <Field label={t("admin.field.title")} value={form.title} onChange={(v) => setForm({ ...form, title: v })} required />
           <div>
             <label className="block text-sm text-ink/70 mb-1.5">{t("admin.field.content")}</label>
@@ -521,10 +521,10 @@ function NoticesTab({ notices, onChange }: { notices: Notice[]; onChange: () => 
 
       <div className="space-y-3">
         {notices.map((n) => (
-          <div key={n.id} className="bg-white border border-line rounded-lg p-4 flex justify-between gap-4">
+          <div key={n.id} className="bg-surface border border-line rounded-lg p-4 flex justify-between gap-4">
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-medium text-pine-dark">{n.title}</h3>
+                <h3 className="font-medium text-heading">{n.title}</h3>
                 <span className="text-xs text-ink/40">{n.date}</span>
               </div>
               <p className="text-sm text-ink/60 mt-1">{n.content}</p>
@@ -593,7 +593,7 @@ function AttendanceTab({
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
-        <h2 className="font-display text-xl text-pine-dark">
+        <h2 className="font-display text-xl text-heading">
           {t("admin.attendanceList")} ({attendance.length})
         </h2>
         <button
@@ -605,7 +605,7 @@ function AttendanceTab({
       </div>
 
       {open && (
-        <form onSubmit={submit} className="bg-white border border-line rounded-lg p-5 mb-6 grid sm:grid-cols-3 gap-4">
+        <form onSubmit={submit} className="bg-surface border border-line rounded-lg p-5 mb-6 grid sm:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm text-ink/70 mb-1.5">{t("admin.field.student")}</label>
             <select
@@ -644,7 +644,7 @@ function AttendanceTab({
         </form>
       )}
 
-      <div className="bg-white border border-line rounded-lg overflow-x-auto">
+      <div className="bg-surface border border-line rounded-lg overflow-x-auto">
         <table className="w-full text-sm min-w-[500px]">
           <thead>
             <tr className="text-left text-ink/50 border-b border-line">

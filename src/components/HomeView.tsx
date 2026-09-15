@@ -51,7 +51,7 @@ export default function HomeView({ notices }: { notices: Notice[] }) {
         {/* Notices */}
         <section id="notices" className="max-w-5xl mx-auto px-4 sm:px-6 py-14">
           <div className="flex items-baseline justify-between mb-6 border-b border-line pb-3">
-            <h2 className="font-display text-2xl text-navy-900">{t("notices.title")}</h2>
+            <h2 className="font-display text-2xl text-heading">{t("notices.title")}</h2>
             <span className="text-sm text-ink/50">
               {notices.length} {t("notices.count")}
             </span>
@@ -62,9 +62,9 @@ export default function HomeView({ notices }: { notices: Notice[] }) {
           ) : (
             <ul className="space-y-4">
               {notices.map((n) => (
-                <li key={n.id} className="border border-line rounded-lg p-5 bg-white shadow-sm">
+                <li key={n.id} className="border border-line rounded-lg p-5 bg-surface shadow-sm">
                   <div className="flex items-start justify-between gap-4">
-                    <h3 className="font-medium text-lg text-navy-900">{n.title}</h3>
+                    <h3 className="font-medium text-lg text-heading">{n.title}</h3>
                     <time className="text-xs text-ink/50 whitespace-nowrap mt-1">{n.date}</time>
                   </div>
                   <p className="text-ink/70 mt-2 leading-relaxed whitespace-pre-line">{n.content}</p>
