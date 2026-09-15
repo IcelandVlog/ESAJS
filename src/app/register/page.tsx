@@ -46,6 +46,17 @@ export default function RegisterPage() {
   const widgetIdRef = useRef<number | null>(null);
   const [recaptchaReady, setRecaptchaReady] = useState(false);
 
+  // Once registration succeeds, briefly show the confirmation then send the
+  // person back to the home page automatically.
+  useEffect(() => {
+    if (!done) return;
+    const timeout = setTimeout(() => {
+      router.push("/");
+      router.refresh();
+    }, 2500);
+    return () => clearTimeout(timeout);
+  }, [done, router]);
+
   // In case the script tag is already loaded (e.g. client-side navigation back to this page),
   // Script's onLoad won't fire again — so also try rendering once grecaptcha shows up.
   useEffect(() => {
@@ -144,6 +155,7 @@ export default function RegisterPage() {
             <div className="bg-surface border border-line rounded-lg p-6 text-center space-y-4">
               <p className="text-heading font-medium">{t("register.title")} ✓</p>
               <p className="text-ink/70 text-sm">{t("register.pendingNotice")}</p>
+              <p className="text-ink/40 text-xs">{t("register.redirecting")}</p>
               <Link
                 href="/login"
                 className="inline-block bg-pine text-on-navy px-5 py-2 rounded text-sm hover:bg-pine-dark transition-colors"

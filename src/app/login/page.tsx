@@ -47,7 +47,7 @@ function LoginForm() {
         setLoading(false);
         return;
       }
-      router.push(role === "admin" ? "/admin" : "/student");
+      router.push("/");
       router.refresh();
     } catch {
       setError(t("login.error"));

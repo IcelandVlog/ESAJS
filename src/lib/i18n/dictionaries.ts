@@ -8,6 +8,7 @@ export const dictionaries = {
     "nav.contact": "যোগাযোগ",
     "nav.login": "লগইন",
     "nav.logout": "লগআউট",
+    "nav.profile": "প্রোফাইল",
     "school.shortName": "ESAJS",
     "school.fullName": "জালালপুর মাধ্যমিক বিদ্যালয়",
     "school.assocName": "প্রাক্তন শিক্ষার্থী সংসদ",
@@ -69,6 +70,7 @@ export const dictionaries = {
     "register.loginPrompt": "ইতিমধ্যে অ্যাকাউন্ট আছে?",
     "register.loginLink": "লগইন করুন",
     "register.pendingNotice": "আপনার রেজিস্ট্রেশন সফল হয়েছে। অ্যাডমিন অনুমোদনের পর আপনি লগইন করতে পারবেন।",
+    "register.redirecting": "হোম পেজে নিয়ে যাওয়া হচ্ছে...",
 
     // Admin login (hidden route)
     "adminLogin.link": "অ্যাডমিন লগইন",
@@ -79,6 +81,12 @@ export const dictionaries = {
     "dash.adminPanel": "অ্যাডমিন প্যানেল",
     "dash.studentPortal": "শিক্ষার্থী পোর্টাল",
     "dash.backHome": "← হোমে ফিরুন",
+
+    // Profile page (post-login hub)
+    "profile.title": "প্রোফাইল",
+    "profile.loggedInAs": "আপনি লগইন করে আছেন",
+    "profile.goToAdmin": "অ্যাডমিন প্যানেলে যান",
+    "profile.goToStudent": "স্টুডেন্ট পোর্টালে যান",
 
     // Admin dashboard tabs
     "admin.tab.students": "শিক্ষার্থী",
@@ -174,6 +182,7 @@ export const dictionaries = {
     "nav.contact": "Contact",
     "nav.login": "Login",
     "nav.logout": "Logout",
+    "nav.profile": "Profile",
     "school.shortName": "ESAJS",
     "school.fullName": "Jalalpur Secondary School",
     "school.assocName": "Ex-Students Association",
@@ -235,6 +244,7 @@ export const dictionaries = {
     "register.loginPrompt": "Already have an account?",
     "register.loginLink": "Login",
     "register.pendingNotice": "Your registration was successful. You can log in once an admin approves your account.",
+    "register.redirecting": "Redirecting to home...",
 
     // Admin login (hidden route)
     "adminLogin.link": "Admin Login",
@@ -245,6 +255,12 @@ export const dictionaries = {
     "dash.adminPanel": "Admin Panel",
     "dash.studentPortal": "Student Portal",
     "dash.backHome": "← Back to home",
+
+    // Profile page (post-login hub)
+    "profile.title": "Profile",
+    "profile.loggedInAs": "You're logged in as",
+    "profile.goToAdmin": "Go to Admin Panel",
+    "profile.goToStudent": "Go to Student Portal",
 
     // Admin dashboard tabs
     "admin.tab.students": "Students",

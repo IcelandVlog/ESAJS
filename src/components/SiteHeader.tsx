@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
@@ -7,6 +8,14 @@ import ThemeToggle from "@/components/ThemeToggle";
 
 export default function SiteHeader() {
   const { lang, setLang, t } = useLanguage();
+  const [sessionName, setSessionName] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/me")
+      .then((res) => res.json())
+      .then((data) => setSessionName(data.session?.name ?? null))
+      .catch(() => setSessionName(null));
+  }, []);
 
   return (
     <header className="bg-navy-900 text-white sticky top-0 z-40 shadow-lg shadow-black/20">
@@ -59,10 +68,10 @@ export default function SiteHeader() {
           <ThemeToggle className="text-white" />
 
           <Link
-            href="/login"
+            href={sessionName ? "/profile" : "/login"}
             className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-brand-blue to-brand-pink hover:opacity-90 transition-opacity"
           >
-            {t("nav.login")}
+            {sessionName ? `${t("nav.profile")} · ${sessionName}` : t("nav.login")}
           </Link>
         </div>
       </div>
