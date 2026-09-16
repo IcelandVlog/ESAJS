@@ -61,12 +61,12 @@ export default function Gallery({ photos }: { photos: GalleryPhoto[] }) {
                 return (
                   <>
                     {content.header.text && (
-                      <p style={styledLineCss(content.header)} className="mb-2">
+                      <p style={styledLineCss(content.header)} className="mb-2 whitespace-pre-wrap">
                         {content.header.text}
                       </p>
                     )}
                     {content.lines.map((line, i) => (
-                      <p key={i} style={styledLineCss(line)} className="leading-relaxed">
+                      <p key={i} style={styledLineCss(line)} className="leading-relaxed whitespace-pre-wrap">
                         {line.text}
                       </p>
                     ))}
