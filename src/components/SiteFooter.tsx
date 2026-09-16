@@ -24,7 +24,12 @@ export default function SiteFooter() {
         </div>
         <div className="text-sm space-y-2">
           <p className="text-heading dark:text-white font-medium mb-2">{t("nav.contact")}</p>
-          <a href="mailto:esajs.official@gmail.com" className="flex items-center gap-2 hover:text-heading dark:hover:text-white transition-colors">
+          <a
+            href="https://mail.google.com/mail/?view=cm&fs=1&to=esajs.official@gmail.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 hover:text-heading dark:hover:text-white transition-colors"
+          >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
               <rect x="2" y="4" width="20" height="16" rx="2" />
               <path d="m22 7-10 6L2 7" />
