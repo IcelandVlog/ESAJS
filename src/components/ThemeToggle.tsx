@@ -10,7 +10,7 @@ export default function ThemeToggle({ className = "" }: { className?: string }) 
       type="button"
       onClick={toggleTheme}
       aria-label="Toggle dark mode"
-      className={`inline-flex items-center justify-center w-8 h-8 rounded-full hover:bg-white/10 transition-colors ${className}`}
+      className={`inline-flex items-center justify-center w-8 h-8 rounded-full hover:bg-navy-900/10 dark:hover:bg-white/10 transition-colors ${className}`}
     >
       {theme === "dark" ? (
         // sun icon (click to go light)

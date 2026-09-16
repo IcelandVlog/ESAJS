@@ -10,8 +10,11 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
+  // suppressHydrationWarning: the inline script in <head> adds the "dark" class
+  // to <html> before React hydrates, so its className legitimately differs from
+  // the server-rendered markup.
   return (
-    <html lang="bn" className="h-full antialiased">
+    <html lang="bn" className="h-full antialiased" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

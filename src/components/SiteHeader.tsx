@@ -5,10 +5,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import ThemeToggle from "@/components/ThemeToggle";
+import LangToggle from "@/components/LangToggle";
 import DefaultAvatar from "@/components/DefaultAvatar";
 
 export default function SiteHeader() {
-  const { lang, setLang, t } = useLanguage();
+  const { t } = useLanguage();
   const [session, setSession] = useState<{ name: string; photoUrl: string | null } | null>(null);
 
   useEffect(() => {
@@ -19,7 +20,7 @@ export default function SiteHeader() {
   }, []);
 
   return (
-    <header className="bg-navy-900 text-white sticky top-0 z-40 shadow-lg shadow-black/20">
+    <header className="bg-white dark:bg-navy-900 text-navy-900 dark:text-white sticky top-0 z-40 border-b border-line dark:border-transparent shadow-sm dark:shadow-lg dark:shadow-black/20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
         <Link href="/" className="flex items-center gap-3 shrink-0">
           <Image
@@ -27,52 +28,33 @@ export default function SiteHeader() {
             alt="ESAJS"
             width={140}
             height={40}
-            className="h-9 w-auto object-contain"
+            className="h-9 w-auto object-contain rounded"
             priority
           />
         </Link>
 
-        <nav className="hidden sm:flex items-center gap-6 text-sm font-medium text-white/85">
-          <Link href="/" className="hover:text-white transition-colors">
+        <nav className="hidden sm:flex items-center gap-6 text-sm font-medium text-navy-900/70 dark:text-white/85">
+          <Link href="/" className="hover:text-navy-900 dark:hover:text-white transition-colors">
             {t("nav.home")}
           </Link>
-          <Link href="/#notices" className="hover:text-white transition-colors">
+          <Link href="/#notices" className="hover:text-navy-900 dark:hover:text-white transition-colors">
             {t("nav.notices")}
           </Link>
-          <Link href="/#contact" className="hover:text-white transition-colors">
+          <Link href="/#contact" className="hover:text-navy-900 dark:hover:text-white transition-colors">
             {t("nav.contact")}
           </Link>
         </nav>
 
         <div className="flex items-center gap-3">
-          <div className="flex items-center rounded-full border border-white/25 text-xs font-medium overflow-hidden">
-            <button
-              type="button"
-              onClick={() => setLang("bn")}
-              className={`px-2.5 py-1.5 transition-colors ${
-                lang === "bn" ? "bg-white text-navy-900" : "text-white/70 hover:text-white"
-              }`}
-            >
-              বাং
-            </button>
-            <button
-              type="button"
-              onClick={() => setLang("en")}
-              className={`px-2.5 py-1.5 transition-colors ${
-                lang === "en" ? "bg-white text-navy-900" : "text-white/70 hover:text-white"
-              }`}
-            >
-              EN
-            </button>
-          </div>
+          <LangToggle />
 
-          <ThemeToggle className="text-white" />
+          <ThemeToggle className="text-navy-900 dark:text-white" />
 
           {session ? (
             <Link
               href="/profile"
               aria-label={t("nav.profile")}
-              className="inline-flex items-center justify-center w-10 h-10 rounded-full overflow-hidden ring-2 ring-white/25 hover:ring-white/60 transition-all shrink-0"
+              className="inline-flex items-center justify-center w-10 h-10 rounded-full overflow-hidden ring-2 ring-navy-900/15 dark:ring-white/25 hover:ring-navy-900/40 dark:hover:ring-white/60 transition-all shrink-0"
             >
               {session.photoUrl ? (
                 <Image src={session.photoUrl} alt={session.name} width={40} height={40} className="w-full h-full object-cover" unoptimized />

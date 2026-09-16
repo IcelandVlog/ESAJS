@@ -3,9 +3,10 @@
 import { useState, useEffect, useMemo, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import SiteHeader from "@/components/SiteHeader";
-import SiteFooter from "@/components/SiteFooter";
+import AuthShell from "@/components/AuthShell";
 import PasswordInput from "@/components/PasswordInput";
+import { AuthInput, AuthSelect } from "@/components/AuthField";
+import { IconUser, IconMail, IconCalendar } from "@/components/icons";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 function LoginForm() {
@@ -56,84 +57,19 @@ function LoginForm() {
   }
 
   return (
-    <>
-      <SiteHeader />
-      <main className="flex-1 flex items-center justify-center px-6 py-16 bg-paper">
-        <div className="w-full max-w-sm">
-          <h1 className="font-display text-2xl text-heading mb-2 text-center">
-            {role === "admin" ? t("adminLogin.title") : t("login.title")}
-          </h1>
-          {role !== "admin" && (
-            <p className="text-center text-ink/60 text-sm mb-8">{t("login.subtitle")}</p>
-          )}
-
-          <form
-            onSubmit={handleSubmit}
-            className={`space-y-4 bg-surface border border-line rounded-lg p-6 ${role !== "admin" ? "" : "mt-8"}`}
-          >
-            <div>
-              <label className="block text-sm text-ink/70 mb-1.5">
-                {role === "student" ? t("login.roll") : t("login.username")}
-              </label>
-              <input
-                type="text"
-                required
-                value={identifier}
-                onChange={(e) => setIdentifier(e.target.value)}
-                className="w-full border border-line rounded px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-pine/40"
-                placeholder={role === "student" ? "01XXXXXXXXX / name@email.com" : "admin"}
-              />
-            </div>
-
-            {role === "student" && (
-              <div>
-                <label className="block text-sm text-ink/70 mb-1.5">{t("login.batch")}</label>
-                <select
-                  required
-                  value={batch}
-                  onChange={(e) => setBatch(e.target.value)}
-                  className="w-full border border-line rounded px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-pine/40"
-                >
-                  <option value="">{t("admin.selectPlaceholder")}</option>
-                  {batchYears.map((y) => (
-                    <option key={y} value={y}>
-                      {y}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
-
-            <div>
-              <label className="block text-sm text-ink/70 mb-1.5">{t("login.password")}</label>
-              <PasswordInput value={password} onChange={setPassword} required placeholder="••••••••" />
-            </div>
-
-            {error && (
-              <p className="text-clay text-sm bg-clay/10 border border-clay/20 rounded px-3 py-2">{error}</p>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-pine text-on-navy py-2.5 rounded font-medium hover:bg-pine-dark transition-colors disabled:opacity-60"
-            >
-              {loading ? t("login.loading") : t("login.submit")}
-            </button>
-          </form>
-
+    <AuthShell
+      title={role === "admin" ? t("adminLogin.title") : t("auth.welcomeBack")}
+      subtitle={role === "admin" ? undefined : t("auth.welcomeSub")}
+      footer={
+        <div className="space-y-4 text-center">
           {role === "student" && (
-            <p className="text-center mt-5 text-sm text-ink/60">
+            <p className="text-sm text-ink/60">
               <Link href="/register" className="text-heading font-medium hover:underline">
                 {t("login.newHere")}
               </Link>
             </p>
           )}
-
-          <div className="flex items-center justify-between mt-6 text-xs text-ink/40">
-            <Link href="/" className="hover:text-heading transition-colors">
-              {t("login.backHome")}
-            </Link>
+          <p className="text-xs text-ink/40">
             {role === "student" ? (
               <button onClick={() => setRole("admin")} className="hover:text-heading transition-colors">
                 {t("adminLogin.link")}
@@ -143,11 +79,58 @@ function LoginForm() {
                 {t("login.roleStudent")}
               </button>
             )}
-          </div>
+          </p>
         </div>
-      </main>
-      <SiteFooter />
-    </>
+      }
+    >
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <AuthInput
+          icon={role === "student" ? <IconMail /> : <IconUser />}
+          label={role === "student" ? t("login.roll") : t("login.username")}
+          value={identifier}
+          onChange={setIdentifier}
+          required
+          placeholder={role === "student" ? "01XXXXXXXXX / name@email.com" : "admin"}
+        />
+
+        {role === "student" && (
+          <AuthSelect
+            icon={<IconCalendar />}
+            label={t("login.batch")}
+            value={batch}
+            onChange={setBatch}
+            required
+          >
+            <option value="">{t("login.batch")}</option>
+            {batchYears.map((y) => (
+              <option key={y} value={y}>
+                {y}
+              </option>
+            ))}
+          </AuthSelect>
+        )}
+
+        <PasswordInput
+          value={password}
+          onChange={setPassword}
+          required
+          label={t("login.password")}
+          placeholder={t("login.password")}
+        />
+
+        {error && (
+          <p className="text-clay text-sm bg-clay/10 border border-clay/20 rounded-lg px-3 py-2">{error}</p>
+        )}
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full rounded-xl py-3 font-bold text-white bg-gradient-to-r from-sky-400 to-cyan-400 hover:opacity-90 transition-opacity shadow-lg shadow-cyan-500/25 disabled:opacity-60"
+        >
+          {loading ? t("login.loading") : t("login.submit")}
+        </button>
+      </form>
+    </AuthShell>
   );
 }
 

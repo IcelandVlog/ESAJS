@@ -7,7 +7,10 @@ export default function SiteFooter() {
   const { t } = useLanguage();
 
   return (
-    <footer id="contact" className="bg-navy-950 text-white/70 mt-auto border-t border-white/10">
+    <footer
+      id="contact"
+      className="bg-white dark:bg-navy-950 text-ink/70 dark:text-white/70 mt-auto border-t border-line dark:border-white/10"
+    >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 grid gap-8 sm:grid-cols-3">
         <div>
           <Image
@@ -15,12 +18,12 @@ export default function SiteFooter() {
             alt="ESAJS"
             width={140}
             height={40}
-            className="h-9 w-auto object-contain mb-3"
+            className="h-9 w-auto object-contain mb-3 rounded"
           />
           <p className="text-sm leading-relaxed max-w-xs">{t("hero.subtitle")}</p>
         </div>
         <div className="text-sm">
-          <p className="text-white font-medium mb-2">{t("nav.contact")}</p>
+          <p className="text-heading dark:text-white font-medium mb-2">{t("nav.contact")}</p>
           <p>esajs.official@gmail.com</p>
           <p className="mt-1">{t("footer.location")}</p>
         </div>

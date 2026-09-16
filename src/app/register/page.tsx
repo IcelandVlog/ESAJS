@@ -4,9 +4,10 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Script from "next/script";
-import SiteHeader from "@/components/SiteHeader";
-import SiteFooter from "@/components/SiteFooter";
+import AuthShell from "@/components/AuthShell";
 import PasswordInput from "@/components/PasswordInput";
+import { AuthInput, AuthSelect } from "@/components/AuthField";
+import { IconUser, IconMail, IconCalendar } from "@/components/icons";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 const PASSWORD_RULE = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{6,}$/;
@@ -145,116 +146,106 @@ export default function RegisterPage() {
           }}
         />
       )}
-      <SiteHeader />
-      <main className="flex-1 flex items-center justify-center px-6 py-16 bg-paper">
-        <div className="w-full max-w-md">
-          <h1 className="font-display text-2xl text-heading mb-2 text-center">{t("register.title")}</h1>
-          <p className="text-center text-ink/60 text-sm mb-8">{t("register.subtitle")}</p>
-
-          {done ? (
-            <div className="bg-surface border border-line rounded-lg p-6 text-center space-y-4">
-              <p className="text-heading font-medium">{t("register.title")} ✓</p>
-              <p className="text-ink/70 text-sm">{t("register.pendingNotice")}</p>
-              <p className="text-ink/40 text-xs">{t("register.redirecting")}</p>
-              <Link
-                href="/login"
-                className="inline-block bg-pine text-on-navy px-5 py-2 rounded text-sm hover:bg-pine-dark transition-colors"
-              >
+      <AuthShell
+        wide
+        title={t("register.title")}
+        subtitle={t("register.subtitle")}
+        footer={
+          !done && (
+            <p className="text-center text-sm text-ink/60">
+              {t("register.loginPrompt")}{" "}
+              <Link href="/login" className="text-heading font-medium hover:underline">
                 {t("register.loginLink")}
               </Link>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-4 bg-surface border border-line rounded-lg p-6">
-              <div>
-                <label className="block text-sm text-ink/70 mb-1.5">{t("register.name")}</label>
-                <input
-                  type="text"
-                  required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full border border-line rounded px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-pine/40"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm text-ink/70 mb-1.5">{t("register.batch")}</label>
-                <select
-                  required
-                  value={batch}
-                  onChange={(e) => setBatch(e.target.value)}
-                  className="w-full border border-line rounded px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-pine/40"
-                >
-                  <option value="">{t("admin.selectPlaceholder")}</option>
-                  {batchYears.map((y) => (
-                    <option key={y} value={y}>
-                      {y}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm text-ink/70 mb-1.5">{t("register.contact")}</label>
-                <input
-                  type="text"
-                  required
-                  value={contact}
-                  onChange={(e) => setContact(e.target.value)}
-                  placeholder="01XXXXXXXXX / name@email.com"
-                  className="w-full border border-line rounded px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-pine/40"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm text-ink/70 mb-1.5">{t("register.password")}</label>
-                <PasswordInput
-                  required
-                  value={password}
-                  onChange={setPassword}
-                  placeholder="••••••••"
-                />
-                <p className="text-xs text-ink/50 mt-1">{t("register.passwordHint")}</p>
-              </div>
-
-              <div>
-                <label className="block text-sm text-ink/70 mb-1.5">{t("register.confirmPassword")}</label>
-                <PasswordInput
-                  required
-                  value={confirmPassword}
-                  onChange={setConfirmPassword}
-                  placeholder="••••••••"
-                />
-              </div>
-
-              {RECAPTCHA_SITE_KEY ? (
-                <div ref={recaptchaRef} className={recaptchaReady ? "" : "opacity-50"} />
-              ) : (
-                <p className="text-xs text-ink/40 italic">reCAPTCHA not configured yet.</p>
-              )}
-
-              {error && (
-                <p className="text-clay text-sm bg-clay/10 border border-clay/20 rounded px-3 py-2">{error}</p>
-              )}
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-gradient-to-r from-brand-blue to-brand-pink text-white py-2.5 rounded font-medium hover:opacity-90 transition-opacity disabled:opacity-60"
-              >
-                {loading ? t("register.submitting") : t("register.submit")}
-              </button>
-            </form>
-          )}
-
-          <p className="text-center mt-6 text-sm text-ink/60">
-            {t("register.loginPrompt")}{" "}
-            <Link href="/login" className="text-heading font-medium hover:underline">
+            </p>
+          )
+        }
+      >
+        {done ? (
+          <div className="text-center space-y-4">
+            <p className="text-heading font-medium">{t("register.title")} ✓</p>
+            <p className="text-ink/70 text-sm">{t("register.pendingNotice")}</p>
+            <p className="text-ink/40 text-xs">{t("register.redirecting")}</p>
+            <Link
+              href="/login"
+              className="inline-block rounded-xl px-5 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-sky-400 to-cyan-400 hover:opacity-90 transition-opacity shadow-lg shadow-cyan-500/25"
+            >
               {t("register.loginLink")}
             </Link>
-          </p>
-        </div>
-      </main>
-      <SiteFooter />
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <AuthInput
+              icon={<IconUser />}
+              label={t("register.name")}
+              value={name}
+              onChange={setName}
+              required
+            />
+
+            <AuthSelect
+              icon={<IconCalendar />}
+              label={t("register.batch")}
+              value={batch}
+              onChange={setBatch}
+              required
+            >
+              <option value="">{t("register.batch")}</option>
+              {batchYears.map((y) => (
+                <option key={y} value={y}>
+                  {y}
+                </option>
+              ))}
+            </AuthSelect>
+
+            <AuthInput
+              icon={<IconMail />}
+              label={t("register.contact")}
+              value={contact}
+              onChange={setContact}
+              required
+              placeholder="01XXXXXXXXX / name@email.com"
+            />
+
+            <div>
+              <PasswordInput
+                required
+                value={password}
+                onChange={setPassword}
+                label={t("register.password")}
+                placeholder={t("register.password")}
+              />
+              <p className="text-xs text-ink/50 mt-1.5">{t("register.passwordHint")}</p>
+            </div>
+
+            <PasswordInput
+              required
+              value={confirmPassword}
+              onChange={setConfirmPassword}
+              label={t("register.confirmPassword")}
+              placeholder={t("register.confirmPassword")}
+            />
+
+            {RECAPTCHA_SITE_KEY ? (
+              <div ref={recaptchaRef} className={recaptchaReady ? "" : "opacity-50"} />
+            ) : (
+              <p className="text-xs text-ink/40 italic">reCAPTCHA not configured yet.</p>
+            )}
+
+            {error && (
+              <p className="text-clay text-sm bg-clay/10 border border-clay/20 rounded-lg px-3 py-2">{error}</p>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full rounded-xl py-3 font-bold text-white bg-gradient-to-r from-sky-400 to-cyan-400 hover:opacity-90 transition-opacity shadow-lg shadow-cyan-500/25 disabled:opacity-60"
+            >
+              {loading ? t("register.submitting") : t("register.submit")}
+            </button>
+          </form>
+        )}
+      </AuthShell>
     </>
   );
 }

@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+/* Dark mode is toggled by a "dark" class on <html> (see ThemeContext), not by
+   the OS setting. Tailwind v4 defaults `dark:` to prefers-color-scheme, so
+   point it at the class instead — otherwise every `dark:` utility would
+   ignore the site's own toggle. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* Tailwind's preflight resets <button> cursor to "default" — restore the
    normal pointer cursor on every clickable control across the site. */
 button:not(:disabled),
@@ -38,17 +44,18 @@ button:disabled,
   --brand-blue: #3b5bfd;
   --brand-pink: #d6249f;
 
-  /* Fixed light text color for content sitting on the navy brand surfaces
-     (header, footer, bg-pine buttons). Those surfaces intentionally stay
-     navy in both themes, so their text must NOT flip with --paper (which
-     turns near-black in dark mode and would go invisible on navy). */
+  /* Fixed light text color for content sitting on a permanently-navy surface
+     (bg-pine buttons, the hero overlay). Those keep their dark background in
+     both themes, so their text must NOT flip with --paper (which turns
+     near-black in dark mode and would go invisible on navy). */
   --on-navy: #F7F8FA;
 }
 
 /* Dark mode — toggled via a "dark" class on <html>, see ThemeContext.
-   Only page-content tokens (background/text/border/card/heading) flip;
-   the navy header, footer, and brand buttons stay the same in both modes
-   by design, so --pine/--pine-dark/--navy-* are intentionally untouched. */
+   Only page-content tokens (background/text/border/card/heading) flip here.
+   The raw brand colours (--pine/--pine-dark/--navy-*) stay fixed on purpose:
+   the header and footer switch between white and navy via `dark:` utilities
+   in their own components, and the gradient buttons look the same in both. */
 .dark {
   --paper: #0a0f1c;
   --ink: #E4E8F1;

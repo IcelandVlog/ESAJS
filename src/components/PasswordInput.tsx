@@ -1,38 +1,46 @@
 "use client";
 
 import { useState } from "react";
+import { IconLock } from "@/components/icons";
+import { authFieldClass } from "@/components/AuthField";
 
 export default function PasswordInput({
   value,
   onChange,
   required,
   placeholder,
+  label,
   className = "",
 }: {
   value: string;
   onChange: (v: string) => void;
   required?: boolean;
   placeholder?: string;
+  label?: string;
   className?: string;
 }) {
   const [visible, setVisible] = useState(false);
 
   return (
     <div className="relative">
+      <span className="absolute inset-y-0 left-0 pl-4 flex items-center text-ink/40 pointer-events-none">
+        <IconLock />
+      </span>
       <input
         type={visible ? "text" : "password"}
         required={required}
+        aria-label={label}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className={`w-full border border-line rounded px-3 py-2.5 pr-10 focus:outline-none focus:ring-2 focus:ring-pine/40 ${className}`}
+        className={`${authFieldClass} pr-11 ${className}`}
       />
       <button
         type="button"
         onClick={() => setVisible((v) => !v)}
         tabIndex={-1}
         aria-label={visible ? "Hide password" : "Show password"}
-        className="absolute inset-y-0 right-0 flex items-center px-3 text-ink/40 hover:text-ink/70"
+        className="absolute inset-y-0 right-0 flex items-center px-4 text-ink/40 hover:text-ink/70"
       >
         {visible ? (
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
