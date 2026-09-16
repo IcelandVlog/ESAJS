@@ -245,22 +245,22 @@ function StudentsTab({ students, onChange }: { students: Student[]; onChange: ()
         <table className="w-full text-sm min-w-[600px]">
           <thead>
             <tr className="text-left text-ink/50 border-b border-line">
-              <th className="px-4 py-2.5 font-normal">{t("admin.col.serial")}</th>
-              <th className="px-4 py-2.5 font-normal">{t("admin.field.name")}</th>
-              <th className="px-4 py-2.5 font-normal">{t("admin.field.batch")}</th>
-              <th className="px-4 py-2.5 font-normal">{t("admin.field.contact")}</th>
-              <th className="px-4 py-2.5 font-normal">{t("admin.field.bloodGroup")}</th>
+              <th className="px-4 py-2.5 font-normal border-r border-line">{t("admin.col.serial")}</th>
+              <th className="px-4 py-2.5 font-normal border-r border-line">{t("admin.field.name")}</th>
+              <th className="px-4 py-2.5 font-normal border-r border-line">{t("admin.field.batch")}</th>
+              <th className="px-4 py-2.5 font-normal border-r border-line">{t("admin.field.contact")}</th>
+              <th className="px-4 py-2.5 font-normal border-r border-line">{t("admin.field.bloodGroup")}</th>
               <th className="px-4 py-2.5 font-normal"></th>
             </tr>
           </thead>
           <tbody>
             {students.map((s, i) => (
-              <tr key={s.id} className="border-b border-line last:border-0">
-                <td className="px-4 py-2.5 text-ink/50">{i + 1}</td>
-                <td className="px-4 py-2.5">{s.name}</td>
-                <td className="px-4 py-2.5">{s.batch || "-"}</td>
-                <td className="px-4 py-2.5">{s.phone || "-"}</td>
-                <td className="px-4 py-2.5">{s.bloodGroup || "-"}</td>
+              <tr key={s.id} className="border-b border-line">
+                <td className="px-4 py-2.5 text-ink/50 border-r border-line">{i + 1}</td>
+                <td className="px-4 py-2.5 border-r border-line">{s.name}</td>
+                <td className="px-4 py-2.5 border-r border-line">{s.batch || "-"}</td>
+                <td className="px-4 py-2.5 border-r border-line">{s.phone || "-"}</td>
+                <td className="px-4 py-2.5 border-r border-line">{s.bloodGroup || "-"}</td>
                 <td className="px-4 py-2.5 text-right space-x-3">
                   <button onClick={() => startEdit(s)} className="text-heading hover:underline text-xs font-medium">
                     {t("admin.edit")}
