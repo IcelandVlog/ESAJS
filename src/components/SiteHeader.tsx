@@ -40,6 +40,9 @@ export default function SiteHeader() {
           <Link href="/#notices" className="hover:text-navy-900 dark:hover:text-white transition-colors">
             {t("nav.notices")}
           </Link>
+          <Link href="/#gallery" className="hover:text-navy-900 dark:hover:text-white transition-colors">
+            {t("nav.gallery")}
+          </Link>
           <Link href="/#contact" className="hover:text-navy-900 dark:hover:text-white transition-colors">
             {t("nav.contact")}
           </Link>

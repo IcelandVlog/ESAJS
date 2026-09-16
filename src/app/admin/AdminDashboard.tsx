@@ -3,6 +3,8 @@
 import { useEffect, useState, useCallback } from "react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import type { DictKey } from "@/lib/i18n/dictionaries";
+import type { GalleryPhoto } from "@/lib/gallery";
+import GalleryTab from "./GalleryTab";
 
 type Student = {
   id: number;
@@ -47,6 +49,7 @@ const TABS = [
   { key: "pending", labelKey: "admin.tab.pending" },
   { key: "results", labelKey: "admin.tab.results" },
   { key: "notices", labelKey: "admin.tab.notices" },
+  { key: "gallery", labelKey: "admin.tab.gallery" },
   { key: "attendance", labelKey: "admin.tab.attendance" },
 ] as const;
 
@@ -58,21 +61,24 @@ export default function AdminDashboard() {
   const [students, setStudents] = useState<Student[]>([]);
   const [results, setResults] = useState<Result[]>([]);
   const [notices, setNotices] = useState<Notice[]>([]);
+  const [gallery, setGallery] = useState<GalleryPhoto[]>([]);
   const [attendance, setAttendance] = useState<Attendance[]>([]);
   const [loading, setLoading] = useState(true);
 
   const loadAll = useCallback(async () => {
     setLoading(true);
-    const [sRes, rRes, nRes, aRes] = await Promise.all([
+    const [sRes, rRes, nRes, aRes, gRes] = await Promise.all([
       fetch("/api/students").then((r) => r.json()),
       fetch("/api/results").then((r) => r.json()),
       fetch("/api/notices").then((r) => r.json()),
       fetch("/api/attendance").then((r) => r.json()),
+      fetch("/api/gallery").then((r) => r.json()),
     ]);
     setStudents(sRes.students || []);
     setResults(rRes.results || []);
     setNotices(nRes.notices || []);
     setAttendance(aRes.attendance || []);
+    setGallery(gRes.photos || []);
     setLoading(false);
   }, []);
 
@@ -118,6 +124,7 @@ export default function AdminDashboard() {
           )}
           {tab === "results" && <ResultsTab results={results} students={students} studentName={studentName} onChange={loadAll} />}
           {tab === "notices" && <NoticesTab notices={notices} onChange={loadAll} />}
+          {tab === "gallery" && <GalleryTab photos={gallery} onChange={loadAll} />}
           {tab === "attendance" && (
             <AttendanceTab attendance={attendance} students={students} studentName={studentName} onChange={loadAll} />
           )}

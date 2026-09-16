@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
+import Gallery from "@/components/Gallery";
+import type { GalleryPhoto } from "@/lib/gallery";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 type Notice = {
@@ -13,7 +15,7 @@ type Notice = {
   date: string;
 };
 
-export default function HomeView({ notices }: { notices: Notice[] }) {
+export default function HomeView({ notices, photos }: { notices: Notice[]; photos: GalleryPhoto[] }) {
   const { t } = useLanguage();
   const [loggedIn, setLoggedIn] = useState(false);
 
@@ -63,6 +65,8 @@ export default function HomeView({ notices }: { notices: Notice[] }) {
             </div>
           </div>
         </section>
+
+        <Gallery photos={photos} />
 
         {/* Notices */}
         <section id="notices" className="max-w-5xl mx-auto px-4 sm:px-6 py-14">

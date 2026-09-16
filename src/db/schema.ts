@@ -57,3 +57,14 @@ export const attendance = pgTable("attendance", {
   status: text("status").notNull(), // "present" | "absent" | "late"
   createdAt: timestamp("created_at").defaultNow(),
 });
+
+// ---------- Gallery ----------
+export const galleryPhotos = pgTable("gallery_photos", {
+  id: serial("id").primaryKey(),
+  imageUrl: text("image_url").notNull(), // resized/compressed base64 data URL
+  // JSON string: { header: {text,color,fontSize,style}, lines: [{text,color,fontSize,style}] }
+  // Kept as one JSON blob (rather than separate columns) since it's a flexible,
+  // admin-authored list of independently styled lines of text.
+  content: text("content").notNull().default("{}"),
+  createdAt: timestamp("created_at").defaultNow(),
+});

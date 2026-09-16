@@ -102,6 +102,23 @@ npm run db:push
 
 ---
 
+## গ্যালারি ফিচার — নতুন টেবিল যোগ করুন
+
+হোম পেজে নোটিশ বোর্ডের আগে একটা গ্যালারি সেকশন যোগ হয়েছে (অ্যাডমিন প্যানেল থেকে ছবি ও বিস্তারিত তথ্য আপলোড করা যায়)। এর জন্য নতুন `gallery_photos` টেবিল লাগবে।
+
+`npm run db:push` এই প্রজেক্টে মাঝেমধ্যে একটা পরিচিত `drizzle-kit` বাগের কারণে ক্র্যাশ করে (উপরে প্রোফাইল-ছবি ফিচারেও একই সমস্যা হয়েছিল) — তাই সরাসরি Supabase-এর **SQL Editor**-এ গিয়ে এই SQL কোডটা চালিয়ে নিন:
+
+```sql
+CREATE TABLE IF NOT EXISTS gallery_photos (
+  id serial PRIMARY KEY,
+  image_url text NOT NULL,
+  content text NOT NULL DEFAULT '{}',
+  created_at timestamp DEFAULT now()
+);
+```
+
+---
+
 ## প্রজেক্ট স্ট্রাকচার
 
 ```
