@@ -112,10 +112,7 @@ function StudentsTab({ students, onChange }: { students: Student[]; onChange: ()
   const currentYear = new Date().getFullYear();
   const batchYears = Array.from({ length: currentYear - 1960 + 1 }, (_, i) => currentYear - i);
   const emptyForm = {
-    roll: "",
     name: "",
-    className: "",
-    section: "",
     batch: "",
     fatherName: "",
     motherName: "",
@@ -136,10 +133,7 @@ function StudentsTab({ students, onChange }: { students: Student[]; onChange: ()
 
   function startEdit(s: Student) {
     setForm({
-      roll: s.roll,
       name: s.name,
-      className: s.className,
-      section: s.section,
       batch: s.batch || "",
       fatherName: s.fatherName,
       motherName: s.motherName,
@@ -195,10 +189,7 @@ function StudentsTab({ students, onChange }: { students: Student[]; onChange: ()
 
       {open && (
         <form onSubmit={submit} className="bg-surface border border-line rounded-lg p-5 mb-6 grid sm:grid-cols-2 gap-4">
-          <Field label={t("admin.field.roll")} value={form.roll} onChange={(v) => setForm({ ...form, roll: v })} required />
           <Field label={t("admin.field.name")} value={form.name} onChange={(v) => setForm({ ...form, name: v })} required />
-          <Field label={t("admin.field.class")} value={form.className} onChange={(v) => setForm({ ...form, className: v })} required placeholder="Class 9" />
-          <Field label={t("admin.field.section")} value={form.section} onChange={(v) => setForm({ ...form, section: v })} placeholder="A" />
           <div>
             <label className="block text-sm text-ink/70 mb-1.5">{t("admin.field.batch")}</label>
             <select
@@ -215,10 +206,7 @@ function StudentsTab({ students, onChange }: { students: Student[]; onChange: ()
               ))}
             </select>
           </div>
-          <Field label={t("admin.field.fatherName")} value={form.fatherName} onChange={(v) => setForm({ ...form, fatherName: v })} />
-          <Field label={t("admin.field.motherName")} value={form.motherName} onChange={(v) => setForm({ ...form, motherName: v })} />
-          <Field label={t("admin.field.phone")} value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} />
-          <Field label={t("admin.field.address")} value={form.address} onChange={(v) => setForm({ ...form, address: v })} />
+          <Field label={t("admin.field.contact")} value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} required />
           <div>
             <label className="block text-sm text-ink/70 mb-1.5">{t("admin.field.bloodGroup")}</label>
             <select
@@ -234,6 +222,9 @@ function StudentsTab({ students, onChange }: { students: Student[]; onChange: ()
               ))}
             </select>
           </div>
+          <Field label={t("admin.field.fatherName")} value={form.fatherName} onChange={(v) => setForm({ ...form, fatherName: v })} />
+          <Field label={t("admin.field.motherName")} value={form.motherName} onChange={(v) => setForm({ ...form, motherName: v })} />
+          <Field label={t("admin.field.address")} value={form.address} onChange={(v) => setForm({ ...form, address: v })} />
           <Field
             label={editingId ? t("admin.leaveBlankToKeep") : t("admin.field.passwordForLogin")}
             value={form.password}
@@ -254,22 +245,20 @@ function StudentsTab({ students, onChange }: { students: Student[]; onChange: ()
         <table className="w-full text-sm min-w-[600px]">
           <thead>
             <tr className="text-left text-ink/50 border-b border-line">
-              <th className="px-4 py-2.5 font-normal">{t("admin.field.roll")}</th>
               <th className="px-4 py-2.5 font-normal">{t("admin.field.name")}</th>
-              <th className="px-4 py-2.5 font-normal">{t("admin.field.class")}</th>
               <th className="px-4 py-2.5 font-normal">{t("admin.field.batch")}</th>
-              <th className="px-4 py-2.5 font-normal">{t("admin.field.phone")}</th>
+              <th className="px-4 py-2.5 font-normal">{t("admin.field.contact")}</th>
+              <th className="px-4 py-2.5 font-normal">{t("admin.field.bloodGroup")}</th>
               <th className="px-4 py-2.5 font-normal"></th>
             </tr>
           </thead>
           <tbody>
             {students.map((s) => (
               <tr key={s.id} className="border-b border-line last:border-0">
-                <td className="px-4 py-2.5">{s.roll}</td>
                 <td className="px-4 py-2.5">{s.name}</td>
-                <td className="px-4 py-2.5">{s.className} {s.section}</td>
                 <td className="px-4 py-2.5">{s.batch || "-"}</td>
                 <td className="px-4 py-2.5">{s.phone || "-"}</td>
+                <td className="px-4 py-2.5">{s.bloodGroup || "-"}</td>
                 <td className="px-4 py-2.5 text-right space-x-3">
                   <button onClick={() => startEdit(s)} className="text-heading hover:underline text-xs font-medium">
                     {t("admin.edit")}

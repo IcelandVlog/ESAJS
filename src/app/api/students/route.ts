@@ -21,17 +21,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const body = await req.json();
-  const { roll, name, className, section, batch, fatherName, motherName, phone, address, bloodGroup, password } = body;
-  if (!roll || !name || !className || !password) {
-    return NextResponse.json({ error: "রোল, নাম, ক্লাস ও পাসওয়ার্ড আবশ্যক" }, { status: 400 });
+  const { name, className, section, batch, fatherName, motherName, phone, address, bloodGroup, password } = body;
+  if (!name || !phone || !password) {
+    return NextResponse.json({ error: "নাম, যোগাযোগ ও পাসওয়ার্ড আবশ্যক" }, { status: 400 });
   }
   try {
     const inserted = await db
       .insert(students)
       .values({
-        roll: String(roll),
+        roll: String(phone).trim(),
         name,
-        className,
+        className: className || "",
         section: section || "",
         batch: batch || "",
         fatherName: fatherName || "",
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
   } catch (e: any) {
     // Postgres unique-violation error code
     if (e?.code === "23505") {
-      return NextResponse.json({ error: "এই রোল নাম্বার ইতিমধ্যে ব্যবহৃত হয়েছে" }, { status: 409 });
+      return NextResponse.json({ error: "এই মোবাইল/ইমেইল দিয়ে ইতিমধ্যে একজন সদস্য আছে" }, { status: 409 });
     }
     return NextResponse.json({ error: "সমস্যা হয়েছে" }, { status: 500 });
   }
