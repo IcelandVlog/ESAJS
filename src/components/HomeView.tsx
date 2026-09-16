@@ -33,7 +33,7 @@ export default function HomeView({ notices }: { notices: Notice[] }) {
           className="relative bg-navy-950 text-white bg-cover bg-center"
           style={{ backgroundImage: "url('/images/hero.jpg')" }}
         >
-          <div className="absolute inset-0 bg-navy-950/70" />
+          <div className="absolute inset-0 bg-navy-950/40" />
           <div className="relative max-w-4xl mx-auto px-4 sm:px-6 py-24 sm:py-32 text-center">
             <p className="text-white/70 tracking-widest text-sm mb-4 uppercase">{t("hero.eyebrow")}</p>
             <h1 className="font-hero font-extrabold uppercase tracking-tight text-4xl sm:text-6xl leading-tight mb-5 drop-shadow-lg">
