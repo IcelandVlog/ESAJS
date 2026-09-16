@@ -28,6 +28,27 @@ type Notice = {
   date: string;
 };
 
+// A student's "contact" value is either a phone number or an email
+// (self-registered members type either into one field). Route each to the
+// right app: phone → dialer, email → Gmail compose in a new tab.
+function ContactLink({ value }: { value: string }) {
+  if (!value || value === "-") return <span>{value || "-"}</span>;
+  const isEmail = value.includes("@");
+  const href = isEmail
+    ? `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(value)}`
+    : `tel:${value.replace(/[^\d+]/g, "")}`;
+  return (
+    <a
+      href={href}
+      target={isEmail ? "_blank" : undefined}
+      rel={isEmail ? "noopener noreferrer" : undefined}
+      className="hover:underline hover:text-heading transition-colors"
+    >
+      {value}
+    </a>
+  );
+}
+
 const TABS = [
   { key: "students", labelKey: "admin.tab.students" },
   { key: "pending", labelKey: "admin.tab.pending" },
@@ -259,7 +280,9 @@ function StudentsTab({ students, onChange }: { students: Student[]; onChange: ()
                 <td className="px-4 py-2.5 text-ink/50 border-r border-line">{i + 1}</td>
                 <td className="px-4 py-2.5 border-r border-line">{s.name}</td>
                 <td className="px-4 py-2.5 border-r border-line">{s.batch || "-"}</td>
-                <td className="px-4 py-2.5 border-r border-line">{s.phone || "-"}</td>
+                <td className="px-4 py-2.5 border-r border-line">
+                  <ContactLink value={s.phone} />
+                </td>
                 <td className="px-4 py-2.5 border-r border-line">{s.bloodGroup || "-"}</td>
                 <td className="px-4 py-2.5 text-right space-x-3">
                   <button onClick={() => startEdit(s)} className="text-heading hover:underline text-xs font-medium">
@@ -329,7 +352,9 @@ function PendingTab({ students, onChange }: { students: Student[]; onChange: () 
               <tr key={s.id} className="border-b border-line last:border-0">
                 <td className="px-4 py-2.5">{s.name}</td>
                 <td className="px-4 py-2.5">{s.batch || "-"}</td>
-                <td className="px-4 py-2.5">{s.phone || s.roll}</td>
+                <td className="px-4 py-2.5">
+                  <ContactLink value={s.phone || s.roll} />
+                </td>
                 <td className="px-4 py-2.5 text-right space-x-3">
                   <button
                     disabled={busyId === s.id}
