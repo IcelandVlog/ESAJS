@@ -181,6 +181,7 @@ export const dictionaries = {
     "admin.field.date": "তারিখ",
     "admin.field.status": "অবস্থা",
     "admin.col.exam": "পরীক্ষা",
+    "admin.col.serial": "নং",
 
     "admin.status.present": "উপস্থিত",
     "admin.status.absent": "অনুপস্থিত",
@@ -392,6 +393,7 @@ export const dictionaries = {
     "admin.field.date": "Date",
     "admin.field.status": "Status",
     "admin.col.exam": "Exam",
+    "admin.col.serial": "SL",
 
     "admin.status.present": "Present",
     "admin.status.absent": "Absent",

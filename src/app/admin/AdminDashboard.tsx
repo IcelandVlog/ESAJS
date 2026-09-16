@@ -245,6 +245,7 @@ function StudentsTab({ students, onChange }: { students: Student[]; onChange: ()
         <table className="w-full text-sm min-w-[600px]">
           <thead>
             <tr className="text-left text-ink/50 border-b border-line">
+              <th className="px-4 py-2.5 font-normal">{t("admin.col.serial")}</th>
               <th className="px-4 py-2.5 font-normal">{t("admin.field.name")}</th>
               <th className="px-4 py-2.5 font-normal">{t("admin.field.batch")}</th>
               <th className="px-4 py-2.5 font-normal">{t("admin.field.contact")}</th>
@@ -253,8 +254,9 @@ function StudentsTab({ students, onChange }: { students: Student[]; onChange: ()
             </tr>
           </thead>
           <tbody>
-            {students.map((s) => (
+            {students.map((s, i) => (
               <tr key={s.id} className="border-b border-line last:border-0">
+                <td className="px-4 py-2.5 text-ink/50">{i + 1}</td>
                 <td className="px-4 py-2.5">{s.name}</td>
                 <td className="px-4 py-2.5">{s.batch || "-"}</td>
                 <td className="px-4 py-2.5">{s.phone || "-"}</td>
@@ -271,7 +273,7 @@ function StudentsTab({ students, onChange }: { students: Student[]; onChange: ()
             ))}
             {students.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-ink/50">
+                <td colSpan={6} className="px-4 py-6 text-center text-ink/50">
                   {t("admin.noStudents")}
                 </td>
               </tr>
