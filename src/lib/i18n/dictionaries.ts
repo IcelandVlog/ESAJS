@@ -41,8 +41,6 @@ export const dictionaries = {
     "footer.location": "বাংলাদেশ",
 
     // Login page
-    "auth.welcomeBack": "আবার স্বাগতম",
-    "auth.welcomeSub": "অ্যাকাউন্টে প্রবেশ করতে আপনার তথ্য দিন",
     "login.title": "লগইন করুন",
     "login.subtitle": "আপনার তথ্য দিয়ে লগইন করুন",
     "login.roleAdmin": "অ্যাডমিন",
@@ -224,8 +222,6 @@ export const dictionaries = {
     "footer.location": "Bangladesh",
 
     // Login page
-    "auth.welcomeBack": "Welcome Back",
-    "auth.welcomeSub": "Enter your credentials to access your account.",
     "login.title": "Login",
     "login.subtitle": "Sign in with your details",
     "login.roleAdmin": "Admin",

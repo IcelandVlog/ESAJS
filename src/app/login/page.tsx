@@ -58,8 +58,8 @@ function LoginForm() {
 
   return (
     <AuthShell
-      title={role === "admin" ? t("adminLogin.title") : t("auth.welcomeBack")}
-      subtitle={role === "admin" ? undefined : t("auth.welcomeSub")}
+      title={role === "admin" ? t("adminLogin.title") : t("login.title")}
+      subtitle={role === "admin" ? undefined : t("login.subtitle")}
       footer={
         <div className="space-y-4 text-center">
           {role === "student" && (
@@ -90,7 +90,7 @@ function LoginForm() {
           value={identifier}
           onChange={setIdentifier}
           required
-          placeholder={role === "student" ? "01XXXXXXXXX / name@email.com" : "admin"}
+          placeholder={role === "student" ? t("login.roll") : t("login.username")}
         />
 
         {role === "student" && (

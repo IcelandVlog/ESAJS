@@ -204,7 +204,7 @@ export default function RegisterPage() {
               value={contact}
               onChange={setContact}
               required
-              placeholder="01XXXXXXXXX / name@email.com"
+              placeholder={t("register.contact")}
             />
 
             <div>
