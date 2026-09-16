@@ -64,7 +64,8 @@ export const dictionaries = {
 
     // Footer
     "footer.rights": "সর্বস্বত্ব সংরক্ষিত।",
-    "footer.location": "বাংলাদেশ",
+    "footer.location": "Jalalpur, Kotchandpur, Jhenaidah",
+    "footer.phone": "+880 1753-680383",
 
     // Login page
     "login.title": "লগইন করুন",
@@ -274,7 +275,8 @@ export const dictionaries = {
 
     // Footer
     "footer.rights": "All rights reserved.",
-    "footer.location": "Bangladesh",
+    "footer.location": "Jalalpur, Kotchandpur, Jhenaidah",
+    "footer.phone": "+880 1753-680383",
 
     // Login page
     "login.title": "Login",
