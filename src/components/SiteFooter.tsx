@@ -38,7 +38,7 @@ export default function SiteFooter() {
             +880 1753-680383
           </a>
           <a
-            href="https://www.google.com/maps/search/?api=1&query=Jalalpur%2C+Kotchandpur%2C+Jhenaidah"
+            href="https://www.google.com/maps/place/%E0%A6%9C%E0%A6%BE%E0%A6%B2%E0%A6%BE%E0%A6%B2%E0%A6%AA%E0%A7%81%E0%A6%B0+%E0%A6%B8%E0%A7%87%E0%A6%95%E0%A7%87%E0%A6%A8%E0%A7%8D%E0%A6%A1%E0%A6%BE%E0%A6%B0%E0%A6%BF+%E0%A6%B8%E0%A7%8D%E0%A6%95%E0%A7%81%E0%A6%B2/@23.4744187,89.0456125,18z/data=!4m15!1m8!3m7!1s0x39fede9a871e2ccf:0xea5cd94a980bf7ba!2z4Kac4Ka-4Kay4Ka-4Kay4Kaq4KeB4Kaw!3b1!8m2!3d23.4632694!4d89.044361!16s%2Fg%2F11q25s6yk2!3m5!1s0x39fede9d54a12bd7:0xdafe3bdfbb95b690!8m2!3d23.4743956!4d89.0465917!16s%2Fg%2F11cs3z5r64!5m1!1e4?entry=ttu&g_ep=EgoyMDI2MDkxMy4wIKXMDSoASAFQAw%3D%3D"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 hover:text-heading dark:hover:text-white transition-colors"
