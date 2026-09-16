@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const body = await req.json();
-  const { roll, name, className, section, batch, fatherName, motherName, phone, address, password } = body;
+  const { roll, name, className, section, batch, fatherName, motherName, phone, address, bloodGroup, password } = body;
   if (!roll || !name || !className || !password) {
     return NextResponse.json({ error: "রোল, নাম, ক্লাস ও পাসওয়ার্ড আবশ্যক" }, { status: 400 });
   }
@@ -38,6 +38,7 @@ export async function POST(req: NextRequest) {
         motherName: motherName || "",
         phone: phone || "",
         address: address || "",
+        bloodGroup: bloodGroup || null,
         password: await hashPassword(password),
       })
       .returning();

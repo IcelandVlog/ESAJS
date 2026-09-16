@@ -7,7 +7,7 @@ import Script from "next/script";
 import AuthShell from "@/components/AuthShell";
 import PasswordInput from "@/components/PasswordInput";
 import { AuthInput, AuthSelect } from "@/components/AuthField";
-import { IconUser, IconMail, IconCalendar } from "@/components/icons";
+import { IconUser, IconMail, IconCalendar, IconDroplet } from "@/components/icons";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 const PASSWORD_RULE = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{6,}$/;
@@ -37,6 +37,7 @@ export default function RegisterPage() {
   const [name, setName] = useState("");
   const [batch, setBatch] = useState("");
   const [contact, setContact] = useState("");
+  const [bloodGroup, setBloodGroup] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
@@ -116,7 +117,7 @@ export default function RegisterPage() {
       const res = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, batch, contact, password, recaptchaToken }),
+        body: JSON.stringify({ name, batch, contact, bloodGroup, password, recaptchaToken }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -206,6 +207,20 @@ export default function RegisterPage() {
               required
               placeholder={t("register.contact")}
             />
+
+            <AuthSelect
+              icon={<IconDroplet />}
+              label={t("register.bloodGroup")}
+              value={bloodGroup}
+              onChange={setBloodGroup}
+            >
+              <option value="">{t("register.bloodGroup")}</option>
+              {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((bg) => (
+                <option key={bg} value={bg}>
+                  {bg}
+                </option>
+              ))}
+            </AuthSelect>
 
             <div>
               <PasswordInput

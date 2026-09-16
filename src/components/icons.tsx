@@ -46,3 +46,11 @@ export function IconCalendar({ className }: IconProps) {
     </svg>
   );
 }
+
+export function IconDroplet({ className }: IconProps) {
+  return (
+    <svg {...base} className={className}>
+      <path d="M12 2s7 7.5 7 12a7 7 0 1 1-14 0c0-4.5 7-12 7-12z" />
+    </svg>
+  );
+}

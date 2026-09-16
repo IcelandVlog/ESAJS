@@ -119,6 +119,16 @@ CREATE TABLE IF NOT EXISTS gallery_photos (
 
 ---
 
+## রেজিস্ট্রেশনে ব্লাড গ্রুপ — নতুন কলাম যোগ করুন
+
+রেজিস্ট্রেশন ফর্মে (ও অ্যাডমিন প্যানেলের স্টুডেন্ট ফর্মে) একটা ঐচ্ছিক "ব্লাড গ্রুপ" ফিল্ড যোগ হয়েছে। এর জন্য `students` টেবিলে নতুন `blood_group` কলাম লাগবে — একইভাবে Supabase SQL Editor-এ চালান:
+
+```sql
+ALTER TABLE students ADD COLUMN IF NOT EXISTS blood_group text;
+```
+
+---
+
 ## প্রজেক্ট স্ট্রাকচার
 
 ```

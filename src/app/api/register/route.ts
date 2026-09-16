@@ -7,6 +7,7 @@ import { hashPassword } from "@/lib/auth";
 const PASSWORD_RULE = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{6,}$/;
 // Very loose phone-or-email check — just enough to reject obvious junk.
 const CONTACT_RULE = /^(\+?\d{10,15}|[^\s@]+@[^\s@]+\.[^\s@]+)$/;
+const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
 async function verifyRecaptcha(token: string | undefined): Promise<boolean> {
   const secret = process.env.RECAPTCHA_SECRET_KEY;
@@ -28,16 +29,21 @@ async function verifyRecaptcha(token: string | undefined): Promise<boolean> {
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  const { name, batch, contact, password, recaptchaToken } = body as {
+  const { name, batch, contact, password, bloodGroup, recaptchaToken } = body as {
     name?: string;
     batch?: string;
     contact?: string;
     password?: string;
+    bloodGroup?: string;
     recaptchaToken?: string;
   };
 
   if (!name || !batch || !contact || !password) {
     return NextResponse.json({ error: "সব ফিল্ড পূরণ করুন" }, { status: 400 });
+  }
+
+  if (bloodGroup && !BLOOD_GROUPS.includes(bloodGroup)) {
+    return NextResponse.json({ error: "সঠিক ব্লাড গ্রুপ বাছাই করুন" }, { status: 400 });
   }
 
   if (!CONTACT_RULE.test(contact.trim())) {
@@ -66,6 +72,7 @@ export async function POST(req: NextRequest) {
         section: "",
         batch,
         phone: contact.trim(),
+        bloodGroup: bloodGroup || null,
         password: await hashPassword(password),
         approved: false,
       })

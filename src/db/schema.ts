@@ -23,6 +23,7 @@ export const students = pgTable("students", {
   address: text("address").default(""),
   password: text("password").notNull(), // hashed, for student login
   batch: text("batch").default(""), // pass-out year / alumni batch, for self-registered members
+  bloodGroup: text("blood_group"), // e.g. "A+", "O-"
   approved: boolean("approved").notNull().default(true), // self-registered members start as false, pending admin approval
   photoUrl: text("photo_url"), // small base64 data URL, set via profile page upload
   createdAt: timestamp("created_at").defaultNow(),
