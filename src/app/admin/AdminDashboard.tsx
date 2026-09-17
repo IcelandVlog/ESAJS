@@ -35,7 +35,7 @@ function ContactLink({ value }: { value: string }) {
   if (!value || value === "-") return <span>{value || "-"}</span>;
   const isEmail = value.includes("@");
   const href = isEmail
-    ? `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(value)}`
+    ? `https://mail.google.com/mail/?authuser=esajs.official@gmail.com&view=cm&fs=1&to=${encodeURIComponent(value)}`
     : `tel:${value.replace(/[^\d+]/g, "")}`;
   return (
     <a
