@@ -15,15 +15,90 @@ type Notice = {
   date: string;
 };
 
+type ReunionInfo = {
+  occasion: string;
+  reunionDate: string;
+};
+
+function useCountdown(target: string | null) {
+  const [remaining, setRemaining] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!target) return;
+    const targetMs = new Date(target).getTime();
+    const tick = () => setRemaining(targetMs - Date.now());
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [target]);
+
+  if (remaining === null) return null;
+  const clamped = Math.max(0, remaining);
+  return {
+    started: remaining <= 0,
+    days: Math.floor(clamped / (1000 * 60 * 60 * 24)),
+    hours: Math.floor((clamped / (1000 * 60 * 60)) % 24),
+    minutes: Math.floor((clamped / (1000 * 60)) % 60),
+    seconds: Math.floor((clamped / 1000) % 60),
+  };
+}
+
+function ReunionCountdown({ reunion }: { reunion: ReunionInfo | null }) {
+  const { t, lang } = useLanguage();
+  const countdown = useCountdown(reunion?.reunionDate ?? null);
+
+  if (!reunion || !countdown) return null;
+
+  const dateStr = new Date(reunion.reunionDate).toLocaleString(lang === "bn" ? "bn-BD" : "en-US", {
+    dateStyle: "full",
+    timeStyle: "short",
+  });
+
+  return (
+    <section className="max-w-3xl mx-auto px-4 sm:px-6 -mt-10 relative z-10">
+      <div className="bg-surface border border-line rounded-xl shadow-lg p-6 sm:p-8 text-center">
+        <p className="text-xs uppercase tracking-widest text-ink/50 mb-1">{t("home.reunion.eyebrow")}</p>
+        <h2 className="font-display text-2xl text-heading mb-1">🎉 {reunion.occasion}</h2>
+        <p className="text-sm text-ink/60 mb-5">{dateStr}</p>
+
+        {countdown.started ? (
+          <p className="text-lg font-semibold text-pine">{t("home.reunion.started")}</p>
+        ) : (
+          <div className="flex items-center justify-center gap-3 sm:gap-5">
+            {[
+              [countdown.days, t("home.reunion.days")],
+              [countdown.hours, t("home.reunion.hours")],
+              [countdown.minutes, t("home.reunion.minutes")],
+              [countdown.seconds, t("home.reunion.seconds")],
+            ].map(([value, label], i) => (
+              <div key={i} className="flex flex-col items-center min-w-[56px]">
+                <span className="font-display text-2xl sm:text-3xl text-heading tabular-nums">
+                  {String(value).padStart(2, "0")}
+                </span>
+                <span className="text-xs text-ink/50 mt-1">{label}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
 export default function HomeView({ notices, photos }: { notices: Notice[]; photos: GalleryPhoto[] }) {
   const { t } = useLanguage();
   const [loggedIn, setLoggedIn] = useState(false);
+  const [reunion, setReunion] = useState<ReunionInfo | null>(null);
 
   useEffect(() => {
     fetch("/api/me")
       .then((res) => res.json())
       .then((data) => setLoggedIn(!!data.session))
       .catch(() => setLoggedIn(false));
+    fetch("/api/reunion-info")
+      .then((res) => res.json())
+      .then((data) => setReunion(data.reunion || null))
+      .catch(() => setReunion(null));
   }, []);
 
   return (
@@ -65,6 +140,8 @@ export default function HomeView({ notices, photos }: { notices: Notice[]; photo
             </div>
           </div>
         </section>
+
+        <ReunionCountdown reunion={reunion} />
 
         <Gallery photos={photos} />
 

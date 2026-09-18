@@ -76,6 +76,9 @@ export const galleryPhotos = pgTable("gallery_photos", {
 export const reunionTokens = pgTable("reunion_tokens", {
   id: serial("id").primaryKey(),
   batch: text("batch").notNull(),
+  occasion: text("occasion").notNull().default(""), // header/title shown to recipients and on the homepage countdown
+  messageBody: text("message_body").notNull().default(""), // optional extra text (emoji-friendly), shown below the header
+  reunionDate: timestamp("reunion_date").notNull(), // when the actual reunion event happens; powers the homepage countdown
   token: text("token").notNull(),
   recipientCount: integer("recipient_count").notNull().default(0),
   smsSent: integer("sms_sent").notNull().default(0),

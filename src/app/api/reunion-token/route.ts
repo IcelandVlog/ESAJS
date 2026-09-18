@@ -27,9 +27,23 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { batch } = (await req.json()) as { batch?: string };
+  const { batch, occasion, messageBody, reunionDate } = (await req.json()) as {
+    batch?: string;
+    occasion?: string;
+    messageBody?: string;
+    reunionDate?: string;
+  };
   if (!batch) {
     return NextResponse.json({ error: "ব্যাচ বাছাই করুন" }, { status: 400 });
+  }
+  const occasionText = occasion?.trim();
+  if (!occasionText) {
+    return NextResponse.json({ error: "উপলক্ষ লিখুন" }, { status: 400 });
+  }
+  const messageBodyText = messageBody?.trim() || "";
+  const reunionDateObj = reunionDate ? new Date(reunionDate) : null;
+  if (!reunionDateObj || Number.isNaN(reunionDateObj.getTime())) {
+    return NextResponse.json({ error: "রিইউনিয়নের তারিখ ও সময় দিন" }, { status: 400 });
   }
 
   // One token per batch per calendar day.
@@ -52,7 +66,16 @@ export async function POST(req: NextRequest) {
   }
 
   const token = randomToken();
-  const message = `ESAJS Reunion — your batch (${batch}) entry code: ${token}`;
+  const dateStr = reunionDateObj.toLocaleString("bn-BD", { dateStyle: "full", timeStyle: "short" });
+  const message = [
+    occasionText,
+    messageBodyText,
+    `ব্যাচ: ${batch}`,
+    `তারিখ: ${dateStr}`,
+    `প্রবেশ কোড: ${token}`,
+  ]
+    .filter(Boolean)
+    .join("\n");
 
   let smsSent = 0;
   let emailSent = 0;
@@ -80,6 +103,9 @@ export async function POST(req: NextRequest) {
     .insert(reunionTokens)
     .values({
       batch,
+      occasion: occasionText,
+      messageBody: messageBodyText,
+      reunionDate: reunionDateObj,
       token,
       recipientCount: members.length,
       smsSent,
