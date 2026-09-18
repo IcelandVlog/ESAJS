@@ -5,6 +5,7 @@ import { useLanguage } from "@/lib/i18n/LanguageContext";
 import type { DictKey } from "@/lib/i18n/dictionaries";
 import type { GalleryPhoto } from "@/lib/gallery";
 import GalleryTab from "./GalleryTab";
+import ReunionTab, { type ReunionToken } from "./ReunionTab";
 
 type Student = {
   id: number;
@@ -54,6 +55,7 @@ const TABS = [
   { key: "pending", labelKey: "admin.tab.pending" },
   { key: "notices", labelKey: "admin.tab.notices" },
   { key: "gallery", labelKey: "admin.tab.gallery" },
+  { key: "reunion", labelKey: "admin.tab.reunion" },
 ] as const;
 
 type TabKey = (typeof TABS)[number]["key"];
@@ -64,18 +66,21 @@ export default function AdminDashboard() {
   const [students, setStudents] = useState<Student[]>([]);
   const [notices, setNotices] = useState<Notice[]>([]);
   const [gallery, setGallery] = useState<GalleryPhoto[]>([]);
+  const [reunionTokens, setReunionTokens] = useState<ReunionToken[]>([]);
   const [loading, setLoading] = useState(true);
 
   const loadAll = useCallback(async () => {
     setLoading(true);
-    const [sRes, nRes, gRes] = await Promise.all([
+    const [sRes, nRes, gRes, rtRes] = await Promise.all([
       fetch("/api/students").then((r) => r.json()),
       fetch("/api/notices").then((r) => r.json()),
       fetch("/api/gallery").then((r) => r.json()),
+      fetch("/api/reunion-token").then((r) => r.json()),
     ]);
     setStudents(sRes.students || []);
     setNotices(nRes.notices || []);
     setGallery(gRes.photos || []);
+    setReunionTokens(rtRes.tokens || []);
     setLoading(false);
   }, []);
 
@@ -119,6 +124,7 @@ export default function AdminDashboard() {
           )}
           {tab === "notices" && <NoticesTab notices={notices} onChange={loadAll} />}
           {tab === "gallery" && <GalleryTab photos={gallery} onChange={loadAll} />}
+          {tab === "reunion" && <ReunionTab tokens={reunionTokens} onChange={loadAll} />}
         </>
       )}
     </div>

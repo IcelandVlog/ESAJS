@@ -129,6 +129,57 @@ ALTER TABLE students ADD COLUMN IF NOT EXISTS blood_group text;
 
 ---
 
+## রিইউনিয়ন টোকেন — নতুন টেবিল ও এনভায়রনমেন্ট ভ্যারিয়েবল লাগবে
+
+হোম পেজের "REUNION CARD" বাটন-সংশ্লিষ্ট ফিচার হিসেবে অ্যাডমিন প্যানেলে একটা নতুন "রিইউনিয়ন" ট্যাব যোগ হয়েছে — এখান থেকে প্রতিটা ব্যাচের জন্য দিনে একবার একটা এন্ট্রি কোড (টোকেন) তৈরি করা যায়, যেটা ব্যাচের সব অনুমোদিত সদস্যের কন্টাক্টে (SMS অথবা ইমেইল, যেটা যার কাছে আছে) স্বয়ংক্রিয়ভাবে পাঠিয়ে দেওয়া হয়।
+
+### ১. নতুন টেবিল
+
+Supabase SQL Editor-এ চালান:
+
+```sql
+CREATE TABLE IF NOT EXISTS reunion_tokens (
+  id serial PRIMARY KEY,
+  batch text NOT NULL,
+  token text NOT NULL,
+  recipient_count integer NOT NULL DEFAULT 0,
+  sms_sent integer NOT NULL DEFAULT 0,
+  email_sent integer NOT NULL DEFAULT 0,
+  failed_count integer NOT NULL DEFAULT 0,
+  created_at timestamp DEFAULT now()
+);
+```
+
+### ২. ইমেইল পাঠানোর জন্য (Gmail)
+
+Vercel-এর Environment Variables-এ যোগ করুন:
+- `GMAIL_USER` = `esajs.official@gmail.com`
+- `GMAIL_APP_PASSWORD` = Google-এর "App Password" (এটা সাধারণ Gmail পাসওয়ার্ড না!)
+
+App Password বানানোর ধাপ:
+1. esajs.official@gmail.com দিয়ে গুগল অ্যাকাউন্টে লগইন করুন
+2. আগে **2-Step Verification** চালু করতে হবে (myaccount.google.com/security থেকে), তা না হলে App Password অপশনটাই দেখাবে না
+3. myaccount.google.com/apppasswords-এ গিয়ে একটা নতুন App Password তৈরি করুন (নাম যা খুশি দিন, যেমন "ESAJS Website")
+4. ১৬-অক্ষরের যে কোডটা দেখাবে (স্পেস বাদে), সেটাই `GMAIL_APP_PASSWORD`
+
+### ৩. SMS পাঠানোর জন্য
+
+এই কোড যেকোনো SMS গেটওয়ের সাথে কাজ করার জন্য বানানো — যে গেটওয়ে ব্যবহার করবেন তার ডকুমেন্টেশন থেকে API URL ফরম্যাট নিয়ে বসিয়ে দিতে হবে। Vercel-এ যোগ করুন:
+- `SMS_API_URL` — আপনার গেটওয়ের API URL, এই ৪টা প্লেসহোল্ডার রেখে: `{API_KEY}`, `{NUMBER}`, `{MESSAGE}`, `{SENDER_ID}`
+- `SMS_API_KEY` — আপনার গেটওয়ের API কী
+- `SMS_SENDER_ID` — আপনার গেটওয়ের Sender ID (না থাকলে খালি রাখুন)
+
+উদাহরণ (BulkSMSBD গেটওয়ে ব্যবহার করলে):
+```
+SMS_API_URL=http://bulksmsbd.net/api/smsapi?api_key={API_KEY}&type=text&number={NUMBER}&senderid={SENDER_ID}&message={MESSAGE}
+```
+
+আপনি যদি অন্য কোনো গেটওয়ে ব্যবহার করেন (Alpha SMS, Elit BD, ইত্যাদি), তাদের ডকুমেন্টেশনের URL ফরম্যাট আমাকে দিলে সেটাও ঠিক করে দিতে পারি।
+
+⚠️ **`GMAIL_USER`/`GMAIL_APP_PASSWORD` বা `SMS_API_URL`/`SMS_API_KEY` কনফিগার না করা থাকলে** — টোকেন তৈরি হবে ও হিস্ট্রিতে দেখাবে, কিন্তু কারো কাছে SMS/ইমেইল পাঠানো হবে না (কোনো এরর ছাড়াই চুপচাপ স্কিপ হয়ে যাবে)।
+
+---
+
 ## প্রজেক্ট স্ট্রাকচার
 
 ```

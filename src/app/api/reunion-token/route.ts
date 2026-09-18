@@ -1,0 +1,92 @@
+import { NextRequest, NextResponse } from "next/server";
+import { db } from "@/db/client";
+import { reunionTokens, students } from "@/db/schema";
+import { getSession } from "@/lib/auth";
+import { and, eq, gte } from "drizzle-orm";
+import { sendEmailMessage, sendSmsMessage, isEmailContact } from "@/lib/messaging";
+
+function randomToken(): string {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no ambiguous chars (0/O, 1/I)
+  let out = "";
+  for (let i = 0; i < 6; i++) out += chars[Math.floor(Math.random() * chars.length)];
+  return out;
+}
+
+export async function GET() {
+  const session = await getSession();
+  if (!session || session.role !== "admin") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  const rows = await db.select().from(reunionTokens).orderBy(reunionTokens.id);
+  return NextResponse.json({ tokens: rows.reverse() });
+}
+
+export async function POST(req: NextRequest) {
+  const session = await getSession();
+  if (!session || session.role !== "admin") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { batch } = (await req.json()) as { batch?: string };
+  if (!batch) {
+    return NextResponse.json({ error: "ব্যাচ বাছাই করুন" }, { status: 400 });
+  }
+
+  // One token per batch per calendar day.
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+  const existing = await db
+    .select()
+    .from(reunionTokens)
+    .where(and(eq(reunionTokens.batch, batch), gte(reunionTokens.createdAt, startOfToday)));
+  if (existing.length > 0) {
+    return NextResponse.json(
+      { error: "আজ এই ব্যাচের জন্য ইতিমধ্যে একটি টোকেন তৈরি হয়েছে" },
+      { status: 409 }
+    );
+  }
+
+  const members = await db.select().from(students).where(and(eq(students.batch, batch), eq(students.approved, true)));
+  if (members.length === 0) {
+    return NextResponse.json({ error: "এই ব্যাচে কোনো অনুমোদিত সদস্য নেই" }, { status: 400 });
+  }
+
+  const token = randomToken();
+  const message = `ESAJS Reunion — your batch (${batch}) entry code: ${token}`;
+
+  let smsSent = 0;
+  let emailSent = 0;
+  let failed = 0;
+
+  await Promise.all(
+    members.map(async (m) => {
+      const contact = m.phone?.trim();
+      if (!contact) {
+        failed++;
+        return;
+      }
+      const ok = isEmailContact(contact)
+        ? await sendEmailMessage(contact, "ESAJS Reunion Entry Code", message)
+        : await sendSmsMessage(contact, message);
+      if (ok) {
+        isEmailContact(contact) ? emailSent++ : smsSent++;
+      } else {
+        failed++;
+      }
+    })
+  );
+
+  const [saved] = await db
+    .insert(reunionTokens)
+    .values({
+      batch,
+      token,
+      recipientCount: members.length,
+      smsSent,
+      emailSent,
+      failedCount: failed,
+    })
+    .returning();
+
+  return NextResponse.json({ token: saved }, { status: 201 });
+}

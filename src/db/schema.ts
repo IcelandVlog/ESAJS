@@ -69,3 +69,17 @@ export const galleryPhotos = pgTable("gallery_photos", {
   content: text("content").notNull().default("{}"),
   createdAt: timestamp("created_at").defaultNow(),
 });
+
+// ---------- Reunion tokens ----------
+// One admin-generated code per batch per calendar day, texted/emailed out to
+// every approved member of that batch (see /api/reunion-token).
+export const reunionTokens = pgTable("reunion_tokens", {
+  id: serial("id").primaryKey(),
+  batch: text("batch").notNull(),
+  token: text("token").notNull(),
+  recipientCount: integer("recipient_count").notNull().default(0),
+  smsSent: integer("sms_sent").notNull().default(0),
+  emailSent: integer("email_sent").notNull().default(0),
+  failedCount: integer("failed_count").notNull().default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+});
