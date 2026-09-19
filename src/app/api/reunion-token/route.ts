@@ -48,13 +48,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "রিইউনিয়নের তারিখ ও সময় দিন" }, { status: 400 });
   }
 
-  // One token per batch per calendar day.
+  // One active (non-cancelled) token per batch per calendar day.
   const startOfToday = new Date();
   startOfToday.setHours(0, 0, 0, 0);
   const existing = await db
     .select()
     .from(reunionTokens)
-    .where(and(eq(reunionTokens.batch, batch), gte(reunionTokens.createdAt, startOfToday)));
+    .where(
+      and(eq(reunionTokens.batch, batch), gte(reunionTokens.createdAt, startOfToday), eq(reunionTokens.cancelled, false))
+    );
   if (existing.length > 0) {
     return NextResponse.json(
       { error: "আজ এই ব্যাচের জন্য ইতিমধ্যে একটি টোকেন তৈরি হয়েছে" },

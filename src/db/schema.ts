@@ -80,6 +80,7 @@ export const reunionTokens = pgTable("reunion_tokens", {
   messageBody: text("message_body").notNull().default(""), // optional extra text (emoji-friendly), shown below the header
   venue: text("venue").notNull().default(""), // where the reunion is happening, shown on the reunion card
   reunionDate: timestamp("reunion_date").notNull(), // when the actual reunion event happens; powers the homepage countdown
+  cancelled: boolean("cancelled").notNull().default(false), // admin can cancel; hidden from students/homepage when true
   token: text("token").notNull(),
   recipientCount: integer("recipient_count").notNull().default(0),
   smsSent: integer("sms_sent").notNull().default(0),

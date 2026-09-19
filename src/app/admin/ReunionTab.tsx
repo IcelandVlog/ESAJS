@@ -10,6 +10,7 @@ export type ReunionToken = {
   messageBody: string;
   venue: string;
   reunionDate: string | null;
+  cancelled: boolean;
   token: string;
   recipientCount: number;
   smsSent: number;
@@ -56,6 +57,111 @@ function EmojiPicker({ onSelect }: { onSelect: (emoji: string) => void }) {
   );
 }
 
+// Converts an ISO date string to the value a <input type="datetime-local"> wants,
+// in the browser's local time (so the picker shows what the admin actually set).
+function toDatetimeLocalValue(iso: string | null): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function EditRow({
+  tk,
+  onCancel,
+  onSaved,
+}: {
+  tk: ReunionToken;
+  onCancel: () => void;
+  onSaved: () => void;
+}) {
+  const { t } = useLanguage();
+  const [occasion, setOccasion] = useState(tk.occasion);
+  const [venue, setVenue] = useState(tk.venue);
+  const [reunionDate, setReunionDate] = useState(toDatetimeLocalValue(tk.reunionDate));
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+
+  async function save() {
+    setError("");
+    if (!occasion.trim() || !reunionDate) return;
+    setSaving(true);
+    const res = await fetch(`/api/reunion-token/${tk.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        occasion: occasion.trim(),
+        venue: venue.trim(),
+        reunionDate: new Date(reunionDate).toISOString(),
+      }),
+    });
+    const data = await res.json();
+    setSaving(false);
+    if (!res.ok) {
+      setError(data.error || t("admin.error"));
+      return;
+    }
+    onSaved();
+  }
+
+  return (
+    <tr className="border-b border-line bg-pine/5">
+      <td className="px-4 py-2.5 border-r border-line">{tk.batch}</td>
+      <td className="px-4 py-2.5 border-r border-line" colSpan={2}>
+        <div className="flex flex-col gap-2">
+          <input
+            type="text"
+            value={occasion}
+            onChange={(e) => setOccasion(e.target.value)}
+            className="border border-line rounded px-2 py-1.5 text-sm"
+            placeholder={t("reunion.occasionPlaceholder")}
+          />
+          <input
+            type="datetime-local"
+            value={reunionDate}
+            onChange={(e) => setReunionDate(e.target.value)}
+            className="border border-line rounded px-2 py-1.5 text-sm"
+          />
+        </div>
+      </td>
+      <td className="px-4 py-2.5 border-r border-line">
+        <input
+          type="text"
+          value={venue}
+          onChange={(e) => setVenue(e.target.value)}
+          className="w-full border border-line rounded px-2 py-1.5 text-sm"
+          placeholder={t("reunion.venuePlaceholder")}
+        />
+      </td>
+      <td className="px-4 py-2.5 border-r border-line font-mono">{tk.token}</td>
+      <td className="px-4 py-2.5 border-r border-line">
+        {tk.createdAt ? new Date(tk.createdAt).toLocaleDateString() : "-"}
+      </td>
+      <td className="px-4 py-2.5 border-r border-line">{tk.recipientCount}</td>
+      <td className="px-4 py-2.5 border-r border-line">{tk.smsSent}</td>
+      <td className="px-4 py-2.5 border-r border-line">{tk.emailSent}</td>
+      <td className="px-4 py-2.5">
+        <div className="flex flex-col gap-1.5 items-start">
+          <div className="flex gap-1.5">
+            <button
+              onClick={save}
+              disabled={saving}
+              className="bg-pine text-on-navy px-3 py-1 rounded text-xs hover:bg-pine-dark disabled:opacity-60"
+            >
+              {saving ? t("reunion.saving") : t("reunion.save")}
+            </button>
+            <button onClick={onCancel} className="border border-line px-3 py-1 rounded text-xs hover:bg-line/30">
+              {t("admin.cancel")}
+            </button>
+          </div>
+          {error && <p className="text-clay text-xs">{error}</p>}
+        </div>
+      </td>
+    </tr>
+  );
+}
+
 export default function ReunionTab({ tokens, onChange }: { tokens: ReunionToken[]; onChange: () => void }) {
   const { t } = useLanguage();
   const currentYear = new Date().getFullYear();
@@ -69,6 +175,10 @@ export default function ReunionTab({ tokens, onChange }: { tokens: ReunionToken[
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [busyId, setBusyId] = useState<number | null>(null);
+
+  const rows = tokens;
 
   const occasionRef = useRef<HTMLInputElement>(null);
   const bodyRef = useRef<HTMLTextAreaElement>(null);
@@ -129,6 +239,26 @@ export default function ReunionTab({ tokens, onChange }: { tokens: ReunionToken[
     setVenue("");
     setReunionDate("");
     onChange();
+  }
+
+  function applyLocalUpdate() {
+    setEditingId(null);
+    onChange();
+  }
+
+  async function toggleCancel(tk: ReunionToken) {
+    const nextCancelled = !tk.cancelled;
+    if (nextCancelled && !confirm(t("reunion.confirmCancel"))) return;
+    setBusyId(tk.id);
+    const res = await fetch(`/api/reunion-token/${tk.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ cancelled: nextCancelled }),
+    });
+    setBusyId(null);
+    if (res.ok) {
+      onChange();
+    }
   }
 
   return (
@@ -220,7 +350,7 @@ export default function ReunionTab({ tokens, onChange }: { tokens: ReunionToken[
 
       <h3 className="font-display text-lg text-heading mb-3">{t("reunion.history")}</h3>
       <div className="bg-surface border border-line rounded-lg overflow-x-auto">
-        <table className="w-full text-sm min-w-[920px]">
+        <table className="w-full text-sm min-w-[1080px]">
           <thead>
             <tr className="text-left text-ink/50 border-b border-line">
               <th className="px-4 py-2.5 font-normal border-r border-line">{t("reunion.col.batch")}</th>
@@ -232,31 +362,69 @@ export default function ReunionTab({ tokens, onChange }: { tokens: ReunionToken[
               <th className="px-4 py-2.5 font-normal border-r border-line">{t("reunion.col.recipients")}</th>
               <th className="px-4 py-2.5 font-normal border-r border-line">{t("reunion.col.sms")}</th>
               <th className="px-4 py-2.5 font-normal border-r border-line">{t("reunion.col.email")}</th>
-              <th className="px-4 py-2.5 font-normal">{t("reunion.col.failed")}</th>
+              <th className="px-4 py-2.5 font-normal border-r border-line">{t("reunion.col.status")}</th>
+              <th className="px-4 py-2.5 font-normal">{t("reunion.col.actions")}</th>
             </tr>
           </thead>
           <tbody>
-            {tokens.map((tk) => (
-              <tr key={tk.id} className="border-b border-line">
-                <td className="px-4 py-2.5 border-r border-line">{tk.batch}</td>
-                <td className="px-4 py-2.5 border-r border-line">{tk.occasion || "-"}</td>
-                <td className="px-4 py-2.5 border-r border-line">
-                  {tk.reunionDate ? new Date(tk.reunionDate).toLocaleString() : "-"}
-                </td>
-                <td className="px-4 py-2.5 border-r border-line">{tk.venue || "-"}</td>
-                <td className="px-4 py-2.5 border-r border-line font-mono">{tk.token}</td>
-                <td className="px-4 py-2.5 border-r border-line">
-                  {tk.createdAt ? new Date(tk.createdAt).toLocaleDateString() : "-"}
-                </td>
-                <td className="px-4 py-2.5 border-r border-line">{tk.recipientCount}</td>
-                <td className="px-4 py-2.5 border-r border-line">{tk.smsSent}</td>
-                <td className="px-4 py-2.5 border-r border-line">{tk.emailSent}</td>
-                <td className="px-4 py-2.5 text-clay">{tk.failedCount || "-"}</td>
-              </tr>
-            ))}
-            {tokens.length === 0 && (
+            {rows.map((tk) =>
+              editingId === tk.id ? (
+                <EditRow key={tk.id} tk={tk} onCancel={() => setEditingId(null)} onSaved={applyLocalUpdate} />
+              ) : (
+                <tr key={tk.id} className={`border-b border-line ${tk.cancelled ? "opacity-50" : ""}`}>
+                  <td className="px-4 py-2.5 border-r border-line">{tk.batch}</td>
+                  <td className="px-4 py-2.5 border-r border-line">{tk.occasion || "-"}</td>
+                  <td className="px-4 py-2.5 border-r border-line">
+                    {tk.reunionDate ? new Date(tk.reunionDate).toLocaleString() : "-"}
+                  </td>
+                  <td className="px-4 py-2.5 border-r border-line">{tk.venue || "-"}</td>
+                  <td className="px-4 py-2.5 border-r border-line font-mono">{tk.token}</td>
+                  <td className="px-4 py-2.5 border-r border-line">
+                    {tk.createdAt ? new Date(tk.createdAt).toLocaleDateString() : "-"}
+                  </td>
+                  <td className="px-4 py-2.5 border-r border-line">{tk.recipientCount}</td>
+                  <td className="px-4 py-2.5 border-r border-line">{tk.smsSent}</td>
+                  <td className="px-4 py-2.5 border-r border-line">{tk.emailSent}</td>
+                  <td className="px-4 py-2.5 border-r border-line">
+                    {tk.cancelled ? (
+                      <span className="px-2 py-0.5 rounded text-xs font-medium bg-clay/10 text-clay">
+                        {t("reunion.status.cancelled")}
+                      </span>
+                    ) : (
+                      <span className="px-2 py-0.5 rounded text-xs font-medium bg-pine/10 text-heading">
+                        {t("reunion.status.active")}
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-4 py-2.5">
+                    <div className="flex gap-1.5 flex-wrap">
+                      {!tk.cancelled && (
+                        <button
+                          onClick={() => setEditingId(tk.id)}
+                          className="border border-line px-2.5 py-1 rounded text-xs hover:bg-line/30"
+                        >
+                          {t("reunion.edit")}
+                        </button>
+                      )}
+                      <button
+                        onClick={() => toggleCancel(tk)}
+                        disabled={busyId === tk.id}
+                        className={`px-2.5 py-1 rounded text-xs border disabled:opacity-60 ${
+                          tk.cancelled
+                            ? "border-pine/30 text-heading hover:bg-pine/10"
+                            : "border-clay/30 text-clay hover:bg-clay/10"
+                        }`}
+                      >
+                        {tk.cancelled ? t("reunion.reactivate") : t("reunion.cancelToken")}
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              )
+            )}
+            {rows.length === 0 && (
               <tr>
-                <td colSpan={10} className="px-4 py-6 text-center text-ink/50">
+                <td colSpan={11} className="px-4 py-6 text-center text-ink/50">
                   {t("reunion.empty")}
                 </td>
               </tr>

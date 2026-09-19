@@ -99,12 +99,17 @@ export default function HomeView({ notices, photos }: { notices: Notice[]; photo
       .then((data) => {
         setLoggedIn(!!data.session);
         setRole(data.session?.role ?? null);
+        // Batch-scoped on purpose: this calls the same endpoint as /reunion, which
+        // only ever returns the logged-in student's own batch's reunion. Other
+        // batches' reunions (or anything shown while logged out) never reach here.
+        if (data.session?.role === "student") {
+          fetch("/api/reunion-register")
+            .then((r) => r.json())
+            .then((d) => setReunion(d.reunion || null))
+            .catch(() => setReunion(null));
+        }
       })
       .catch(() => setLoggedIn(false));
-    fetch("/api/reunion-info")
-      .then((res) => res.json())
-      .then((data) => setReunion(data.reunion || null))
-      .catch(() => setReunion(null));
   }, []);
 
   return (

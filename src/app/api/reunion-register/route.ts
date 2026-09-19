@@ -13,7 +13,7 @@ async function latestTokenForBatch(batch: string) {
   const [row] = await db
     .select()
     .from(reunionTokens)
-    .where(eq(reunionTokens.batch, batch))
+    .where(and(eq(reunionTokens.batch, batch), eq(reunionTokens.cancelled, false)))
     .orderBy(desc(reunionTokens.id))
     .limit(1);
   return row ?? null;
@@ -76,6 +76,9 @@ export async function POST(req: NextRequest) {
   // Same-batch rule: a code only registers members of the batch it was sent to.
   if (!student.batch || tokenRow.batch !== student.batch) {
     return NextResponse.json({ error: "এই কোডটি আপনার ব্যাচের জন্য নয়" }, { status: 403 });
+  }
+  if (tokenRow.cancelled) {
+    return NextResponse.json({ error: "এই রিইউনিয়নটি বাতিল করা হয়েছে" }, { status: 410 });
   }
 
   const [existing] = await db
