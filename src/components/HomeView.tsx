@@ -64,7 +64,9 @@ function ReunionCountdown({ reunion }: { reunion: ReunionInfo | null }) {
         {reunion.venue && <p className="text-sm text-ink/60 -mt-4 mb-5">📍 {reunion.venue}</p>}
 
         {countdown.started ? (
-          <p className="text-lg font-semibold text-pine">{t("home.reunion.started")}</p>
+          <p className="text-lg font-bold bg-gradient-to-r from-purple-600 to-brand-pink bg-clip-text text-transparent">
+            {t("home.reunion.started")}
+          </p>
         ) : (
           <div className="flex items-center justify-center gap-3 sm:gap-5">
             {[
