@@ -8,7 +8,7 @@ import { asc, gte } from "drizzle-orm";
 export async function GET() {
   const now = new Date();
   const rows = await db
-    .select({ occasion: reunionTokens.occasion, reunionDate: reunionTokens.reunionDate })
+    .select({ occasion: reunionTokens.occasion, venue: reunionTokens.venue, reunionDate: reunionTokens.reunionDate })
     .from(reunionTokens)
     .where(gte(reunionTokens.reunionDate, now))
     .orderBy(asc(reunionTokens.reunionDate))

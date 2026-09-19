@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import DashboardHeader from "@/components/DashboardHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
@@ -52,6 +53,13 @@ export default function StudentView({
             value={attendanceRate !== null ? `${attendanceRate}%` : t("student.noData")}
           />
         </section>
+
+        <Link
+          href="/reunion"
+          className="block bg-gradient-to-r from-brand-blue to-brand-pink text-white rounded-lg p-5 text-center font-medium hover:opacity-90 transition-opacity"
+        >
+          🎉 {t("hero.reunionCard")}
+        </Link>
 
         <section>
           <h2 className="font-display text-2xl text-heading mb-4 border-b border-line pb-3">

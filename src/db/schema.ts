@@ -78,11 +78,22 @@ export const reunionTokens = pgTable("reunion_tokens", {
   batch: text("batch").notNull(),
   occasion: text("occasion").notNull().default(""), // header/title shown to recipients and on the homepage countdown
   messageBody: text("message_body").notNull().default(""), // optional extra text (emoji-friendly), shown below the header
+  venue: text("venue").notNull().default(""), // where the reunion is happening, shown on the reunion card
   reunionDate: timestamp("reunion_date").notNull(), // when the actual reunion event happens; powers the homepage countdown
   token: text("token").notNull(),
   recipientCount: integer("recipient_count").notNull().default(0),
   smsSent: integer("sms_sent").notNull().default(0),
   emailSent: integer("email_sent").notNull().default(0),
   failedCount: integer("failed_count").notNull().default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// ---------- Reunion registrations ----------
+// Recorded when a student enters their batch's entry code on /reunion to
+// confirm they're attending (see /api/reunion-register).
+export const reunionRegistrations = pgTable("reunion_registrations", {
+  id: serial("id").primaryKey(),
+  studentId: integer("student_id").notNull().references(() => students.id, { onDelete: "cascade" }),
+  reunionTokenId: integer("reunion_token_id").notNull().references(() => reunionTokens.id, { onDelete: "cascade" }),
   createdAt: timestamp("created_at").defaultNow(),
 });

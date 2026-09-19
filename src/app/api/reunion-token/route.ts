@@ -27,10 +27,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { batch, occasion, messageBody, reunionDate } = (await req.json()) as {
+  const { batch, occasion, messageBody, venue, reunionDate } = (await req.json()) as {
     batch?: string;
     occasion?: string;
     messageBody?: string;
+    venue?: string;
     reunionDate?: string;
   };
   if (!batch) {
@@ -41,6 +42,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "উপলক্ষ লিখুন" }, { status: 400 });
   }
   const messageBodyText = messageBody?.trim() || "";
+  const venueText = venue?.trim() || "";
   const reunionDateObj = reunionDate ? new Date(reunionDate) : null;
   if (!reunionDateObj || Number.isNaN(reunionDateObj.getTime())) {
     return NextResponse.json({ error: "রিইউনিয়নের তারিখ ও সময় দিন" }, { status: 400 });
@@ -72,6 +74,7 @@ export async function POST(req: NextRequest) {
     messageBodyText,
     `ব্যাচ: ${batch}`,
     `তারিখ: ${dateStr}`,
+    venueText ? `স্থান: ${venueText}` : "",
     `প্রবেশ কোড: ${token}`,
   ]
     .filter(Boolean)
@@ -105,6 +108,7 @@ export async function POST(req: NextRequest) {
       batch,
       occasion: occasionText,
       messageBody: messageBodyText,
+      venue: venueText,
       reunionDate: reunionDateObj,
       token,
       recipientCount: members.length,

@@ -8,6 +8,7 @@ export type ReunionToken = {
   batch: string;
   occasion: string;
   messageBody: string;
+  venue: string;
   reunionDate: string | null;
   token: string;
   recipientCount: number;
@@ -63,6 +64,7 @@ export default function ReunionTab({ tokens, onChange }: { tokens: ReunionToken[
   const [batch, setBatch] = useState("");
   const [occasion, setOccasion] = useState("");
   const [messageBody, setMessageBody] = useState("");
+  const [venue, setVenue] = useState("");
   const [reunionDate, setReunionDate] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -106,6 +108,7 @@ export default function ReunionTab({ tokens, onChange }: { tokens: ReunionToken[
         batch,
         occasion: occasion.trim(),
         messageBody: messageBody.trim(),
+        venue: venue.trim(),
         reunionDate: new Date(reunionDate).toISOString(),
       }),
     });
@@ -123,6 +126,7 @@ export default function ReunionTab({ tokens, onChange }: { tokens: ReunionToken[
     setBatch("");
     setOccasion("");
     setMessageBody("");
+    setVenue("");
     setReunionDate("");
     onChange();
   }
@@ -158,6 +162,16 @@ export default function ReunionTab({ tokens, onChange }: { tokens: ReunionToken[
               value={reunionDate}
               onChange={(e) => setReunionDate(e.target.value)}
               className="border border-line rounded px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-pine/40"
+            />
+          </div>
+          <div className="flex-1 min-w-[160px]">
+            <label className="block text-sm text-ink/70 mb-1.5">{t("reunion.venue")}</label>
+            <input
+              type="text"
+              value={venue}
+              onChange={(e) => setVenue(e.target.value)}
+              placeholder={t("reunion.venuePlaceholder")}
+              className="w-full border border-line rounded px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-pine/40"
             />
           </div>
         </div>
@@ -206,12 +220,13 @@ export default function ReunionTab({ tokens, onChange }: { tokens: ReunionToken[
 
       <h3 className="font-display text-lg text-heading mb-3">{t("reunion.history")}</h3>
       <div className="bg-surface border border-line rounded-lg overflow-x-auto">
-        <table className="w-full text-sm min-w-[820px]">
+        <table className="w-full text-sm min-w-[920px]">
           <thead>
             <tr className="text-left text-ink/50 border-b border-line">
               <th className="px-4 py-2.5 font-normal border-r border-line">{t("reunion.col.batch")}</th>
               <th className="px-4 py-2.5 font-normal border-r border-line">{t("reunion.col.occasion")}</th>
               <th className="px-4 py-2.5 font-normal border-r border-line">{t("reunion.col.eventDate")}</th>
+              <th className="px-4 py-2.5 font-normal border-r border-line">{t("reunion.col.venue")}</th>
               <th className="px-4 py-2.5 font-normal border-r border-line">{t("reunion.col.token")}</th>
               <th className="px-4 py-2.5 font-normal border-r border-line">{t("reunion.col.date")}</th>
               <th className="px-4 py-2.5 font-normal border-r border-line">{t("reunion.col.recipients")}</th>
@@ -228,6 +243,7 @@ export default function ReunionTab({ tokens, onChange }: { tokens: ReunionToken[
                 <td className="px-4 py-2.5 border-r border-line">
                   {tk.reunionDate ? new Date(tk.reunionDate).toLocaleString() : "-"}
                 </td>
+                <td className="px-4 py-2.5 border-r border-line">{tk.venue || "-"}</td>
                 <td className="px-4 py-2.5 border-r border-line font-mono">{tk.token}</td>
                 <td className="px-4 py-2.5 border-r border-line">
                   {tk.createdAt ? new Date(tk.createdAt).toLocaleDateString() : "-"}
@@ -240,7 +256,7 @@ export default function ReunionTab({ tokens, onChange }: { tokens: ReunionToken[
             ))}
             {tokens.length === 0 && (
               <tr>
-                <td colSpan={9} className="px-4 py-6 text-center text-ink/50">
+                <td colSpan={10} className="px-4 py-6 text-center text-ink/50">
                   {t("reunion.empty")}
                 </td>
               </tr>

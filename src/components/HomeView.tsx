@@ -17,6 +17,7 @@ type Notice = {
 
 type ReunionInfo = {
   occasion: string;
+  venue?: string;
   reunionDate: string;
 };
 
@@ -60,6 +61,7 @@ function ReunionCountdown({ reunion }: { reunion: ReunionInfo | null }) {
         <p className="text-xs uppercase tracking-widest text-ink/50 mb-1">{t("home.reunion.eyebrow")}</p>
         <h2 className="font-display text-2xl text-heading mb-1">🎉 {reunion.occasion}</h2>
         <p className="text-sm text-ink/60 mb-5">{dateStr}</p>
+        {reunion.venue && <p className="text-sm text-ink/60 -mt-4 mb-5">📍 {reunion.venue}</p>}
 
         {countdown.started ? (
           <p className="text-lg font-semibold text-pine">{t("home.reunion.started")}</p>
@@ -88,12 +90,16 @@ function ReunionCountdown({ reunion }: { reunion: ReunionInfo | null }) {
 export default function HomeView({ notices, photos }: { notices: Notice[]; photos: GalleryPhoto[] }) {
   const { t } = useLanguage();
   const [loggedIn, setLoggedIn] = useState(false);
+  const [role, setRole] = useState<string | null>(null);
   const [reunion, setReunion] = useState<ReunionInfo | null>(null);
 
   useEffect(() => {
     fetch("/api/me")
       .then((res) => res.json())
-      .then((data) => setLoggedIn(!!data.session))
+      .then((data) => {
+        setLoggedIn(!!data.session);
+        setRole(data.session?.role ?? null);
+      })
       .catch(() => setLoggedIn(false));
     fetch("/api/reunion-info")
       .then((res) => res.json())
@@ -119,7 +125,7 @@ export default function HomeView({ notices, photos }: { notices: Notice[]; photo
             <p className="text-white/85 max-w-xl mx-auto leading-relaxed mb-8">{t("hero.subtitle")}</p>
             <div className="flex flex-wrap items-center justify-center gap-4">
               <Link
-                href={loggedIn ? "/profile" : "/register"}
+                href={loggedIn ? (role === "admin" ? "/admin" : "/reunion") : "/register"}
                 className="inline-flex items-center gap-2 rounded-full px-6 py-3 font-bold uppercase tracking-wide text-white bg-gradient-to-r from-brand-blue to-blue-600 hover:opacity-90 transition-opacity shadow-lg shadow-black/30"
               >
                 {loggedIn && (
