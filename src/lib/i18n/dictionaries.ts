@@ -143,6 +143,24 @@ export const dictionaries = {
     "login.error": "লগইন ব্যর্থ হয়েছে",
     "login.newHere": "নতুন? রেজিস্ট্রেশন করুন",
     "login.haveAccount": "ইতিমধ্যে অ্যাকাউন্ট আছে?",
+    "login.forgotPassword": "পাসওয়ার্ড ভুলে গেছেন?",
+
+    // Forgot password
+    "forgotPassword.title": "পাসওয়ার্ড রিসেট",
+    "forgotPassword.subtitle": "রোল ও ব্যাচ দিন, আপনার ফোন/ইমেইলে একটি কোড পাঠানো হবে",
+    "forgotPassword.sendCode": "কোড পাঠান",
+    "forgotPassword.sending": "পাঠানো হচ্ছে...",
+    "forgotPassword.codeSentTo": "{contact} এ একটি কোড পাঠানো হয়েছে",
+    "forgotPassword.codeLabel": "কোড",
+    "forgotPassword.codePlaceholder": "৬-সংখ্যার কোড",
+    "forgotPassword.newPassword": "নতুন পাসওয়ার্ড",
+    "forgotPassword.confirmPassword": "নতুন পাসওয়ার্ড আবার লিখুন",
+    "forgotPassword.resetButton": "পাসওয়ার্ড পরিবর্তন করুন",
+    "forgotPassword.resetting": "পরিবর্তন হচ্ছে...",
+    "forgotPassword.resendCode": "ভুল রোল/ব্যাচ দিয়েছেন? আবার চেষ্টা করুন",
+    "forgotPassword.mismatch": "দুটো পাসওয়ার্ড মিলছে না",
+    "forgotPassword.success": "আপনার পাসওয়ার্ড সফলভাবে পরিবর্তন হয়েছে! এখন নতুন পাসওয়ার্ড দিয়ে লগইন করুন।",
+    "forgotPassword.backToLogin": "← লগইনে ফিরে যান",
 
     // Registration page
     "register.title": "রেজিস্ট্রেশন করুন",
@@ -417,6 +435,24 @@ export const dictionaries = {
     "login.error": "Login failed",
     "login.newHere": "New here? Register",
     "login.haveAccount": "Already have an account?",
+    "login.forgotPassword": "Forgot password?",
+
+    // Forgot password
+    "forgotPassword.title": "Reset Password",
+    "forgotPassword.subtitle": "Enter your roll and batch, we'll send a code to your phone/email",
+    "forgotPassword.sendCode": "Send Code",
+    "forgotPassword.sending": "Sending...",
+    "forgotPassword.codeSentTo": "A code has been sent to {contact}",
+    "forgotPassword.codeLabel": "Code",
+    "forgotPassword.codePlaceholder": "6-digit code",
+    "forgotPassword.newPassword": "New Password",
+    "forgotPassword.confirmPassword": "Confirm New Password",
+    "forgotPassword.resetButton": "Change Password",
+    "forgotPassword.resetting": "Changing...",
+    "forgotPassword.resendCode": "Wrong roll/batch? Try again",
+    "forgotPassword.mismatch": "Passwords don't match",
+    "forgotPassword.success": "Your password has been changed successfully! Log in with your new password.",
+    "forgotPassword.backToLogin": "← Back to login",
 
     // Registration page
     "register.title": "Registration",

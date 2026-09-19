@@ -22,6 +22,8 @@ export const students = pgTable("students", {
   phone: text("phone").default(""),
   address: text("address").default(""),
   password: text("password").notNull(), // hashed, for student login
+  resetCode: text("reset_code"), // one-time code for forgot-password flow
+  resetCodeExpires: timestamp("reset_code_expires"),
   batch: text("batch").default(""), // pass-out year / alumni batch, for self-registered members
   bloodGroup: text("blood_group"), // e.g. "A+", "O-"
   approved: boolean("approved").notNull().default(true), // self-registered members start as false, pending admin approval

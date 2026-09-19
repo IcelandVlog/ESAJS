@@ -118,6 +118,14 @@ function LoginForm() {
           placeholder={t("login.password")}
         />
 
+        {role === "student" && (
+          <div className="text-right -mt-2">
+            <Link href="/forgot-password" className="text-xs text-ink/50 hover:text-heading transition-colors">
+              {t("login.forgotPassword")}
+            </Link>
+          </div>
+        )}
+
         {error && (
           <p className="text-clay text-sm bg-clay/10 border border-clay/20 rounded-lg px-3 py-2">{error}</p>
         )}
