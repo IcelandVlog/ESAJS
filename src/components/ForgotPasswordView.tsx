@@ -9,11 +9,13 @@ import { AuthInput, AuthSelect } from "@/components/AuthField";
 import { IconMail, IconCalendar, IconLock } from "@/components/icons";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
+type Step = "request" | "code" | "password";
+
 export default function ForgotPasswordView() {
   const router = useRouter();
   const { t } = useLanguage();
 
-  const [step, setStep] = useState<"request" | "reset">("request");
+  const [step, setStep] = useState<Step>("request");
   const [roll, setRoll] = useState("");
   const [batch, setBatch] = useState("");
   const [code, setCode] = useState("");
@@ -47,7 +49,25 @@ export default function ForgotPasswordView() {
       return;
     }
     setMaskedContact(data.maskedContact || "");
-    setStep("reset");
+    setStep("code");
+  }
+
+  async function verifyCode(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    const res = await fetch("/api/auth/verify-reset-code", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ roll, batch, code }),
+    });
+    const data = await res.json();
+    setLoading(false);
+    if (!res.ok) {
+      setError(data.error || t("login.error"));
+      return;
+    }
+    setStep("password");
   }
 
   async function resetPassword(e: React.FormEvent) {
@@ -101,7 +121,7 @@ export default function ForgotPasswordView() {
         </p>
       }
     >
-      {step === "request" ? (
+      {step === "request" && (
         <form onSubmit={requestCode} className="space-y-4">
           <AuthInput
             icon={<IconMail />}
@@ -130,8 +150,10 @@ export default function ForgotPasswordView() {
             {loading ? t("forgotPassword.sending") : t("forgotPassword.sendCode")}
           </button>
         </form>
-      ) : (
-        <form onSubmit={resetPassword} className="space-y-4">
+      )}
+
+      {step === "code" && (
+        <form onSubmit={verifyCode} className="space-y-4">
           <p className="text-sm text-ink/60 -mt-1">{t("forgotPassword.codeSentTo").replace("{contact}", maskedContact)}</p>
 
           <AuthInput
@@ -142,6 +164,33 @@ export default function ForgotPasswordView() {
             required
             placeholder={t("forgotPassword.codePlaceholder")}
           />
+
+          {error && <p className="text-clay text-sm bg-clay/10 border border-clay/20 rounded-lg px-3 py-2">{error}</p>}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-xl py-3 font-bold text-white bg-gradient-to-r from-sky-400 to-cyan-400 hover:opacity-90 transition-opacity shadow-lg shadow-cyan-500/25 disabled:opacity-60"
+          >
+            {loading ? t("forgotPassword.verifying") : t("forgotPassword.verifyCode")}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setError("");
+              setCode("");
+              setStep("request");
+            }}
+            className="w-full text-center text-xs text-ink/50 hover:text-heading transition-colors"
+          >
+            {t("forgotPassword.resendCode")}
+          </button>
+        </form>
+      )}
+
+      {step === "password" && (
+        <form onSubmit={resetPassword} className="space-y-4">
           <PasswordInput
             value={newPassword}
             onChange={setNewPassword}
@@ -165,14 +214,6 @@ export default function ForgotPasswordView() {
             className="w-full rounded-xl py-3 font-bold text-white bg-gradient-to-r from-sky-400 to-cyan-400 hover:opacity-90 transition-opacity shadow-lg shadow-cyan-500/25 disabled:opacity-60"
           >
             {loading ? t("forgotPassword.resetting") : t("forgotPassword.resetButton")}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setStep("request")}
-            className="w-full text-center text-xs text-ink/50 hover:text-heading transition-colors"
-          >
-            {t("forgotPassword.resendCode")}
           </button>
         </form>
       )}
