@@ -148,6 +148,8 @@ export const dictionaries = {
     // Social login / OAuth
     "oauth.continueWithGoogle": "Google দিয়ে চালিয়ে যান",
     "oauth.continueWithFacebook": "Facebook দিয়ে চালিয়ে যান",
+    "oauth.google": "Google",
+    "oauth.facebook": "Facebook",
     "oauth.or": "অথবা",
     "oauth.errorNotConfigured": "এই লগইন মেথডটি এখনো চালু করা হয়নি",
     "oauth.errorNoEmail": "আপনার Facebook অ্যাকাউন্টে কোনো ইমেইল নেই, তাই এটি দিয়ে সাইন-আপ করা যাচ্ছে না",
@@ -454,6 +456,8 @@ export const dictionaries = {
     // Social login / OAuth
     "oauth.continueWithGoogle": "Continue with Google",
     "oauth.continueWithFacebook": "Continue with Facebook",
+    "oauth.google": "Google",
+    "oauth.facebook": "Facebook",
     "oauth.or": "OR",
     "oauth.errorNotConfigured": "This login method isn't set up yet",
     "oauth.errorNoEmail": "Your Facebook account has no email, so we can't sign you up with it",

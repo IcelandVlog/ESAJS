@@ -14,20 +14,22 @@ export default function SocialLoginButtons() {
         <div className="flex-1 h-px bg-line" />
       </div>
 
-      <a
-        href="/api/auth/oauth/google"
-        className="flex items-center justify-center gap-3 w-full rounded-xl py-3 font-medium bg-white text-gray-700 border border-line hover:bg-gray-50 transition-colors"
-      >
-        <IconGoogle />
-        {t("oauth.continueWithGoogle")}
-      </a>
-      <a
-        href="/api/auth/oauth/facebook"
-        className="flex items-center justify-center gap-3 w-full rounded-xl py-3 font-medium text-white bg-[#1877F2] hover:opacity-90 transition-opacity"
-      >
-        <IconFacebook className="[&_path]:fill-white" />
-        {t("oauth.continueWithFacebook")}
-      </a>
+      <div className="grid grid-cols-2 gap-3">
+        <a
+          href="/api/auth/oauth/google"
+          className="flex items-center justify-center gap-2 rounded-xl bg-paper dark:bg-white/5 border border-line py-3 text-sm font-medium text-heading hover:bg-white/10 transition-colors"
+        >
+          <IconGoogle />
+          {t("oauth.google")}
+        </a>
+        <a
+          href="/api/auth/oauth/facebook"
+          className="flex items-center justify-center gap-2 rounded-xl bg-paper dark:bg-white/5 border border-line py-3 text-sm font-medium text-heading hover:bg-white/10 transition-colors"
+        >
+          <IconFacebook />
+          {t("oauth.facebook")}
+        </a>
+      </div>
     </div>
   );
 }
