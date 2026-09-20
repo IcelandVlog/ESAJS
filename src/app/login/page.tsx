@@ -122,6 +122,7 @@ function LoginForm() {
                 {y}
               </option>
             ))}
+            <option value="other">{t("register.batchOtherOption")}</option>
           </AuthSelect>
         )}
 

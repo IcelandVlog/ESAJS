@@ -197,6 +197,7 @@ export default function RegisterPage() {
                   {y}
                 </option>
               ))}
+              <option value="other">{t("register.batchOtherOption")}</option>
             </AuthSelect>
 
             <AuthInput

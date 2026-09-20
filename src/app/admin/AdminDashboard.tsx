@@ -29,6 +29,12 @@ type Notice = {
   date: string;
 };
 
+function formatBatch(batch: string | null, t: (key: DictKey) => string): string {
+  if (!batch) return "-";
+  if (batch === "other") return t("register.batchOtherShort");
+  return batch;
+}
+
 // A student's "contact" value is either a phone number or an email
 // (self-registered members type either into one field). Route each to the
 // right app: phone → dialer, email → Gmail compose in a new tab.
@@ -231,6 +237,7 @@ function StudentsTab({ students, onChange }: { students: Student[]; onChange: ()
                   {y}
                 </option>
               ))}
+              <option value="other">{t("register.batchOtherOption")}</option>
             </select>
           </div>
           <Field label={t("admin.field.contact")} value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} required />
@@ -285,7 +292,7 @@ function StudentsTab({ students, onChange }: { students: Student[]; onChange: ()
               <tr key={s.id} className="border-b border-line">
                 <td className="px-4 py-2.5 text-ink/50 border-r border-line">{i + 1}</td>
                 <td className="px-4 py-2.5 border-r border-line">{s.name}</td>
-                <td className="px-4 py-2.5 border-r border-line">{s.batch || "-"}</td>
+                <td className="px-4 py-2.5 border-r border-line">{formatBatch(s.batch, t)}</td>
                 <td className="px-4 py-2.5 border-r border-line">
                   <ContactLink value={s.phone} />
                 </td>
@@ -357,7 +364,7 @@ function PendingTab({ students, onChange }: { students: Student[]; onChange: () 
             {students.map((s) => (
               <tr key={s.id} className="border-b border-line last:border-0">
                 <td className="px-4 py-2.5">{s.name}</td>
-                <td className="px-4 py-2.5">{s.batch || "-"}</td>
+                <td className="px-4 py-2.5">{formatBatch(s.batch, t)}</td>
                 <td className="px-4 py-2.5">
                   <ContactLink value={s.phone || s.roll} />
                 </td>

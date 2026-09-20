@@ -138,6 +138,7 @@ export default function ForgotPasswordView() {
                 {y}
               </option>
             ))}
+            <option value="other">{t("register.batchOtherOption")}</option>
           </AuthSelect>
 
           {error && <p className="text-clay text-sm bg-clay/10 border border-clay/20 rounded-lg px-3 py-2">{error}</p>}
