@@ -5,8 +5,10 @@ import { hashPassword } from "@/lib/auth";
 
 // Password rule: at least 6 characters, one uppercase letter, one number, one special character.
 const PASSWORD_RULE = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{6,}$/;
-// Very loose phone-or-email check — just enough to reject obvious junk.
-const CONTACT_RULE = /^(\+?\d{10,15}|[^\s@]+@[^\s@]+\.[^\s@]+)$/;
+// Email is required and used as the account's login identifier.
+const EMAIL_RULE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// Mobile number is optional — just enough of a check to reject obvious junk if provided.
+const MOBILE_RULE = /^\+?\d{10,15}$/;
 const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
 async function verifyRecaptcha(token: string | undefined): Promise<boolean> {
@@ -29,16 +31,17 @@ async function verifyRecaptcha(token: string | undefined): Promise<boolean> {
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  const { name, batch, contact, password, bloodGroup, recaptchaToken } = body as {
+  const { name, batch, email, mobile, password, bloodGroup, recaptchaToken } = body as {
     name?: string;
     batch?: string;
-    contact?: string;
+    email?: string;
+    mobile?: string;
     password?: string;
     bloodGroup?: string;
     recaptchaToken?: string;
   };
 
-  if (!name || !batch || !contact || !password) {
+  if (!name || !batch || !email || !password) {
     return NextResponse.json({ error: "সব ফিল্ড পূরণ করুন" }, { status: 400 });
   }
 
@@ -46,8 +49,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "সঠিক ব্লাড গ্রুপ বাছাই করুন" }, { status: 400 });
   }
 
-  if (!CONTACT_RULE.test(contact.trim())) {
-    return NextResponse.json({ error: "সঠিক মোবাইল নম্বর বা ইমেইল দিন" }, { status: 400 });
+  if (!EMAIL_RULE.test(email.trim())) {
+    return NextResponse.json({ error: "সঠিক ইমেইল দিন" }, { status: 400 });
+  }
+
+  const mobileTrimmed = mobile?.trim() || "";
+  if (mobileTrimmed && !MOBILE_RULE.test(mobileTrimmed)) {
+    return NextResponse.json({ error: "সঠিক মোবাইল নম্বর দিন" }, { status: 400 });
   }
 
   if (!PASSWORD_RULE.test(password)) {
@@ -66,12 +74,12 @@ export async function POST(req: NextRequest) {
     const inserted = await db
       .insert(students)
       .values({
-        roll: contact.trim(),
+        roll: email.trim(),
         name: name.trim(),
         className: "",
         section: "",
         batch,
-        phone: contact.trim(),
+        phone: mobileTrimmed,
         bloodGroup: bloodGroup || null,
         password: await hashPassword(password),
         approved: false,
@@ -85,7 +93,7 @@ export async function POST(req: NextRequest) {
     );
   } catch (e: any) {
     if (e?.code === "23505") {
-      return NextResponse.json({ error: "এই মোবাইল/ইমেইল দিয়ে ইতিমধ্যে রেজিস্ট্রেশন করা হয়েছে" }, { status: 409 });
+      return NextResponse.json({ error: "এই ইমেইল দিয়ে ইতিমধ্যে রেজিস্ট্রেশন করা হয়েছে" }, { status: 409 });
     }
     return NextResponse.json({ error: "সমস্যা হয়েছে, আবার চেষ্টা করুন" }, { status: 500 });
   }

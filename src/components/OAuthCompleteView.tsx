@@ -37,7 +37,6 @@ export default function OAuthCompleteView({ draft }: { draft: string }) {
   const [batch, setBatch] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [done, setDone] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -49,12 +48,13 @@ export default function OAuthCompleteView({ draft }: { draft: string }) {
       body: JSON.stringify({ draft, batch }),
     });
     const data = await res.json();
-    setLoading(false);
     if (!res.ok) {
       setError(data.error || t("login.error"));
+      setLoading(false);
       return;
     }
-    setDone(true);
+    router.push("/");
+    router.refresh();
   }
 
   if (!draft || !profile) {
@@ -64,23 +64,6 @@ export default function OAuthCompleteView({ draft }: { draft: string }) {
           <p className="text-clay text-sm">{t("oauth.expired")}</p>
           <Link href="/login" className="text-heading font-medium hover:underline text-sm">
             {t("forgotPassword.backToLogin")}
-          </Link>
-        </div>
-      </AuthShell>
-    );
-  }
-
-  if (done) {
-    return (
-      <AuthShell title={t("register.title")}>
-        <div className="text-center space-y-4">
-          <p className="text-heading font-medium">{t("register.title")} ✓</p>
-          <p className="text-ink/70 text-sm">{t("register.pendingNotice")}</p>
-          <Link
-            href="/login"
-            className="inline-block rounded-xl px-5 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-sky-400 to-cyan-400 hover:opacity-90 transition-opacity shadow-lg shadow-cyan-500/25"
-          >
-            {t("register.loginLink")}
           </Link>
         </div>
       </AuthShell>

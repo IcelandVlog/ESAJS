@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db/client";
 import { students } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { sendEmailMessage, sendSmsMessage, isEmailContact } from "@/lib/messaging";
+import { sendEmailMessage, sendSmsMessage, isEmailContact, resolveContact } from "@/lib/messaging";
 
 function randomCode(): string {
   return String(Math.floor(100000 + Math.random() * 900000)); // 6-digit numeric OTP
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     return genericError();
   }
 
-  const contact = student.phone?.trim();
+  const contact = resolveContact(student.roll, student.phone);
   if (!contact) {
     return NextResponse.json(
       { error: "আপনার প্রোফাইলে কোনো ফোন/ইমেইল নেই। অ্যাডমিনের সাথে যোগাযোগ করুন।" },

@@ -60,7 +60,17 @@ export async function sendSmsMessage(to: string, message: string): Promise<boole
 }
 
 // A contact value from the students table is either a phone number or an
-// email — self-registered members type either one into the same field.
+// email — admin-added students may have either in their "phone" field.
 export function isEmailContact(value: string): boolean {
   return value.includes("@");
+}
+
+// Picks the best contact point for a student. Self-registered members log in
+// with their email (stored as their "roll"), so prefer that when present;
+// otherwise fall back to their "phone" field (used by admin-added students,
+// and optionally by self-registered members who also gave a mobile number).
+export function resolveContact(roll: string, phone?: string | null): string {
+  const rollTrimmed = roll?.trim() || "";
+  if (isEmailContact(rollTrimmed)) return rollTrimmed;
+  return phone?.trim() || "";
 }

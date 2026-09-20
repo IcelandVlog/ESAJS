@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db/client";
 import { students } from "@/db/schema";
-import { verifyOAuthDraft, hashPassword } from "@/lib/auth";
+import { verifyOAuthDraft, hashPassword, signSession, COOKIE_NAME } from "@/lib/auth";
 import { randomBytes } from "crypto";
 
 export async function POST(req: NextRequest) {
@@ -29,14 +29,27 @@ export async function POST(req: NextRequest) {
         className: "",
         section: "",
         batch,
-        phone: payload.email,
+        phone: "",
         password: unusablePassword,
         photoUrl: payload.picture,
-        approved: false,
+        // Google already verified this person's identity/email, so unlike
+        // plain email+password sign-ups, they don't need to wait for an
+        // admin to manually approve the account before logging in.
+        approved: true,
       })
       .returning();
 
-    return NextResponse.json({ ok: true, name: inserted[0].name });
+    const student = inserted[0];
+    const token = signSession({ role: "student", id: student.id, name: student.name });
+    const res = NextResponse.json({ ok: true, name: student.name });
+    res.cookies.set(COOKIE_NAME, token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7,
+    });
+    return res;
   } catch (e: unknown) {
     const err = e as { code?: string };
     if (err?.code === "23505") {

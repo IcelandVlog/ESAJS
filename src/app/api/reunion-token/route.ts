@@ -3,7 +3,7 @@ import { db } from "@/db/client";
 import { reunionTokens, students } from "@/db/schema";
 import { getSession } from "@/lib/auth";
 import { and, eq, gte } from "drizzle-orm";
-import { sendEmailMessage, sendSmsMessage, isEmailContact } from "@/lib/messaging";
+import { sendEmailMessage, sendSmsMessage, isEmailContact, resolveContact } from "@/lib/messaging";
 
 function randomToken(): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no ambiguous chars (0/O, 1/I)
@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
 
   await Promise.all(
     members.map(async (m) => {
-      const contact = m.phone?.trim();
+      const contact = resolveContact(m.roll, m.phone);
       if (!contact) {
         failed++;
         return;
