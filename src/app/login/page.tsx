@@ -98,7 +98,6 @@ function LoginForm() {
         </div>
       }
     >
-      {role === "student" && <SocialLoginButtons />}
       <form onSubmit={handleSubmit} className="space-y-4">
         <AuthInput
           icon={role === "student" ? <IconMail /> : <IconUser />}
@@ -154,6 +153,8 @@ function LoginForm() {
           {loading ? t("login.loading") : t("login.submit")}
         </button>
       </form>
+
+      {role === "student" && <SocialLoginButtons />}
     </AuthShell>
   );
 }

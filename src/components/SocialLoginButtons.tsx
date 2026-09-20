@@ -8,6 +8,12 @@ export default function SocialLoginButtons() {
 
   return (
     <div className="space-y-3">
+      <div className="flex items-center gap-3 py-1">
+        <div className="flex-1 h-px bg-line" />
+        <span className="text-xs text-ink/40">{t("oauth.or")}</span>
+        <div className="flex-1 h-px bg-line" />
+      </div>
+
       <a
         href="/api/auth/oauth/google"
         className="flex items-center justify-center gap-3 w-full rounded-xl py-3 font-medium bg-white text-gray-700 border border-line hover:bg-gray-50 transition-colors"
@@ -22,12 +28,6 @@ export default function SocialLoginButtons() {
         <IconFacebook className="[&_path]:fill-white" />
         {t("oauth.continueWithFacebook")}
       </a>
-
-      <div className="flex items-center gap-3 py-1">
-        <div className="flex-1 h-px bg-line" />
-        <span className="text-xs text-ink/40">{t("oauth.or")}</span>
-        <div className="flex-1 h-px bg-line" />
-      </div>
     </div>
   );
 }
