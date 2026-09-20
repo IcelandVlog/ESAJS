@@ -145,6 +145,18 @@ export const dictionaries = {
     "login.haveAccount": "ইতিমধ্যে অ্যাকাউন্ট আছে?",
     "login.forgotPassword": "পাসওয়ার্ড ভুলে গেছেন?",
 
+    // Social login / OAuth
+    "oauth.continueWithGoogle": "Google দিয়ে চালিয়ে যান",
+    "oauth.continueWithFacebook": "Facebook দিয়ে চালিয়ে যান",
+    "oauth.or": "অথবা",
+    "oauth.errorNotConfigured": "এই লগইন মেথডটি এখনো চালু করা হয়নি",
+    "oauth.errorNoEmail": "আপনার Facebook অ্যাকাউন্টে কোনো ইমেইল নেই, তাই এটি দিয়ে সাইন-আপ করা যাচ্ছে না",
+    "oauth.errorGeneric": "লগইন ব্যর্থ হয়েছে, আবার চেষ্টা করুন",
+    "oauth.expired": "এই লিংকটির মেয়াদ শেষ হয়ে গেছে, আবার Google/Facebook দিয়ে চেষ্টা করুন",
+    "oauth.completeTitle": "প্রায় শেষ!",
+    "oauth.completeSubtitle": "আপনার ব্যাচ বাছাই করে রেজিস্ট্রেশন সম্পন্ন করুন",
+    "oauth.finish": "রেজিস্ট্রেশন সম্পন্ন করুন",
+
     // Forgot password
     "forgotPassword.title": "পাসওয়ার্ড রিসেট",
     "forgotPassword.subtitle": "রোল ও ব্যাচ দিন, আপনার ফোন/ইমেইলে একটি কোড পাঠানো হবে",
@@ -438,6 +450,18 @@ export const dictionaries = {
     "login.newHere": "New here? Register",
     "login.haveAccount": "Already have an account?",
     "login.forgotPassword": "Forgot password?",
+
+    // Social login / OAuth
+    "oauth.continueWithGoogle": "Continue with Google",
+    "oauth.continueWithFacebook": "Continue with Facebook",
+    "oauth.or": "OR",
+    "oauth.errorNotConfigured": "This login method isn't set up yet",
+    "oauth.errorNoEmail": "Your Facebook account has no email, so we can't sign you up with it",
+    "oauth.errorGeneric": "Login failed, please try again",
+    "oauth.expired": "This link has expired, please try Google/Facebook again",
+    "oauth.completeTitle": "Almost done!",
+    "oauth.completeSubtitle": "Pick your batch to finish registration",
+    "oauth.finish": "Finish Registration",
 
     // Forgot password
     "forgotPassword.title": "Reset Password",

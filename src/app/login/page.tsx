@@ -7,7 +7,16 @@ import AuthShell from "@/components/AuthShell";
 import PasswordInput from "@/components/PasswordInput";
 import { AuthInput, AuthSelect } from "@/components/AuthField";
 import { IconUser, IconMail, IconCalendar } from "@/components/icons";
+import SocialLoginButtons from "@/components/SocialLoginButtons";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import type { DictKey } from "@/lib/i18n/dictionaries";
+
+function oauthErrorKey(code: string): DictKey {
+  if (code === "pending_approval") return "register.pendingNotice";
+  if (code === "not_configured") return "oauth.errorNotConfigured";
+  if (code === "facebook_no_email") return "oauth.errorNoEmail";
+  return "oauth.errorGeneric";
+}
 
 function LoginForm() {
   const router = useRouter();
@@ -30,6 +39,12 @@ function LoginForm() {
   useEffect(() => {
     if (searchParams.get("role") === "admin") setRole("admin");
     if (searchParams.get("role") === "student") setRole("student");
+  }, [searchParams]);
+
+  useEffect(() => {
+    const oauthError = searchParams.get("oauthError");
+    if (oauthError) setError(t(oauthErrorKey(oauthError)));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -83,6 +98,7 @@ function LoginForm() {
         </div>
       }
     >
+      {role === "student" && <SocialLoginButtons />}
       <form onSubmit={handleSubmit} className="space-y-4">
         <AuthInput
           icon={role === "student" ? <IconMail /> : <IconUser />}
