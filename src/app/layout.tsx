@@ -3,6 +3,7 @@ import "./globals.css";
 import { LanguageProvider } from "@/lib/i18n/LanguageContext";
 import { ThemeProvider } from "@/lib/theme/ThemeContext";
 import LanguageGate from "@/components/LanguageGate";
+import BirthdayPopup from "@/components/BirthdayPopup";
 
 export const metadata: Metadata = {
   title: "Ex-Students Association of Jalalpur Secondary School (ESAJS)",
@@ -37,6 +38,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <ThemeProvider>
           <LanguageProvider>
             <LanguageGate />
+            <BirthdayPopup />
             {children}
           </LanguageProvider>
         </ThemeProvider>

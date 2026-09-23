@@ -21,6 +21,7 @@ export const students = pgTable("students", {
   motherName: text("mother_name").default(""),
   phone: text("phone").default(""),
   address: text("address").default(""),
+  dateOfBirth: text("date_of_birth"), // "YYYY-MM-DD"; optional, powers the birthday-wish popup
   password: text("password").notNull(), // hashed, for student login
   resetCode: text("reset_code"), // one-time code for forgot-password flow
   resetCodeExpires: timestamp("reset_code_expires"),

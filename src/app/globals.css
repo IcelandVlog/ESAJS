@@ -23,6 +23,28 @@ button:disabled,
   cursor: not-allowed;
 }
 
+/* Birthday-wish popup animation (see BirthdayPopup.tsx) */
+@keyframes birthday-pop {
+  0% {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+@keyframes birthday-confetti-fall {
+  0% {
+    transform: translateY(-24px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(260px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
 :root {
   --paper: #F7F8FA;
   --ink: #10172A;
@@ -122,4 +144,33 @@ body {
 .font-hero {
   font-family: system-ui, "Noto Sans Bengali", sans-serif;
   letter-spacing: 0.02em;
+}
+
+/* --- Older-phone compatibility -------------------------------------------
+   Tailwind v4 builds every gradient as `linear-gradient(to right in oklab, ...)`.
+   Browsers older than Chrome 111 (e.g. Chrome on Redmi 5A / other Android 8
+   phones) reject that whole declaration, so the gradient background is never
+   drawn. Since those buttons use white text, they became invisible — that is
+   why "Continue", the login / register submit buttons and the hero buttons
+   disappeared. In such browsers only, fall back to plain sRGB interpolation,
+   which every browser understands. Un-layered CSS beats @layer utilities. */
+@supports not (background-image: linear-gradient(in oklab, red, red)) {
+  .bg-gradient-to-t  { --tw-gradient-position: to top; }
+  .bg-gradient-to-b  { --tw-gradient-position: to bottom; }
+  .bg-gradient-to-l  { --tw-gradient-position: to left; }
+  .bg-gradient-to-r  { --tw-gradient-position: to right; }
+  .bg-gradient-to-tl { --tw-gradient-position: to top left; }
+  .bg-gradient-to-tr { --tw-gradient-position: to top right; }
+  .bg-gradient-to-bl { --tw-gradient-position: to bottom left; }
+  .bg-gradient-to-br { --tw-gradient-position: to bottom right; }
+  .bg-linear-to-t  { --tw-gradient-position: to top; }
+  .bg-linear-to-b  { --tw-gradient-position: to bottom; }
+  .bg-linear-to-r  { --tw-gradient-position: to right; }
+  .bg-linear-to-br { --tw-gradient-position: to bottom right; }
+
+  /* Last-resort solid colour behind gradient buttons, so white text is never
+     left on a transparent background. */
+  .bg-gradient-to-r.from-brand-blue,
+  .bg-gradient-to-r.from-sky-400 { background-color: var(--brand-blue); }
+  .bg-gradient-to-r.from-purple-600 { background-color: var(--brand-pink); }
 }

@@ -19,6 +19,7 @@ type Student = {
   address: string;
   batch: string | null;
   bloodGroup: string | null;
+  dateOfBirth: string | null;
   approved: boolean;
 };
 
@@ -152,6 +153,7 @@ function StudentsTab({ students, onChange }: { students: Student[]; onChange: ()
     phone: "",
     address: "",
     bloodGroup: "",
+    dateOfBirth: "",
     password: "",
   };
   const [form, setForm] = useState(emptyForm);
@@ -173,6 +175,7 @@ function StudentsTab({ students, onChange }: { students: Student[]; onChange: ()
       phone: s.phone,
       address: s.address,
       bloodGroup: s.bloodGroup || "",
+      dateOfBirth: s.dateOfBirth || "",
       password: "",
     });
     setEditingId(s.id);
@@ -259,6 +262,12 @@ function StudentsTab({ students, onChange }: { students: Student[]; onChange: ()
           <Field label={t("admin.field.fatherName")} value={form.fatherName} onChange={(v) => setForm({ ...form, fatherName: v })} />
           <Field label={t("admin.field.motherName")} value={form.motherName} onChange={(v) => setForm({ ...form, motherName: v })} />
           <Field label={t("admin.field.address")} value={form.address} onChange={(v) => setForm({ ...form, address: v })} />
+          <Field
+            label={t("admin.field.dob")}
+            value={form.dateOfBirth}
+            onChange={(v) => setForm({ ...form, dateOfBirth: v })}
+            type="date"
+          />
           <Field
             label={editingId ? t("admin.leaveBlankToKeep") : t("admin.field.passwordForLogin")}
             value={form.password}

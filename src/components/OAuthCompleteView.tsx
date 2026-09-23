@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import AuthShell from "@/components/AuthShell";
-import { AuthSelect } from "@/components/AuthField";
+import { AuthSelect, AuthInput } from "@/components/AuthField";
 import { IconCalendar } from "@/components/icons";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
@@ -35,6 +35,7 @@ export default function OAuthCompleteView({ draft }: { draft: string }) {
   }, [currentYear]);
 
   const [batch, setBatch] = useState("");
+  const [dob, setDob] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -45,7 +46,7 @@ export default function OAuthCompleteView({ draft }: { draft: string }) {
     const res = await fetch("/api/auth/oauth/complete", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ draft, batch }),
+      body: JSON.stringify({ draft, batch, dob }),
     });
     const data = await res.json();
     if (!res.ok) {
@@ -95,6 +96,8 @@ export default function OAuthCompleteView({ draft }: { draft: string }) {
           ))}
           <option value="other">{t("register.batchOtherOption")}</option>
         </AuthSelect>
+
+        <AuthInput icon={<IconCalendar />} label={t("register.dob")} value={dob} onChange={setDob} type="date" placeholder={t("register.dob")} />
 
         {error && <p className="text-clay text-sm bg-clay/10 border border-clay/20 rounded-lg px-3 py-2">{error}</p>}
 

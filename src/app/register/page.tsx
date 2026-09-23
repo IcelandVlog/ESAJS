@@ -38,6 +38,7 @@ export default function RegisterPage() {
   const [batch, setBatch] = useState("");
   const [email, setEmail] = useState("");
   const [mobile, setMobile] = useState("");
+  const [dob, setDob] = useState("");
   const [bloodGroup, setBloodGroup] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -118,7 +119,7 @@ export default function RegisterPage() {
       const res = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, batch, email, mobile, bloodGroup, password, recaptchaToken }),
+        body: JSON.stringify({ name, batch, email, mobile, dob, bloodGroup, password, recaptchaToken }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -216,6 +217,15 @@ export default function RegisterPage() {
               value={mobile}
               onChange={setMobile}
               placeholder={t("register.mobile")}
+            />
+
+            <AuthInput
+              icon={<IconCalendar />}
+              label={t("register.dob")}
+              value={dob}
+              onChange={setDob}
+              type="date"
+              placeholder={t("register.dob")}
             />
 
             <AuthSelect

@@ -40,8 +40,16 @@ export default function LanguageGate() {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy-950/80 backdrop-blur-sm p-4">
       <div className="w-full max-w-sm rounded-2xl bg-white shadow-2xl overflow-hidden">
-        <div className="bg-navy-900 px-6 py-5 text-center">
-          <img src="/images/logo.png" alt="ESAJS" className="h-10 mx-auto object-contain" />
+        <div className="px-6 py-5 text-center" style={{ backgroundColor: "#011125" }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/logo.png"
+            alt="ESAJS"
+            width={120}
+            height={40}
+            decoding="async"
+            className="h-10 w-auto mx-auto object-contain"
+          />
         </div>
 
         <div className="px-6 py-6 space-y-6">

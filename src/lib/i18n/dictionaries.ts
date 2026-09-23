@@ -187,6 +187,7 @@ export const dictionaries = {
     "register.batchOtherShort": "অন্যান্য (নন-স্টুডেন্ট)",
     "register.email": "ইমেইল",
     "register.mobile": "মোবাইল নম্বর (ঐচ্ছিক)",
+    "register.dob": "জন্ম তারিখ (ঐচ্ছিক)",
     "register.password": "পাসওয়ার্ড",
     "register.passwordHint": "অন্তত ৬ অক্ষর, একটি বড় হাতের অক্ষর, একটি সংখ্যা ও একটি বিশেষ চিহ্ন থাকতে হবে",
     "register.confirmPassword": "পাসওয়ার্ড নিশ্চিত করুন",
@@ -267,6 +268,7 @@ export const dictionaries = {
     "admin.field.phone": "ফোন",
     "admin.field.address": "ঠিকানা",
     "admin.field.bloodGroup": "ব্লাড গ্রুপ",
+    "admin.field.dob": "জন্ম তারিখ",
     "admin.field.passwordForLogin": "পাসওয়ার্ড (লগইনের জন্য)",
     "admin.leaveBlankToKeep": "পাসওয়ার্ড (খালি রাখলে আগেরটাই থাকবে)",
     "admin.field.student": "শিক্ষার্থী",
@@ -311,6 +313,12 @@ export const dictionaries = {
     "student.table.grade": "গ্রেড",
     "student.table.date": "তারিখ",
     "student.table.status": "অবস্থা",
+
+    // Birthday wish popup
+    "birthday.eyebrow": "আজকের জন্মদিন",
+    "birthday.title": "শুভ জন্মদিন!",
+    "birthday.wish": "জীবনের এই বিশেষ দিনে ESAJS পরিবারের পক্ষ থেকে অনেক অনেক শুভেচ্ছা ও ভালোবাসা।",
+    "birthday.close": "বন্ধ করুন",
   },
   en: {
     // Nav / header
@@ -498,6 +506,7 @@ export const dictionaries = {
     "register.batchOtherShort": "Other (Non-student)",
     "register.email": "Email",
     "register.mobile": "Mobile Number (optional)",
+    "register.dob": "Date of Birth (optional)",
     "register.password": "Password",
     "register.passwordHint": "At least 6 characters, one uppercase letter, one number and one special character",
     "register.confirmPassword": "Confirm Password",
@@ -578,6 +587,7 @@ export const dictionaries = {
     "admin.field.phone": "Phone",
     "admin.field.address": "Address",
     "admin.field.bloodGroup": "Blood Group",
+    "admin.field.dob": "Date of Birth",
     "admin.field.passwordForLogin": "Password (for login)",
     "admin.leaveBlankToKeep": "Password (leave blank to keep current)",
     "admin.field.student": "Student",
@@ -622,6 +632,12 @@ export const dictionaries = {
     "student.table.grade": "Grade",
     "student.table.date": "Date",
     "student.table.status": "Status",
+
+    // Birthday wish popup
+    "birthday.eyebrow": "Today's Birthday",
+    "birthday.title": "Happy Birthday!",
+    "birthday.wish": "Wishing you a wonderful day, filled with joy and love from the entire ESAJS family.",
+    "birthday.close": "Close",
   },
 } as const satisfies Record<Lang, Record<string, string>>;
 

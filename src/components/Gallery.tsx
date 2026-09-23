@@ -31,6 +31,8 @@ export default function Gallery({ photos }: { photos: GalleryPhoto[] }) {
                 <img
                   src={p.imageUrl}
                   alt={content.header.text}
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 {content.header.text && (

@@ -9,6 +9,7 @@ const PASSWORD_RULE = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{6,}$/;
 const EMAIL_RULE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // Mobile number is optional — just enough of a check to reject obvious junk if provided.
 const MOBILE_RULE = /^\+?\d{10,15}$/;
+const DOB_RULE = /^\d{4}-\d{2}-\d{2}$/;
 const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
 async function verifyRecaptcha(token: string | undefined): Promise<boolean> {
@@ -31,11 +32,12 @@ async function verifyRecaptcha(token: string | undefined): Promise<boolean> {
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  const { name, batch, email, mobile, password, bloodGroup, recaptchaToken } = body as {
+  const { name, batch, email, mobile, dob, password, bloodGroup, recaptchaToken } = body as {
     name?: string;
     batch?: string;
     email?: string;
     mobile?: string;
+    dob?: string;
     password?: string;
     bloodGroup?: string;
     recaptchaToken?: string;
@@ -56,6 +58,11 @@ export async function POST(req: NextRequest) {
   const mobileTrimmed = mobile?.trim() || "";
   if (mobileTrimmed && !MOBILE_RULE.test(mobileTrimmed)) {
     return NextResponse.json({ error: "সঠিক মোবাইল নম্বর দিন" }, { status: 400 });
+  }
+
+  const dobTrimmed = dob?.trim() || "";
+  if (dobTrimmed && (!DOB_RULE.test(dobTrimmed) || Number.isNaN(new Date(dobTrimmed).getTime()))) {
+    return NextResponse.json({ error: "সঠিক জন্ম তারিখ দিন" }, { status: 400 });
   }
 
   if (!PASSWORD_RULE.test(password)) {
@@ -80,6 +87,7 @@ export async function POST(req: NextRequest) {
         section: "",
         batch,
         phone: mobileTrimmed,
+        dateOfBirth: dobTrimmed || null,
         bloodGroup: bloodGroup || null,
         password: await hashPassword(password),
         approved: false,

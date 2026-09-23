@@ -5,9 +5,14 @@ import { verifyOAuthDraft, hashPassword, signSession, COOKIE_NAME } from "@/lib/
 import { randomBytes } from "crypto";
 
 export async function POST(req: NextRequest) {
-  const { draft, batch } = (await req.json()) as { draft?: string; batch?: string };
+  const { draft, batch, dob } = (await req.json()) as { draft?: string; batch?: string; dob?: string };
   if (!draft || !batch) {
     return NextResponse.json({ error: "ব্যাচ বাছাই করুন" }, { status: 400 });
+  }
+
+  const dobTrimmed = dob?.trim() || "";
+  if (dobTrimmed && (!/^\d{4}-\d{2}-\d{2}$/.test(dobTrimmed) || Number.isNaN(new Date(dobTrimmed).getTime()))) {
+    return NextResponse.json({ error: "সঠিক জন্ম তারিখ দিন" }, { status: 400 });
   }
 
   const payload = verifyOAuthDraft(draft);
@@ -30,6 +35,7 @@ export async function POST(req: NextRequest) {
         section: "",
         batch,
         phone: "",
+        dateOfBirth: dobTrimmed || null,
         password: unusablePassword,
         photoUrl: payload.picture,
         // Google already verified this person's identity/email, so unlike
