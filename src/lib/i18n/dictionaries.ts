@@ -258,7 +258,7 @@ export const dictionaries = {
     "admin.noNotices": "কোনো নোটিশ যুক্ত করা হয়নি",
     "admin.noEntries": "কোনো এন্ট্রি নেই",
 
-    "admin.confirmDeleteStudent": "এই শিক্ষার্থীকে মুছে ফেলতে চান? এর সাথে সম্পর্কিত রেজাল্ট ও অ্যাটেনডেন্সও মুছে যাবে।",
+    "admin.confirmDeleteStudent": "এই শিক্ষার্থীকে মুছে ফেলতে চান? এর সাথে সম্পর্কিত অ্যাটেনডেন্সও মুছে যাবে।",
     "admin.confirmDeleteResult": "এই রেজাল্টটি মুছে ফেলতে চান?",
     "admin.confirmDeleteNotice": "এই নোটিশটি মুছে ফেলতে চান?",
 
@@ -582,7 +582,7 @@ export const dictionaries = {
     "admin.noNotices": "No notices added yet",
     "admin.noEntries": "No entries yet",
 
-    "admin.confirmDeleteStudent": "Delete this student? Their related results and attendance will also be deleted.",
+    "admin.confirmDeleteStudent": "Delete this student? Their related attendance will also be deleted.",
     "admin.confirmDeleteResult": "Delete this result?",
     "admin.confirmDeleteNotice": "Delete this notice?",
 
