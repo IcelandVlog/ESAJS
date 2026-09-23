@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useConfirm } from "@/components/ConfirmDialog";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export type ReunionToken = {
@@ -164,6 +165,7 @@ function EditRow({
 
 export default function ReunionTab({ tokens, onChange }: { tokens: ReunionToken[]; onChange: () => void }) {
   const { t } = useLanguage();
+  const confirm = useConfirm();
   const currentYear = new Date().getFullYear();
   const batchYears = Array.from({ length: currentYear - 1960 + 1 }, (_, i) => currentYear - i);
 
@@ -248,7 +250,7 @@ export default function ReunionTab({ tokens, onChange }: { tokens: ReunionToken[
 
   async function toggleCancel(tk: ReunionToken) {
     const nextCancelled = !tk.cancelled;
-    if (nextCancelled && !confirm(t("reunion.confirmCancel"))) return;
+    if (nextCancelled && !(await confirm(t("reunion.confirmCancel"), { confirmLabel: t("reunion.cancelToken") }))) return;
     setBusyId(tk.id);
     const res = await fetch(`/api/reunion-token/${tk.id}`, {
       method: "PATCH",

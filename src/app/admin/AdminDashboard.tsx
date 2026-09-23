@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { useConfirm } from "@/components/ConfirmDialog";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import type { DictKey } from "@/lib/i18n/dictionaries";
 import type { GalleryPhoto } from "@/lib/gallery";
@@ -141,6 +142,7 @@ export default function AdminDashboard() {
 /* ---------------- Students ---------------- */
 function StudentsTab({ students, onChange }: { students: Student[]; onChange: () => void }) {
   const { t } = useLanguage();
+  const confirm = useConfirm();
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const currentYear = new Date().getFullYear();
@@ -204,7 +206,7 @@ function StudentsTab({ students, onChange }: { students: Student[]; onChange: ()
   }
 
   async function remove(id: number) {
-    if (!confirm(t("admin.confirmDeleteStudent"))) return;
+    if (!(await confirm(t("admin.confirmDeleteStudent"), { confirmLabel: t("admin.delete") }))) return;
     await fetch(`/api/students/${id}`, { method: "DELETE" });
     onChange();
   }
@@ -333,6 +335,7 @@ function StudentsTab({ students, onChange }: { students: Student[]; onChange: ()
 /* ---------------- Pending Registrations ---------------- */
 function PendingTab({ students, onChange }: { students: Student[]; onChange: () => void }) {
   const { t } = useLanguage();
+  const confirm = useConfirm();
   const [busyId, setBusyId] = useState<number | null>(null);
 
   async function approve(id: number) {
@@ -347,7 +350,7 @@ function PendingTab({ students, onChange }: { students: Student[]; onChange: () 
   }
 
   async function reject(id: number) {
-    if (!confirm(t("admin.confirmRejectRegistration"))) return;
+    if (!(await confirm(t("admin.confirmRejectRegistration"), { confirmLabel: t("admin.reject") }))) return;
     setBusyId(id);
     await fetch(`/api/students/${id}`, { method: "DELETE" });
     setBusyId(null);
@@ -412,6 +415,7 @@ function PendingTab({ students, onChange }: { students: Student[]; onChange: () 
 /* ---------------- Notices ---------------- */
 function NoticesTab({ notices, onChange }: { notices: Notice[]; onChange: () => void }) {
   const { t } = useLanguage();
+  const confirm = useConfirm();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ title: "", content: "", date: new Date().toISOString().slice(0, 10) });
   const [error, setError] = useState("");
@@ -438,7 +442,7 @@ function NoticesTab({ notices, onChange }: { notices: Notice[]; onChange: () => 
   }
 
   async function remove(id: number) {
-    if (!confirm(t("admin.confirmDeleteNotice"))) return;
+    if (!(await confirm(t("admin.confirmDeleteNotice"), { confirmLabel: t("admin.delete") }))) return;
     await fetch(`/api/notices/${id}`, { method: "DELETE" });
     onChange();
   }

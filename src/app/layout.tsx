@@ -4,6 +4,7 @@ import { LanguageProvider } from "@/lib/i18n/LanguageContext";
 import { ThemeProvider } from "@/lib/theme/ThemeContext";
 import LanguageGate from "@/components/LanguageGate";
 import BirthdayPopup from "@/components/BirthdayPopup";
+import { ConfirmProvider } from "@/components/ConfirmDialog";
 
 export const metadata: Metadata = {
   title: "Ex-Students Association of Jalalpur Secondary School (ESAJS)",
@@ -37,9 +38,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col bg-paper text-ink font-body">
         <ThemeProvider>
           <LanguageProvider>
-            <LanguageGate />
-            <BirthdayPopup />
-            {children}
+            <ConfirmProvider>
+              <LanguageGate />
+              <BirthdayPopup />
+              {children}
+            </ConfirmProvider>
           </LanguageProvider>
         </ThemeProvider>
       </body>

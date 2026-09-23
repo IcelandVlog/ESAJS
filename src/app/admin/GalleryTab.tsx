@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useConfirm } from "@/components/ConfirmDialog";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { resizeImageToDataUrl } from "@/lib/resizeImage";
 import {
@@ -15,6 +16,7 @@ import StyledLineEditor from "@/components/StyledLineEditor";
 
 export default function GalleryTab({ photos, onChange }: { photos: GalleryPhoto[]; onChange: () => void }) {
   const { t } = useLanguage();
+  const confirm = useConfirm();
   const [open, setOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -73,7 +75,7 @@ export default function GalleryTab({ photos, onChange }: { photos: GalleryPhoto[
   }
 
   async function remove(id: number) {
-    if (!confirm(t("gallery.confirmDelete"))) return;
+    if (!(await confirm(t("gallery.confirmDelete"), { confirmLabel: t("admin.delete") }))) return;
     await fetch(`/api/gallery/${id}`, { method: "DELETE" });
     onChange();
   }
