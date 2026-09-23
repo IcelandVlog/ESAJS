@@ -319,6 +319,8 @@ export const dictionaries = {
     "birthday.title": "শুভ জন্মদিন!",
     "birthday.wish": "জীবনের এই বিশেষ দিনে ESAJS পরিবারের পক্ষ থেকে অনেক অনেক শুভেচ্ছা ও ভালোবাসা।",
     "birthday.close": "বন্ধ করুন",
+    "birthday.skip": "এড়িয়ে যান",
+    "birthday.tapSkip": "এড়িয়ে যেতে ট্যাপ করুন",
   },
   en: {
     // Nav / header
@@ -638,6 +640,8 @@ export const dictionaries = {
     "birthday.title": "Happy Birthday!",
     "birthday.wish": "Wishing you a wonderful day, filled with joy and love from the entire ESAJS family.",
     "birthday.close": "Close",
+    "birthday.skip": "Skip",
+    "birthday.tapSkip": "Tap anywhere to skip",
   },
 } as const satisfies Record<Lang, Record<string, string>>;
 

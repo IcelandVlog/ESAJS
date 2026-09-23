@@ -103,6 +103,8 @@ export async function POST(req: NextRequest) {
     if (e?.code === "23505") {
       return NextResponse.json({ error: "এই ইমেইল দিয়ে ইতিমধ্যে রেজিস্ট্রেশন করা হয়েছে" }, { status: 409 });
     }
+    // Log the real reason (visible in terminal / Vercel logs) instead of hiding it.
+    console.error("REGISTER ERROR:", e?.code, e?.message, e?.cause?.message ?? "");
     return NextResponse.json({ error: "সমস্যা হয়েছে, আবার চেষ্টা করুন" }, { status: 500 });
   }
 }
