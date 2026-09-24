@@ -22,6 +22,8 @@ type Props = {
   galleryCount: number;
   /** Set for batch admins: they only see their own batch, so hide site-wide extras. */
   scopedBatch?: string | null;
+  /** Main admin: jump to the "Batch Admins" tab. */
+  onManageAdmins?: () => void;
 };
 
 const NON_STUDENT = "other";
@@ -41,9 +43,18 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
   return <h3 className="font-display text-lg text-heading mb-3">{children}</h3>;
 }
 
-export default function DashboardTab({ students, tokens, noticeCount, galleryCount, scopedBatch = null }: Props) {
+export default function DashboardTab({ students, tokens, noticeCount, galleryCount, scopedBatch = null, onManageAdmins }: Props) {
   const { t, lang } = useLanguage();
   const [attendees, setAttendees] = useState<Record<number, number>>({});
+  // Who has been made admin of which batch (main admin only — the API refuses everyone else).
+  const [batchAdmins, setBatchAdmins] = useState<{ id: number; name: string; batch: string | null }[]>([]);
+  useEffect(() => {
+    if (scopedBatch) return;
+    fetch("/api/admins")
+      .then((r) => r.json())
+      .then((d) => setBatchAdmins(d.admins || []))
+      .catch(() => setBatchAdmins([]));
+  }, [scopedBatch]);
   // Birthday-wish test: which person(s) to preview, and a counter so each click replays the animation.
   const [bdChoice, setBdChoice] = useState("sample");
   const [bdPreview, setBdPreview] = useState<{ key: number; list: Birthday[] } | null>(null);
@@ -144,6 +155,25 @@ export default function DashboardTab({ students, tokens, noticeCount, galleryCou
     setBdPreview((prev) => ({ key: (prev?.key ?? 0) + 1, list }));
   }
 
+  // Batch table rows: every batch with students, plus any batch that only has an admin.
+  const batchTableRows = useMemo(() => {
+    const adminsByBatch = new Map<string, string[]>();
+    for (const a of batchAdmins) {
+      if (!a.batch) continue;
+      adminsByBatch.set(a.batch, [...(adminsByBatch.get(a.batch) ?? []), a.name]);
+    }
+    const rows = stats.batchRows.map((r) => ({ ...r, admins: adminsByBatch.get(r.batch) ?? [] }));
+    const known = new Set(rows.map((r) => r.batch));
+    for (const [batch, names] of adminsByBatch) {
+      if (!known.has(batch)) rows.push({ batch, total: 0, approved: 0, admins: names });
+    }
+    return rows.sort((a, b) => {
+      if (!a.batch) return 1;
+      if (!b.batch) return -1;
+      return Number(b.batch) - Number(a.batch);
+    });
+  }, [stats.batchRows, batchAdmins]);
+
   const maxBatch = Math.max(1, ...stats.batchRows.map((r) => r.total));
   const maxBlood = Math.max(1, ...stats.bloodRows.map(([, c]) => c));
   const locale = lang === "bn" ? "bn-BD" : "en-GB";
@@ -172,6 +202,7 @@ export default function DashboardTab({ students, tokens, noticeCount, galleryCou
           <StatCard label={t("dashboard.approved")} value={stats.approved} tone="good" />
           <StatCard label={t("dashboard.pending")} value={stats.pending} tone={stats.pending > 0 ? "warn" : "default"} />
           <StatCard label={t("dashboard.birthdaysThisMonth")} value={stats.birthdays} />
+          {!scopedBatch && <StatCard label={t("dashboard.totalBatchAdmins")} value={batchAdmins.length} />}
         </div>
       </section>
 
@@ -179,23 +210,39 @@ export default function DashboardTab({ students, tokens, noticeCount, galleryCou
       <section>
         <SectionTitle>{t("dashboard.batchWise")}</SectionTitle>
         <div className="bg-surface border border-line rounded-lg overflow-x-auto">
-          <table className="w-full text-sm min-w-[520px]">
+          <table className={`w-full text-sm ${scopedBatch ? "min-w-[520px]" : "min-w-[720px]"}`}>
             <thead>
               <tr className="text-left text-ink/50 border-b border-line">
                 <th className="px-4 py-2.5 font-normal">{t("admin.field.batch")}</th>
                 <th className="px-4 py-2.5 font-normal">{t("dashboard.total")}</th>
                 <th className="px-4 py-2.5 font-normal">{t("dashboard.approved")}</th>
                 <th className="px-4 py-2.5 font-normal">{t("dashboard.pending")}</th>
-                <th className="px-4 py-2.5 font-normal w-1/3"></th>
+                {!scopedBatch && <th className="px-4 py-2.5 font-normal">{t("admin.tab.admins")}</th>}
+                <th className="px-4 py-2.5 font-normal w-1/4"></th>
               </tr>
             </thead>
             <tbody>
-              {stats.batchRows.map((r) => (
+              {batchTableRows.map((r) => (
                 <tr key={r.batch || "none"} className="border-b border-line last:border-0">
                   <td className="px-4 py-2.5 font-medium">{r.batch || t("dashboard.noBatch")}</td>
                   <td className="px-4 py-2.5">{r.total}</td>
                   <td className="px-4 py-2.5">{r.approved}</td>
                   <td className="px-4 py-2.5">{r.total - r.approved}</td>
+                  {!scopedBatch && (
+                    <td className="px-4 py-2.5">
+                      {r.admins.length > 0 ? (
+                        <div className="flex flex-wrap gap-1.5">
+                          {r.admins.map((name, i) => (
+                            <span key={i} className="rounded-full bg-sky-500/15 text-sky-500 px-2.5 py-0.5 text-xs font-medium">
+                              {name}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="text-ink/30">{t("dashboard.noAdmin")}</span>
+                      )}
+                    </td>
+                  )}
                   <td className="px-4 py-2.5">
                     <div className="h-2 rounded-full bg-ink/10 overflow-hidden">
                       <div className="h-full rounded-full bg-gradient-to-r from-brand-blue to-brand-pink" style={{ width: `${(r.total / maxBatch) * 100}%` }} />
@@ -209,12 +256,13 @@ export default function DashboardTab({ students, tokens, noticeCount, galleryCou
                   <td className="px-4 py-2.5">{stats.nonStudents}</td>
                   <td className="px-4 py-2.5">{students.filter((s) => s.batch === NON_STUDENT && s.approved).length}</td>
                   <td className="px-4 py-2.5">{students.filter((s) => s.batch === NON_STUDENT && !s.approved).length}</td>
+                  {!scopedBatch && <td className="px-4 py-2.5" />}
                   <td className="px-4 py-2.5" />
                 </tr>
               )}
-              {stats.batchRows.length === 0 && stats.nonStudents === 0 && (
+              {batchTableRows.length === 0 && stats.nonStudents === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-4 py-6 text-center text-ink/50">
+                  <td colSpan={6} className="px-4 py-6 text-center text-ink/50">
                     {t("dashboard.noRegistrations")}
                   </td>
                 </tr>
@@ -222,6 +270,11 @@ export default function DashboardTab({ students, tokens, noticeCount, galleryCou
             </tbody>
           </table>
         </div>
+        {!scopedBatch && onManageAdmins && (
+          <button type="button" onClick={onManageAdmins} className="mt-3 text-sm font-medium text-sky-500 hover:underline">
+            {t("dashboard.manageAdmins")} →
+          </button>
+        )}
       </section>
 
       {/* Reunions */}

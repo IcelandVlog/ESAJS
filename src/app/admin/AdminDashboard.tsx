@@ -165,6 +165,7 @@ export default function AdminDashboard({ batch }: { batch: string | null }) {
               noticeCount={notices.length}
               galleryCount={gallery.length}
               scopedBatch={scopedBatch}
+              onManageAdmins={() => setTab("admins")}
             />
           )}
           {tab === "students" && (
