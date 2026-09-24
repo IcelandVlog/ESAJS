@@ -52,7 +52,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ prov
       return loginErrorRedirect(origin, "pending_approval");
     }
     const token = signSession({ role: "student", id: existing.id, name: existing.name });
-    const res = NextResponse.redirect(new URL("/student", origin));
+    // Signed in — land on the home page (same as normal email/password login).
+    const res = NextResponse.redirect(new URL("/", origin));
     res.cookies.set(COOKIE_NAME, token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
