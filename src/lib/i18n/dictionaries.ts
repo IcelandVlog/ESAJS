@@ -59,6 +59,7 @@ export const dictionaries = {
     "notices.title": "নোটিশ বোর্ড",
     "notices.count": "টি নোটিশ",
     "notices.empty": "এখনো কোনো নোটিশ যুক্ত করা হয়নি।",
+    "notices.readMore": "বিস্তারিত দেখুন",
 
     // Gallery
     "gallery.title": "গ্যালারি",
@@ -279,6 +280,7 @@ export const dictionaries = {
     "admin.addNewStudent": "+ নতুন শিক্ষার্থী",
     "admin.addNewResult": "+ নতুন রেজাল্ট",
     "admin.addNewNotice": "+ নতুন নোটিশ",
+    "admin.editNotice": "নোটিশ সম্পাদনা করুন",
     "admin.addNewEntry": "+ এন্ট্রি যুক্ত করুন",
 
     "admin.studentList": "শিক্ষার্থী তালিকা",
@@ -421,6 +423,7 @@ export const dictionaries = {
     "notices.title": "Notice Board",
     "notices.count": "notices",
     "notices.empty": "No notices have been posted yet.",
+    "notices.readMore": "Read details",
 
     // Gallery
     "gallery.title": "Gallery",
@@ -641,6 +644,7 @@ export const dictionaries = {
     "admin.addNewStudent": "+ New Student",
     "admin.addNewResult": "+ New Result",
     "admin.addNewNotice": "+ New Notice",
+    "admin.editNotice": "Edit notice",
     "admin.addNewEntry": "+ Add Entry",
 
     "admin.studentList": "Student List",

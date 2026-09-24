@@ -449,13 +449,25 @@ function NoticesTab({ notices, onChange }: { notices: Notice[]; onChange: () => 
   const [form, setForm] = useState({ title: "", content: "", date: new Date().toISOString().slice(0, 10) });
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  // Set while editing an existing notice; null means the form adds a new one.
+  const [editingId, setEditingId] = useState<number | null>(null);
+
+  const emptyForm = () => ({ title: "", content: "", date: new Date().toISOString().slice(0, 10) });
+
+  function startEdit(n: Notice) {
+    setEditingId(n.id);
+    setForm({ title: n.title, content: n.content, date: n.date });
+    setError("");
+    setOpen(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setSaving(true);
-    const res = await fetch("/api/notices", {
-      method: "POST",
+    const res = await fetch(editingId ? `/api/notices/${editingId}` : "/api/notices", {
+      method: editingId ? "PUT" : "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
     });
@@ -465,7 +477,8 @@ function NoticesTab({ notices, onChange }: { notices: Notice[]; onChange: () => 
       setError(data.error || t("admin.error"));
       return;
     }
-    setForm({ title: "", content: "", date: new Date().toISOString().slice(0, 10) });
+    setForm(emptyForm());
+    setEditingId(null);
     setOpen(false);
     onChange();
   }
@@ -483,7 +496,14 @@ function NoticesTab({ notices, onChange }: { notices: Notice[]; onChange: () => 
           {t("admin.noticeList")} ({notices.length})
         </h2>
         <button
-          onClick={() => setOpen((o) => !o)}
+          onClick={() => {
+            if (open) {
+              setEditingId(null);
+              setForm(emptyForm());
+              setError("");
+            }
+            setOpen((o) => !o);
+          }}
           className="bg-pine text-on-navy text-sm px-4 py-2 rounded hover:bg-pine-dark transition-colors"
         >
           {open ? t("admin.cancel") : t("admin.addNewNotice")}
@@ -492,6 +512,9 @@ function NoticesTab({ notices, onChange }: { notices: Notice[]; onChange: () => 
 
       {open && (
         <form onSubmit={submit} className="bg-surface border border-line rounded-lg p-5 mb-6 space-y-4">
+          <h3 className="font-display text-lg text-heading">
+            {editingId ? t("admin.editNotice") : t("admin.addNewNotice")}
+          </h3>
           <Field label={t("admin.field.title")} value={form.title} onChange={(v) => setForm({ ...form, title: v })} required />
           <div>
             <label className="block text-sm text-ink/70 mb-1.5">{t("admin.field.content")}</label>
@@ -521,9 +544,14 @@ function NoticesTab({ notices, onChange }: { notices: Notice[]; onChange: () => 
               </div>
               <p className="text-sm text-ink/60 mt-1">{n.content}</p>
             </div>
-            <button onClick={() => remove(n.id)} className="text-clay hover:underline text-xs shrink-0 h-fit">
-              {t("admin.delete")}
-            </button>
+            <div className="flex gap-3 shrink-0 h-fit">
+              <button onClick={() => startEdit(n)} className="text-heading hover:underline text-xs font-medium">
+                {t("admin.edit")}
+              </button>
+              <button onClick={() => remove(n.id)} className="text-clay hover:underline text-xs">
+                {t("admin.delete")}
+              </button>
+            </div>
           </div>
         ))}
         {notices.length === 0 && <p className="text-ink/50 text-center py-6">{t("admin.noNotices")}</p>}
