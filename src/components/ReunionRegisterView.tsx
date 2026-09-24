@@ -118,6 +118,16 @@ export default function ReunionRegisterView({ name }: { name: string }) {
             </p>
           ) : (
             <>
+              {/* Tell the student first: a join code was sent to their Gmail. */}
+              {!registered && (
+                <div className="mb-6 rounded-xl border border-sky-500/30 bg-sky-500/10 p-5 text-center">
+                  <p className="text-3xl mb-2">📧</p>
+                  <p className="font-medium text-heading mb-1">{t("reunionPage.codeSentTitle")}</p>
+                  <p className="text-sm text-ink/70 leading-relaxed">{t("reunionPage.codeSentBody")}</p>
+                  <p className="text-xs text-ink/50 mt-2">{t("reunionPage.codeSentHint")}</p>
+                </div>
+              )}
+
               {/* Dark gradient reunion card */}
               <div className="rounded-2xl p-6 sm:p-8 mb-6 shadow-xl bg-gradient-to-br from-navy-950 via-[#1b1035] to-navy-950">
                 <GradientHeading>{t("reunionPage.cardTitle")}</GradientHeading>

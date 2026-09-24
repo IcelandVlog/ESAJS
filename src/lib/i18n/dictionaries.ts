@@ -29,7 +29,7 @@ export const dictionaries = {
     "hero.subtitle": "এক্স-স্টুডেন্টস অ্যাসোসিয়েশন অব জালালপুর সেকেন্ডারি স্কুল-এর অফিসিয়াল ওয়েবসাইট",
     "hero.studentLogin": "স্টুডেন্ট লগইন",
     "hero.viewNotices": "নোটিশ দেখুন",
-    "hero.reunionCard": "REUNION CARD",
+    "hero.reunionCard": "রিইউনিয়নে যোগ দিন",
     "hero.register": "রেজিস্ট্রেশন করুন",
 
     // Homepage reunion countdown
@@ -41,19 +41,22 @@ export const dictionaries = {
     "home.reunion.started": "রিইউনিয়ন শুরু হয়ে গেছে! 🎉",
 
     // Reunion registration page (/reunion)
-    "reunionPage.title": "রিইউনিয়ন রেজিস্ট্রেশন",
+    "reunionPage.title": "রিইউনিয়নে যোগ দিন",
     "reunionPage.loading": "লোড হচ্ছে...",
-    "reunionPage.noReunion": "আপনার ব্যাচের জন্য এখনো কোনো রিইউনিয়ন ঘোষণা করা হয়নি।",
+    "reunionPage.noReunion": "আপনার ব্যাচের অ্যাডমিন এখনো কোনো রিইউনিয়ন যোগ করেননি। অ্যাডমিন রিইউনিয়ন যোগ করলে এখানেই জয়েন করতে পারবেন।",
     "reunionPage.cardTitle": "Reunion Date & Time",
     "reunionPage.dateLabel": "তারিখ",
     "reunionPage.venueLabel": "স্থান",
     "reunionPage.started": "Reunion Has Started!",
-    "reunionPage.tokenLabel": "প্রবেশ কোড দিয়ে রেজিস্ট্রেশন করুন",
+    "reunionPage.tokenLabel": "জয়েন কোড বসান",
     "reunionPage.tokenPlaceholder": "যেমনঃ PUA253",
-    "reunionPage.submit": "রেজিস্ট্রেশন করুন",
-    "reunionPage.submitting": "রেজিস্ট্রেশন হচ্ছে...",
-    "reunionPage.tokenHint": "SMS বা ইমেইলে পাঠানো প্রবেশ কোডটি এখানে দিন। এই কোড শুধু আপনার ব্যাচের জন্যই কাজ করবে।",
-    "reunionPage.registeredMessage": "আপনি সফলভাবে রেজিস্ট্রেশন করেছেন! রিইউনিয়নে আপনাকে স্বাগতম।",
+    "reunionPage.submit": "রিইউনিয়নে যোগ দিন",
+    "reunionPage.submitting": "যোগ হচ্ছে...",
+    "reunionPage.tokenHint": "Gmail-এ পাঠানো জয়েন/কুপন কোডটি এখানে দিন। এই কোড শুধু আপনার ব্যাচের জন্যই কাজ করবে।",
+    "reunionPage.registeredMessage": "আপনি রিইউনিয়নে যুক্ত হয়েছেন! রিইউনিয়নে আপনাকে স্বাগতম।",
+    "reunionPage.codeSentTitle": "আপনার Gmail-এ জয়েন কোড পাঠানো হয়েছে",
+    "reunionPage.codeSentBody": "আপনার ব্যাচের অ্যাডমিন রিইউনিয়ন যোগ করেছেন। আপনার Gmail-এ একটি কুপন/জয়েন কোড পাঠানো হয়েছে — সেই কোডটি নিচের ঘরে বসান, তাহলেই আপনি রিইউনিয়নে যুক্ত হয়ে যাবেন।",
+    "reunionPage.codeSentHint": "ইনবক্সে না পেলে স্প্যাম বা প্রমোশন ফোল্ডার দেখুন।",
 
     // Notices section
     "notices.title": "নোটিশ বোর্ড",
@@ -423,7 +426,7 @@ export const dictionaries = {
     "hero.subtitle": "Official website of the Ex-Students Association of Jalalpur Secondary School",
     "hero.studentLogin": "Student Login",
     "hero.viewNotices": "View Notices",
-    "hero.reunionCard": "REUNION CARD",
+    "hero.reunionCard": "JOIN REUNION",
     "hero.register": "Register",
 
     // Homepage reunion countdown
@@ -435,19 +438,22 @@ export const dictionaries = {
     "home.reunion.started": "The reunion has started! 🎉",
 
     // Reunion registration page (/reunion)
-    "reunionPage.title": "Reunion Registration",
+    "reunionPage.title": "Join the Reunion",
     "reunionPage.loading": "Loading...",
-    "reunionPage.noReunion": "No reunion has been announced for your batch yet.",
+    "reunionPage.noReunion": "Your batch admin hasn't added a reunion yet. Once they add one, you can join it right here.",
     "reunionPage.cardTitle": "Reunion Date & Time",
     "reunionPage.dateLabel": "Date",
     "reunionPage.venueLabel": "Venue",
     "reunionPage.started": "Reunion Has Started!",
-    "reunionPage.tokenLabel": "Register with your entry code",
+    "reunionPage.tokenLabel": "Enter your join code",
     "reunionPage.tokenPlaceholder": "e.g. PUA253",
-    "reunionPage.submit": "Register",
-    "reunionPage.submitting": "Registering...",
-    "reunionPage.tokenHint": "Enter the entry code you received by SMS or email. It only works for your own batch.",
-    "reunionPage.registeredMessage": "You're successfully registered! See you at the reunion.",
+    "reunionPage.submit": "Join reunion",
+    "reunionPage.submitting": "Joining...",
+    "reunionPage.tokenHint": "Enter the join/coupon code sent to your Gmail. It only works for your own batch.",
+    "reunionPage.registeredMessage": "You've joined the reunion! See you there.",
+    "reunionPage.codeSentTitle": "A join code has been sent to your Gmail",
+    "reunionPage.codeSentBody": "Your batch admin has added a reunion. A coupon/join code was sent to your Gmail — enter that code below and you'll be added to the reunion.",
+    "reunionPage.codeSentHint": "If you can't find it in your inbox, check the spam or promotions folder.",
 
     // Notices section
     "notices.title": "Notice Board",

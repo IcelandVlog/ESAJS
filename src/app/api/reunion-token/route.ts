@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
     `ব্যাচ: ${batch}`,
     `তারিখ: ${dateStr}`,
     venueText ? `স্থান: ${venueText}` : "",
-    `প্রবেশ কোড: ${token}`,
+    `জয়েন কোড: ${token}`,
   ]
     .filter(Boolean)
     .join("\n");
@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
         return;
       }
       const ok = isEmailContact(contact)
-        ? await sendEmailMessage(contact, "ESAJS Reunion Entry Code", message)
+        ? await sendEmailMessage(contact, "ESAJS Reunion Join Code", message)
         : await sendSmsMessage(contact, message);
       if (ok) {
         isEmailContact(contact) ? emailSent++ : smsSent++;
