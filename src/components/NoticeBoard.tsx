@@ -81,7 +81,7 @@ export default function NoticeBoard({ notices }: { notices: Notice[] }) {
               type="button"
               onClick={() => setActiveId(null)}
               aria-label={t("gallery.close")}
-              className="absolute top-3 right-3 flex h-9 w-9 items-center justify-center rounded-full text-ink/60 hover:bg-ink/10 hover:text-heading transition-colors"
+              className="absolute top-3 right-3 flex h-9 w-9 items-center justify-center rounded-full border border-line text-ink/60 hover:bg-ink/10 hover:text-heading hover:border-ink/30 transition-colors"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
                 <path d="M18 6 6 18M6 6l12 12" />
