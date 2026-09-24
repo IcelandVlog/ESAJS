@@ -65,7 +65,6 @@ export function parseGalleryContent(raw: string): GalleryContent {
 export function featureLineStyle(line: StyledLine, defaults: StyledLine): CSSProperties {
   const style: CSSProperties = {};
   if (line.color.toLowerCase() !== defaults.color.toLowerCase()) style.color = line.color;
-  if (line.fontSize !== defaults.fontSize) style.fontSize = line.fontSize;
   if (line.style === "italic" || line.style === "bold-italic") style.fontStyle = "italic";
   if (line.style === "bold" || line.style === "bold-italic") style.fontWeight = 700;
   return style;
