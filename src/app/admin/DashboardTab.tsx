@@ -3,8 +3,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import type { ReunionToken } from "./ReunionTab";
+import BirthdayPopup, { type Birthday } from "@/components/BirthdayPopup";
 
 type StudentLite = {
+  id: number;
+  name: string;
+  photoUrl?: string | null;
   batch: string | null;
   approved: boolean;
   bloodGroup: string | null;
@@ -38,6 +42,9 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 export default function DashboardTab({ students, tokens, noticeCount, galleryCount }: Props) {
   const { t, lang } = useLanguage();
   const [attendees, setAttendees] = useState<Record<number, number>>({});
+  // Birthday-wish test: which person(s) to preview, and a counter so each click replays the animation.
+  const [bdChoice, setBdChoice] = useState("sample");
+  const [bdPreview, setBdPreview] = useState<{ key: number; list: Birthday[] } | null>(null);
 
   useEffect(() => {
     fetch("/api/admin-stats")
@@ -108,6 +115,32 @@ export default function DashboardTab({ students, tokens, noticeCount, galleryCou
       .map((tk) => ({ tk, status: statusOf(tk) }));
     return { held: held.size, upcoming: upcoming.size, cancelled: cancelled.size, confirmed, rows };
   }, [tokens, attendees]);
+
+  // Same rule as the public popup: approved students whose birthday is today in Bangladesh.
+  const todaysBirthdays = useMemo(() => {
+    const parts = new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Dhaka", month: "2-digit", day: "2-digit" }).formatToParts(new Date());
+    const month = parts.find((p) => p.type === "month")?.value;
+    const day = parts.find((p) => p.type === "day")?.value;
+    return students.filter((s) => {
+      if (!s.approved || !s.dateOfBirth) return false;
+      const p = s.dateOfBirth.split("-");
+      return p.length === 3 && p[1] === month && p[2] === day;
+    });
+  }, [students]);
+
+  function startBirthdayPreview() {
+    let list: Birthday[];
+    if (bdChoice === "sample") {
+      list = [{ id: -1, name: t("dashboard.birthdaySampleName"), photoUrl: null }];
+    } else if (bdChoice === "today") {
+      list = todaysBirthdays.map((s) => ({ id: s.id, name: s.name, photoUrl: s.photoUrl ?? null }));
+    } else {
+      const s = students.find((x) => String(x.id) === bdChoice);
+      list = s ? [{ id: s.id, name: s.name, photoUrl: s.photoUrl ?? null }] : [];
+    }
+    if (list.length === 0) return;
+    setBdPreview((prev) => ({ key: (prev?.key ?? 0) + 1, list }));
+  }
 
   const maxBatch = Math.max(1, ...stats.batchRows.map((r) => r.total));
   const maxBlood = Math.max(1, ...stats.bloodRows.map(([, c]) => c));
@@ -260,6 +293,48 @@ export default function DashboardTab({ students, tokens, noticeCount, galleryCou
           </div>
         </div>
       </section>
+
+      {/* Birthday wish test */}
+      <section>
+        <SectionTitle>{t("dashboard.birthdayTest")}</SectionTitle>
+        <div className="bg-surface border border-line rounded-lg p-5 space-y-4">
+          <p className="text-sm text-ink/60">{t("dashboard.birthdayTestHint")}</p>
+          <p className="text-sm">
+            <span className="text-ink/50">{t("dashboard.birthdayToday")}: </span>
+            {todaysBirthdays.length > 0 ? (
+              <span className="font-medium">{todaysBirthdays.map((s) => s.name).join(", ")}</span>
+            ) : (
+              <span className="text-ink/60">{t("dashboard.birthdayNone")}</span>
+            )}
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <select
+              value={bdChoice}
+              onChange={(e) => setBdChoice(e.target.value)}
+              className="flex-1 border border-line rounded px-3 py-2.5 bg-transparent focus:outline-none focus:ring-2 focus:ring-pine/40"
+            >
+              <option value="sample">{t("dashboard.birthdaySample")}</option>
+              {todaysBirthdays.length > 0 && <option value="today">{t("dashboard.birthdayTodayAll")}</option>}
+              <optgroup label={t("dashboard.birthdayPickStudent")}>
+                {students.map((s) => (
+                  <option key={s.id} value={String(s.id)}>
+                    {s.name}
+                  </option>
+                ))}
+              </optgroup>
+            </select>
+            <button
+              type="button"
+              onClick={startBirthdayPreview}
+              className="bg-pine text-on-navy px-5 py-2.5 rounded text-sm hover:bg-pine-dark transition-colors whitespace-nowrap"
+            >
+              🎂 {t("dashboard.birthdayPreview")}
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {bdPreview && <BirthdayPopup key={bdPreview.key} preview={bdPreview.list} onClose={() => setBdPreview(null)} />}
     </div>
   );
 }

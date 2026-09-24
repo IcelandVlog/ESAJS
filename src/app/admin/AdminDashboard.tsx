@@ -23,6 +23,7 @@ type Student = {
   bloodGroup: string | null;
   dateOfBirth: string | null;
   approved: boolean;
+  photoUrl?: string | null;
 };
 
 type Notice = {

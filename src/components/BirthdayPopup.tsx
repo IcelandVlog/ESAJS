@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
-type Birthday = { id: number; name: string; photoUrl: string | null };
+export type Birthday = { id: number; name: string; photoUrl: string | null };
 type Phase = "intro" | "profile";
 
 const DISMISS_KEY_PREFIX = "esajs_birthday_dismissed_";
@@ -84,13 +84,28 @@ function splitTitle(text: string, lang: string): string[][] {
   return words.map((w) => (lang === "en" ? Array.from(w) : [w]));
 }
 
-export default function BirthdayPopup() {
+// Normally (no props) the popup loads today's birthdays itself and remembers per
+// day that it was closed. With `preview` it shows exactly those people right away,
+// on any day, and never touches the "closed today" memory — used by the admin's
+// birthday-wish test. `onClose` fires when the preview is closed.
+export default function BirthdayPopup({ preview, onClose }: { preview?: Birthday[]; onClose?: () => void } = {}) {
   const { t, lang } = useLanguage();
   const [birthdays, setBirthdays] = useState<Birthday[]>([]);
   const [phase, setPhase] = useState<Phase | null>(null);
   const [leaving, setLeaving] = useState(false);
 
   useEffect(() => {
+    if (preview) {
+      let reduce = false;
+      try {
+        reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      } catch {
+        reduce = false;
+      }
+      setBirthdays(preview);
+      setPhase(reduce ? "profile" : "intro");
+      return;
+    }
     const todayKey = new Date().toISOString().slice(0, 10);
     fetch("/api/birthdays/today")
       .then((res) => res.json())
@@ -114,7 +129,8 @@ export default function BirthdayPopup() {
         setPhase(reduce ? "profile" : "intro");
       })
       .catch(() => {});
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preview]);
 
   // Intro plays for a few seconds, then hands over to the birthday profile.
   useEffect(() => {
@@ -134,6 +150,10 @@ export default function BirthdayPopup() {
 
   function close() {
     setPhase(null);
+    if (preview) {
+      onClose?.();
+      return;
+    }
     const todayKey = new Date().toISOString().slice(0, 10);
     try {
       localStorage.setItem(DISMISS_KEY_PREFIX + todayKey, "1");
