@@ -198,7 +198,9 @@ export const dictionaries = {
     "register.submitting": "রেজিস্ট্রেশন হচ্ছে...",
     "register.loginPrompt": "ইতিমধ্যে অ্যাকাউন্ট আছে?",
     "register.loginLink": "লগইন করুন",
-    "register.pendingNotice": "আপনার রেজিস্ট্রেশন সফল হয়েছে। অ্যাডমিন অনুমোদনের পর আপনি লগইন করতে পারবেন।",
+    "register.pendingNotice": "আপনার রেজিস্ট্রেশন সফল হয়েছে। আপনি এই স্কুলের শিক্ষার্থী নন, তাই অ্যাডমিন অনুমোদন করার পর আপনি লগইন করতে পারবেন।",
+    "register.successLoggedIn": "রেজিস্ট্রেশন সফলভাবে সম্পন্ন হয়েছে! আপনি এখন লগইন অবস্থায় আছেন।",
+    "register.goHome": "হোম পেজে যান",
     "register.redirecting": "হোম পেজে নিয়ে যাওয়া হচ্ছে...",
 
     // Admin login (hidden route)
@@ -316,6 +318,10 @@ export const dictionaries = {
     "student.table.grade": "গ্রেড",
     "student.table.date": "তারিখ",
     "student.table.status": "অবস্থা",
+    "student.detailsTitle": "আমার তথ্য",
+    "student.detailsSubtitle": "এখান থেকে আপনার সব তথ্য এডিট করে সংরক্ষণ করতে পারবেন।",
+    "student.saved": "তথ্য সফলভাবে সংরক্ষণ হয়েছে ✓",
+    "student.emailNote": "ইমেইলই আপনার লগইন আইডি — বদলালে নতুন ইমেইল দিয়ে লগইন করতে হবে।",
 
     // Birthday wish popup
     "birthday.eyebrow": "আজকের জন্মদিন",
@@ -522,7 +528,9 @@ export const dictionaries = {
     "register.submitting": "Registering...",
     "register.loginPrompt": "Already have an account?",
     "register.loginLink": "Login",
-    "register.pendingNotice": "Your registration was successful. You can log in once an admin approves your account.",
+    "register.pendingNotice": "Your registration was successful. Since you are not a student of this school, you can log in once an admin approves your account.",
+    "register.successLoggedIn": "Registration completed successfully! You are now logged in.",
+    "register.goHome": "Go to home page",
     "register.redirecting": "Redirecting to home...",
 
     // Admin login (hidden route)
@@ -640,6 +648,10 @@ export const dictionaries = {
     "student.table.grade": "Grade",
     "student.table.date": "Date",
     "student.table.status": "Status",
+    "student.detailsTitle": "My Details",
+    "student.detailsSubtitle": "You can edit all of your details here and save them.",
+    "student.saved": "Details saved successfully ✓",
+    "student.emailNote": "Your email is your login ID — if you change it, log in with the new email next time.",
 
     // Birthday wish popup
     "birthday.eyebrow": "Today's Birthday",

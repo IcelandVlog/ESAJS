@@ -1,16 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db/client";
 import { students } from "@/db/schema";
-import { hashPassword } from "@/lib/auth";
+import { hashPassword, signSession, COOKIE_NAME } from "@/lib/auth";
+import {
+  PASSWORD_RULE,
+  EMAIL_RULE,
+  MOBILE_RULE,
+  BLOOD_GROUPS,
+  NON_STUDENT_BATCH,
+  isValidBatch,
+  isValidDob,
+} from "@/lib/validation";
 
-// Password rule: at least 6 characters, one uppercase letter, one number, one special character.
-const PASSWORD_RULE = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{6,}$/;
-// Email is required and used as the account's login identifier.
-const EMAIL_RULE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-// Mobile number is optional — just enough of a check to reject obvious junk if provided.
-const MOBILE_RULE = /^\+?\d{10,15}$/;
-const DOB_RULE = /^\d{4}-\d{2}-\d{2}$/;
-const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+// People who pick a real batch year (i.e. say they are alumni of this school) are
+// approved right away and logged in automatically. People who pick "other"
+// (not a student of this school) stay pending until an admin approves them.
+// Set this to false to send EVERY new registration to the admin's pending list again.
+const AUTO_APPROVE_SCHOOL_STUDENTS = true;
 
 async function verifyRecaptcha(token: string | undefined): Promise<boolean> {
   const secret = process.env.RECAPTCHA_SECRET_KEY;
@@ -47,6 +53,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "সব ফিল্ড পূরণ করুন" }, { status: 400 });
   }
 
+  if (!isValidBatch(batch)) {
+    return NextResponse.json({ error: "সঠিক ব্যাচ নির্বাচন করুন" }, { status: 400 });
+  }
+
   if (bloodGroup && !BLOOD_GROUPS.includes(bloodGroup)) {
     return NextResponse.json({ error: "সঠিক ব্লাড গ্রুপ বাছাই করুন" }, { status: 400 });
   }
@@ -61,7 +71,7 @@ export async function POST(req: NextRequest) {
   }
 
   const dobTrimmed = dob?.trim() || "";
-  if (dobTrimmed && (!DOB_RULE.test(dobTrimmed) || Number.isNaN(new Date(dobTrimmed).getTime()))) {
+  if (dobTrimmed && !isValidDob(dobTrimmed)) {
     return NextResponse.json({ error: "সঠিক জন্ম তারিখ দিন" }, { status: 400 });
   }
 
@@ -77,6 +87,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "reCAPTCHA যাচাই ব্যর্থ হয়েছে, আবার চেষ্টা করুন" }, { status: 400 });
   }
 
+  const approved = AUTO_APPROVE_SCHOOL_STUDENTS && batch !== NON_STUDENT_BATCH;
+
   try {
     const inserted = await db
       .insert(students)
@@ -90,15 +102,28 @@ export async function POST(req: NextRequest) {
         dateOfBirth: dobTrimmed || null,
         bloodGroup: bloodGroup || null,
         password: await hashPassword(password),
-        approved: false,
+        approved,
       })
       .returning();
 
     const student = inserted[0];
-    return NextResponse.json(
-      { ok: true, pending: true, name: student.name },
-      { status: 201 }
-    );
+
+    if (!approved) {
+      // Non-student: no session yet — they can log in once an admin approves them.
+      return NextResponse.json({ ok: true, pending: true, name: student.name }, { status: 201 });
+    }
+
+    // School student: log them in straight away so they land on the home page signed in.
+    const token = signSession({ role: "student", id: student.id, name: student.name });
+    const res = NextResponse.json({ ok: true, pending: false, name: student.name }, { status: 201 });
+    res.cookies.set(COOKIE_NAME, token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7,
+    });
+    return res;
   } catch (e: any) {
     if (e?.code === "23505") {
       return NextResponse.json({ error: "এই ইমেইল দিয়ে ইতিমধ্যে রেজিস্ট্রেশন করা হয়েছে" }, { status: 409 });

@@ -45,21 +45,27 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
+  // true  = school student: already logged in, going straight to the home page
+  // false = non-student: waiting for admin approval before they can log in
+  const [loggedIn, setLoggedIn] = useState(false);
 
   const recaptchaRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<number | null>(null);
   const [recaptchaReady, setRecaptchaReady] = useState(false);
 
   // Once registration succeeds, briefly show the confirmation then send the
-  // person back to the home page automatically.
+  // person to the home page (already signed in, for school students).
   useEffect(() => {
     if (!done) return;
-    const timeout = setTimeout(() => {
-      router.push("/");
-      router.refresh();
-    }, 2500);
+    const timeout = setTimeout(
+      () => {
+        router.push("/");
+        router.refresh();
+      },
+      loggedIn ? 2000 : 5000
+    );
     return () => clearTimeout(timeout);
-  }, [done, router]);
+  }, [done, loggedIn, router]);
 
   // In case the script tag is already loaded (e.g. client-side navigation back to this page),
   // Script's onLoad won't fire again — so also try rendering once grecaptcha shows up.
@@ -130,6 +136,7 @@ export default function RegisterPage() {
         }
         return;
       }
+      setLoggedIn(data.pending === false);
       setDone(true);
     } catch {
       setError(t("login.error"));
@@ -166,14 +173,25 @@ export default function RegisterPage() {
       >
         {done ? (
           <div className="text-center space-y-4">
+            <div
+              className={`mx-auto flex h-14 w-14 items-center justify-center rounded-full ${
+                loggedIn ? "bg-emerald-500/15 text-emerald-500" : "bg-sky-500/15 text-sky-500"
+              }`}
+            >
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                {loggedIn ? <path d="M5 13l4 4L19 7" /> : <><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></>}
+              </svg>
+            </div>
             <p className="text-heading font-medium">{t("register.title")} ✓</p>
-            <p className="text-ink/70 text-sm">{t("register.pendingNotice")}</p>
+            <p className="text-ink/70 text-sm">
+              {loggedIn ? t("register.successLoggedIn") : t("register.pendingNotice")}
+            </p>
             <p className="text-ink/40 text-xs">{t("register.redirecting")}</p>
             <Link
-              href="/login"
+              href="/"
               className="inline-block rounded-xl px-5 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-sky-400 to-cyan-400 hover:opacity-90 transition-opacity shadow-lg shadow-cyan-500/25"
             >
-              {t("register.loginLink")}
+              {t("register.goHome")}
             </Link>
           </div>
         ) : (

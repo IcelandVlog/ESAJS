@@ -14,7 +14,22 @@ export default async function StudentPage() {
   }
 
   const [student] = await db.select().from(students).where(eq(students.id, session.id));
-  if (!student) redirect("/login");
+  if (!student || !student.approved) redirect("/login");
 
-  return <StudentView student={student} />;
+  // Only pass what the page needs — never the password hash / reset code.
+  const details = {
+    name: student.name,
+    email: student.roll,
+    phone: student.phone ?? "",
+    batch: student.batch ?? "",
+    dateOfBirth: student.dateOfBirth ?? "",
+    bloodGroup: student.bloodGroup ?? "",
+    fatherName: student.fatherName ?? "",
+    motherName: student.motherName ?? "",
+    address: student.address ?? "",
+    className: student.className ?? "",
+    section: student.section ?? "",
+  };
+
+  return <StudentView initialDetails={details} />;
 }
