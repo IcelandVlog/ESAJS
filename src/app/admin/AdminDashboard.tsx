@@ -37,6 +37,21 @@ function formatBatch(batch: string | null, t: (key: DictKey) => string): string 
   return batch;
 }
 
+// Registration collects email and mobile separately (email is stored in `roll`).
+// Older records may have an email typed into the phone field, so handle both.
+function splitContact(s: Student): { email: string; mobile: string } {
+  const email = s.roll.includes("@") ? s.roll : s.phone.includes("@") ? s.phone : "";
+  const mobile = s.phone && !s.phone.includes("@") ? s.phone : "";
+  return { email, mobile };
+}
+
+// "2007-03-25" -> "25/03/2007"
+function formatDob(dob: string | null): string {
+  if (!dob) return "-";
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(dob);
+  return m ? `${m[3]}/${m[2]}/${m[1]}` : dob;
+}
+
 // A student's "contact" value is either a phone number or an email
 // (self-registered members type either into one field). Route each to the
 // right app: phone → dialer, email → Gmail compose in a new tab.
@@ -287,26 +302,34 @@ function StudentsTab({ students, onChange }: { students: Student[]; onChange: ()
       )}
 
       <div className="bg-surface border border-line rounded-lg overflow-x-auto">
-        <table className="w-full text-sm min-w-[600px]">
+        <table className="w-full text-sm min-w-[900px]">
           <thead>
             <tr className="text-left text-ink/50 border-b border-line">
               <th className="px-4 py-2.5 font-normal border-r border-line">{t("admin.col.serial")}</th>
               <th className="px-4 py-2.5 font-normal border-r border-line">{t("admin.field.name")}</th>
               <th className="px-4 py-2.5 font-normal border-r border-line">{t("admin.field.batch")}</th>
-              <th className="px-4 py-2.5 font-normal border-r border-line">{t("admin.field.contact")}</th>
+              <th className="px-4 py-2.5 font-normal border-r border-line">{t("register.email")}</th>
+              <th className="px-4 py-2.5 font-normal border-r border-line">{t("admin.field.mobile")}</th>
+              <th className="px-4 py-2.5 font-normal border-r border-line">{t("admin.field.dob")}</th>
               <th className="px-4 py-2.5 font-normal border-r border-line">{t("admin.field.bloodGroup")}</th>
               <th className="px-4 py-2.5 font-normal"></th>
             </tr>
           </thead>
           <tbody>
-            {students.map((s, i) => (
+            {students.map((s, i) => {
+              const { email, mobile } = splitContact(s);
+              return (
               <tr key={s.id} className="border-b border-line">
                 <td className="px-4 py-2.5 text-ink/50 border-r border-line">{i + 1}</td>
                 <td className="px-4 py-2.5 border-r border-line">{s.name}</td>
                 <td className="px-4 py-2.5 border-r border-line">{formatBatch(s.batch, t)}</td>
-                <td className="px-4 py-2.5 border-r border-line">
-                  <ContactLink value={s.phone} />
+                <td className="px-4 py-2.5 border-r border-line break-all">
+                  <ContactLink value={email} />
                 </td>
+                <td className="px-4 py-2.5 border-r border-line whitespace-nowrap">
+                  <ContactLink value={mobile} />
+                </td>
+                <td className="px-4 py-2.5 border-r border-line whitespace-nowrap">{formatDob(s.dateOfBirth)}</td>
                 <td className="px-4 py-2.5 border-r border-line">{s.bloodGroup || "-"}</td>
                 <td className="px-4 py-2.5 text-right space-x-3">
                   <button onClick={() => startEdit(s)} className="text-heading hover:underline text-xs font-medium">
@@ -317,10 +340,11 @@ function StudentsTab({ students, onChange }: { students: Student[]; onChange: ()
                   </button>
                 </td>
               </tr>
-            ))}
+              );
+            })}
             {students.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-4 py-6 text-center text-ink/50">
+                <td colSpan={8} className="px-4 py-6 text-center text-ink/50">
                   {t("admin.noStudents")}
                 </td>
               </tr>

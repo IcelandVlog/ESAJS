@@ -303,6 +303,7 @@ export const dictionaries = {
     "admin.confirmRejectRegistration": "এই রেজিস্ট্রেশনটি প্রত্যাখ্যান করে মুছে ফেলতে চান?",
     "admin.field.batch": "ব্যাচ",
     "admin.field.contact": "মোবাইল/ইমেইল",
+    "admin.field.mobile": "মোবাইল",
 
     // Student dashboard
     "student.dashboardTitle": "শিক্ষার্থী ড্যাশবোর্ড",
@@ -636,6 +637,7 @@ export const dictionaries = {
     "admin.confirmRejectRegistration": "Reject and delete this registration?",
     "admin.field.batch": "Batch",
     "admin.field.contact": "Mobile/Email",
+    "admin.field.mobile": "Mobile",
 
     // Student dashboard
     "student.dashboardTitle": "Student Dashboard",
