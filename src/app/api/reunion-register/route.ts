@@ -2,19 +2,23 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db/client";
 import { reunionTokens, reunionRegistrations, students } from "@/db/schema";
 import { getSession } from "@/lib/auth";
-import { and, desc, eq } from "drizzle-orm";
+import { and, asc, eq, gte } from "drizzle-orm";
+import { REUNION_VISIBLE_AFTER_MS, hasReunionEnded } from "@/lib/reunion";
 
 async function currentStudent(sessionId: number) {
   const [student] = await db.select().from(students).where(eq(students.id, sessionId));
   return student ?? null;
 }
 
-async function latestTokenForBatch(batch: string) {
+// The batch's current reunion: not cancelled and not yet finished. When there is
+// more than one, the soonest one wins. Finished reunions never come back.
+async function currentTokenForBatch(batch: string) {
+  const cutoff = new Date(Date.now() - REUNION_VISIBLE_AFTER_MS);
   const [row] = await db
     .select()
     .from(reunionTokens)
-    .where(and(eq(reunionTokens.batch, batch), eq(reunionTokens.cancelled, false)))
-    .orderBy(desc(reunionTokens.id))
+    .where(and(eq(reunionTokens.batch, batch), eq(reunionTokens.cancelled, false), gte(reunionTokens.reunionDate, cutoff)))
+    .orderBy(asc(reunionTokens.reunionDate))
     .limit(1);
   return row ?? null;
 }
@@ -31,7 +35,7 @@ export async function GET() {
     return NextResponse.json({ reunion: null, registered: false });
   }
 
-  const tokenRow = await latestTokenForBatch(student.batch);
+  const tokenRow = await currentTokenForBatch(student.batch);
   if (!tokenRow) {
     return NextResponse.json({ reunion: null, registered: false });
   }
@@ -79,6 +83,9 @@ export async function POST(req: NextRequest) {
   }
   if (tokenRow.cancelled) {
     return NextResponse.json({ error: "এই রিইউনিয়নটি বাতিল করা হয়েছে" }, { status: 410 });
+  }
+  if (hasReunionEnded(tokenRow.reunionDate)) {
+    return NextResponse.json({ error: "এই রিইউনিয়নটি শেষ হয়ে গেছে" }, { status: 410 });
   }
 
   const [existing] = await db

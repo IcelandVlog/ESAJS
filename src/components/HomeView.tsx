@@ -8,6 +8,7 @@ import Gallery from "@/components/Gallery";
 import NoticeBoard from "@/components/NoticeBoard";
 import type { GalleryPhoto } from "@/lib/gallery";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { REUNION_VISIBLE_AFTER_MS } from "@/lib/reunion";
 
 type Notice = {
   id: number;
@@ -38,6 +39,8 @@ function useCountdown(target: string | null) {
   const clamped = Math.max(0, remaining);
   return {
     started: remaining <= 0,
+    // Reunion is over: stop showing the card even if the page was left open.
+    ended: remaining < -REUNION_VISIBLE_AFTER_MS,
     days: Math.floor(clamped / (1000 * 60 * 60 * 24)),
     hours: Math.floor((clamped / (1000 * 60 * 60)) % 24),
     minutes: Math.floor((clamped / (1000 * 60)) % 60),
@@ -49,7 +52,7 @@ function ReunionCountdown({ reunion }: { reunion: ReunionInfo | null }) {
   const { t, lang } = useLanguage();
   const countdown = useCountdown(reunion?.reunionDate ?? null);
 
-  if (!reunion || !countdown) return null;
+  if (!reunion || !countdown || countdown.ended) return null;
 
   const dateStr = new Date(reunion.reunionDate).toLocaleString(lang === "bn" ? "bn-BD" : "en-US", {
     dateStyle: "full",
