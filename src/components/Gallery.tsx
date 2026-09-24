@@ -102,11 +102,12 @@ export default function Gallery({ photos }: { photos: GalleryPhoto[] }) {
                     <div>
                       {header.text && (
                         <h3
-                          style={{ ...featureLineStyle(header, DEFAULT_HEADER), ...sizeVar(header, DEFAULT_HEADER) }}
-                          // Phones always get a big, readable title. From md up the admin's size is used, but never smaller than 36px so the title stays prominent.
-                          className={`font-bold leading-tight mb-3 md:mb-5 whitespace-pre-wrap text-3xl ${
-                            usesCustomSize(header, DEFAULT_HEADER) ? "md:[font-size:max(var(--fs),2.25rem)]" : "md:text-4xl"
-                          } ${usesCustomColor(header, DEFAULT_HEADER) ? "" : "text-sky-600 dark:text-sky-400"}`}
+                          style={featureLineStyle(header, DEFAULT_HEADER)}
+                          // Two fixed sizes: text-2xl (24px) on phones, text-4xl (36px) from md up.
+                          // Change these two classes to resize the title everywhere.
+                          className={`font-bold leading-tight mb-3 md:mb-5 whitespace-pre-wrap text-2xl md:text-4xl ${
+                            usesCustomColor(header, DEFAULT_HEADER) ? "" : "text-sky-600 dark:text-sky-400"
+                          }`}
                         >
                           {header.text}
                         </h3>
