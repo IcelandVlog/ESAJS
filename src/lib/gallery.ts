@@ -57,3 +57,23 @@ export function parseGalleryContent(raw: string): GalleryContent {
     return { header: { ...DEFAULT_HEADER }, lines: [] };
   }
 }
+
+// Used by the public gallery "feature" layout. The admin's colour / size are only
+// applied when they picked something other than the defaults — otherwise the page's
+// own theme-aware colours and larger sizes are used, so text stays readable on
+// both the dark and light theme. Bold / italic always follow the admin's choice.
+export function featureLineStyle(line: StyledLine, defaults: StyledLine): CSSProperties {
+  const style: CSSProperties = {};
+  if (line.color.toLowerCase() !== defaults.color.toLowerCase()) style.color = line.color;
+  if (line.fontSize !== defaults.fontSize) style.fontSize = line.fontSize;
+  if (line.style === "italic" || line.style === "bold-italic") style.fontStyle = "italic";
+  if (line.style === "bold" || line.style === "bold-italic") style.fontWeight = 700;
+  return style;
+}
+
+export function usesCustomColor(line: StyledLine, defaults: StyledLine): boolean {
+  return line.color.toLowerCase() !== defaults.color.toLowerCase();
+}
+export function usesCustomSize(line: StyledLine, defaults: StyledLine): boolean {
+  return line.fontSize !== defaults.fontSize;
+}

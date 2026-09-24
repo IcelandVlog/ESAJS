@@ -1,88 +1,73 @@
 "use client";
 
-import { useState } from "react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
-import { parseGalleryContent, styledLineCss, type GalleryPhoto } from "@/lib/gallery";
+import {
+  DEFAULT_HEADER,
+  DEFAULT_LINE,
+  featureLineStyle,
+  parseGalleryContent,
+  usesCustomColor,
+  usesCustomSize,
+  type GalleryPhoto,
+} from "@/lib/gallery";
 
+// Each gallery item is shown as a large "feature" row: rounded photo on the
+// left, title + description on the right (stacked on phones).
 export default function Gallery({ photos }: { photos: GalleryPhoto[] }) {
   const { t } = useLanguage();
-  const [activeId, setActiveId] = useState<number | null>(null);
-  const active = photos.find((p) => p.id === activeId) || null;
 
   return (
-    <section id="gallery" className="max-w-5xl mx-auto px-4 sm:px-6 py-14">
-      <div className="flex items-baseline justify-between mb-6 border-b border-line pb-3">
+    <section id="gallery" className="max-w-6xl mx-auto px-4 sm:px-6 py-14">
+      <div className="mb-10">
         <h2 className="font-display text-2xl text-heading">{t("gallery.title")}</h2>
       </div>
 
       {photos.length === 0 ? (
         <p className="text-ink/60 py-10 text-center">{t("gallery.empty")}</p>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+        <div className="space-y-16 md:space-y-24">
           {photos.map((p) => {
             const content = parseGalleryContent(p.content);
+            const header = content.header;
             return (
-              <button
-                key={p.id}
-                onClick={() => setActiveId(p.id)}
-                className="group relative rounded-lg overflow-hidden border border-line aspect-square"
-              >
+              <article key={p.id} className="grid md:grid-cols-2 gap-8 md:gap-16 items-center">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={p.imageUrl}
-                  alt={content.header.text}
+                  alt={header.text}
                   loading="lazy"
                   decoding="async"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full aspect-[4/3] object-cover rounded-3xl shadow-2xl shadow-black/30"
                 />
-                {content.header.text && (
-                  <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent text-white text-xs px-2 py-2 text-left truncate">
-                    {content.header.text}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </div>
-      )}
 
-      {active && (
-        <div
-          className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
-          onClick={() => setActiveId(null)}
-        >
-          <div
-            className="bg-surface rounded-lg max-w-lg w-full max-h-[85vh] overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={active.imageUrl} alt="" className="w-full object-cover" />
-            <div className="p-5">
-              {(() => {
-                const content = parseGalleryContent(active.content);
-                return (
-                  <>
-                    {content.header.text && (
-                      <p style={styledLineCss(content.header)} className="mb-2 whitespace-pre-wrap">
-                        {content.header.text}
-                      </p>
-                    )}
+                <div>
+                  {header.text && (
+                    <h3
+                      style={featureLineStyle(header, DEFAULT_HEADER)}
+                      className={`font-bold leading-tight mb-5 whitespace-pre-wrap ${
+                        usesCustomSize(header, DEFAULT_HEADER) ? "" : "text-3xl sm:text-4xl"
+                      } ${usesCustomColor(header, DEFAULT_HEADER) ? "" : "text-sky-600 dark:text-sky-400"}`}
+                    >
+                      {header.text}
+                    </h3>
+                  )}
+                  <div className="space-y-2">
                     {content.lines.map((line, i) => (
-                      <p key={i} style={styledLineCss(line)} className="leading-relaxed whitespace-pre-wrap">
+                      <p
+                        key={i}
+                        style={featureLineStyle(line, DEFAULT_LINE)}
+                        className={`leading-8 whitespace-pre-wrap ${
+                          usesCustomSize(line, DEFAULT_LINE) ? "" : "text-base sm:text-lg"
+                        } ${usesCustomColor(line, DEFAULT_LINE) ? "" : "text-ink/80"}`}
+                      >
                         {line.text}
                       </p>
                     ))}
-                  </>
-                );
-              })()}
-              <button
-                onClick={() => setActiveId(null)}
-                className="mt-4 text-sm text-heading font-medium hover:underline"
-              >
-                {t("gallery.close")}
-              </button>
-            </div>
-          </div>
+                  </div>
+                </div>
+              </article>
+            );
+          })}
         </div>
       )}
     </section>

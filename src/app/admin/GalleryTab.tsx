@@ -24,8 +24,13 @@ export default function GalleryTab({ photos, onChange }: { photos: GalleryPhoto[
   const [lines, setLines] = useState<StyledLine[]>([{ ...DEFAULT_LINE }]);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  // Set while editing an existing photo; null means the form adds a new one.
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [imageChanged, setImageChanged] = useState(false);
 
   function resetForm() {
+    setEditingId(null);
+    setImageChanged(false);
     setImageUrl(null);
     setHeader({ ...DEFAULT_HEADER });
     setLines([{ ...DEFAULT_LINE }]);
@@ -39,6 +44,19 @@ export default function GalleryTab({ photos, onChange }: { photos: GalleryPhoto[
     // Gallery photos can be larger/sharper than a tiny avatar — 900px max side.
     const dataUrl = await resizeImageToDataUrl(file, 900, 0.85);
     setImageUrl(dataUrl);
+    setImageChanged(true);
+  }
+
+  function startEdit(p: GalleryPhoto) {
+    const c = parseGalleryContent(p.content);
+    setEditingId(p.id);
+    setImageChanged(false);
+    setImageUrl(p.imageUrl);
+    setHeader(c.header);
+    setLines(c.lines.length > 0 ? c.lines : [{ ...DEFAULT_LINE }]);
+    setError("");
+    setOpen(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function updateLine(index: number, next: StyledLine) {
@@ -58,10 +76,11 @@ export default function GalleryTab({ photos, onChange }: { photos: GalleryPhoto[
     }
     setSaving(true);
     const content = JSON.stringify({ header, lines: lines.filter((l) => l.text.trim() !== "") });
-    const res = await fetch("/api/gallery", {
-      method: "POST",
+    const res = await fetch(editingId ? `/api/gallery/${editingId}` : "/api/gallery", {
+      method: editingId ? "PUT" : "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ imageUrl, content }),
+      // When editing, only send the image if a new one was picked.
+      body: JSON.stringify(editingId && !imageChanged ? { content } : { imageUrl, content }),
     });
     const data = await res.json();
     setSaving(false);
@@ -88,8 +107,8 @@ export default function GalleryTab({ photos, onChange }: { photos: GalleryPhoto[
         </h2>
         <button
           onClick={() => {
-            setOpen((o) => !o);
             if (open) resetForm();
+            setOpen((o) => !o);
           }}
           className="bg-pine text-on-navy text-sm px-4 py-2 rounded hover:bg-pine-dark transition-colors"
         >
@@ -99,6 +118,9 @@ export default function GalleryTab({ photos, onChange }: { photos: GalleryPhoto[
 
       {open && (
         <form onSubmit={submit} className="bg-surface border border-line rounded-lg p-5 mb-6 space-y-4">
+          <h3 className="font-display text-lg text-heading">
+            {editingId ? t("gallery.editPhoto") : t("gallery.addPhoto")}
+          </h3>
           <div>
             <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFile} className="hidden" />
             <button
@@ -164,9 +186,14 @@ export default function GalleryTab({ photos, onChange }: { photos: GalleryPhoto[
                 <p style={styledLineCss(content.header)} className="truncate">
                   {content.header.text}
                 </p>
-                <button onClick={() => remove(p.id)} className="text-clay hover:underline text-xs mt-1">
-                  {t("admin.delete")}
-                </button>
+                <div className="flex gap-3 mt-1">
+                  <button onClick={() => startEdit(p)} className="text-heading hover:underline text-xs">
+                    {t("admin.edit")}
+                  </button>
+                  <button onClick={() => remove(p.id)} className="text-clay hover:underline text-xs">
+                    {t("admin.delete")}
+                  </button>
+                </div>
               </div>
             </div>
           );
