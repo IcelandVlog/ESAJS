@@ -7,6 +7,7 @@ import type { DictKey } from "@/lib/i18n/dictionaries";
 import type { GalleryPhoto } from "@/lib/gallery";
 import GalleryTab from "./GalleryTab";
 import ReunionTab, { type ReunionToken } from "./ReunionTab";
+import DashboardTab from "./DashboardTab";
 
 type Student = {
   id: number;
@@ -74,6 +75,7 @@ function ContactLink({ value }: { value: string }) {
 }
 
 const TABS = [
+  { key: "dashboard", labelKey: "admin.tab.dashboard" },
   { key: "students", labelKey: "admin.tab.students" },
   { key: "pending", labelKey: "admin.tab.pending" },
   { key: "notices", labelKey: "admin.tab.notices" },
@@ -85,7 +87,7 @@ type TabKey = (typeof TABS)[number]["key"];
 
 export default function AdminDashboard() {
   const { t } = useLanguage();
-  const [tab, setTab] = useState<TabKey>("students");
+  const [tab, setTab] = useState<TabKey>("dashboard");
   const [students, setStudents] = useState<Student[]>([]);
   const [notices, setNotices] = useState<Notice[]>([]);
   const [gallery, setGallery] = useState<GalleryPhoto[]>([]);
@@ -139,6 +141,9 @@ export default function AdminDashboard() {
         <p className="text-ink/50">{t("admin.loading")}</p>
       ) : (
         <>
+          {tab === "dashboard" && (
+            <DashboardTab students={students} tokens={reunionTokens} noticeCount={notices.length} galleryCount={gallery.length} />
+          )}
           {tab === "students" && (
             <StudentsTab students={students.filter((s) => s.approved)} onChange={loadAll} />
           )}
