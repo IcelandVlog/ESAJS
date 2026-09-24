@@ -89,15 +89,22 @@ export default function Gallery({ photos }: { photos: GalleryPhoto[] }) {
                     aria-hidden={i !== current}
                     className="w-full shrink-0 grid md:grid-cols-2 gap-4 md:gap-16 items-center"
                   >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={p.imageUrl}
-                      alt={header.text}
-                      loading={i === 0 ? "eager" : "lazy"}
-                      decoding="async"
-                      draggable={false}
-                      className="w-full aspect-[4/3] object-cover rounded-3xl shadow-2xl shadow-black/30"
-                    />
+                    {/* Hover: photo zooms in slowly and a soft blue glow fades in */}
+                    <div className="group relative overflow-hidden rounded-3xl shadow-2xl shadow-black/30 transition-shadow duration-500 hover:shadow-sky-500/30">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={p.imageUrl}
+                        alt={header.text}
+                        loading={i === 0 ? "eager" : "lazy"}
+                        decoding="async"
+                        draggable={false}
+                        className="w-full aspect-[4/3] object-cover transition-transform duration-700 ease-out group-hover:scale-110 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+                      />
+                      <div
+                        aria-hidden="true"
+                        className="pointer-events-none absolute inset-0 bg-gradient-to-t from-sky-500/30 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                      />
+                    </div>
 
                     <div>
                       {header.text && (

@@ -6,10 +6,17 @@ const JWT_SECRET = process.env.JWT_SECRET || "dev-secret-change-me-in-production
 export const COOKIE_NAME = "school_session";
 
 export type SessionPayload = {
-  role: "admin" | "student";
+  // "admin" = main admin, "batch_admin" = limited to one batch, "student".
+  // Existing routes that check role === "admin" therefore stay main-admin-only.
+  role: "admin" | "batch_admin" | "student";
   id: number;
   name: string;
 };
+
+/** True for accounts that live in the `admins` table (main admin + batch admins). */
+export function isStaffRole(role: SessionPayload["role"]): boolean {
+  return role === "admin" || role === "batch_admin";
+}
 
 export async function hashPassword(password: string) {
   return bcrypt.hash(password, 10);

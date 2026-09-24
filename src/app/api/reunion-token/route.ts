@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db/client";
 import { reunionTokens, students } from "@/db/schema";
-import { getSession } from "@/lib/auth";
+import { getStaffAccess } from "@/lib/staff";
 import { and, eq, gte } from "drizzle-orm";
 import { sendEmailMessage, sendSmsMessage, isEmailContact, resolveContact } from "@/lib/messaging";
 
@@ -13,17 +13,19 @@ function randomToken(): string {
 }
 
 export async function GET() {
-  const session = await getSession();
-  if (!session || session.role !== "admin") {
+  const access = await getStaffAccess();
+  if (!access) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const rows = await db.select().from(reunionTokens).orderBy(reunionTokens.id);
+  const rows = access.batch
+    ? await db.select().from(reunionTokens).where(eq(reunionTokens.batch, access.batch)).orderBy(reunionTokens.id)
+    : await db.select().from(reunionTokens).orderBy(reunionTokens.id);
   return NextResponse.json({ tokens: rows.reverse() });
 }
 
 export async function POST(req: NextRequest) {
-  const session = await getSession();
-  if (!session || session.role !== "admin") {
+  const access = await getStaffAccess();
+  if (!access) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -36,6 +38,9 @@ export async function POST(req: NextRequest) {
   };
   if (!batch) {
     return NextResponse.json({ error: "ব্যাচ বাছাই করুন" }, { status: 400 });
+  }
+  if (access.batch && batch !== access.batch) {
+    return NextResponse.json({ error: "আপনি শুধু নিজের ব্যাচের জন্য রিইউনিয়ন তৈরি করতে পারবেন" }, { status: 403 });
   }
   const occasionText = occasion?.trim();
   if (!occasionText) {

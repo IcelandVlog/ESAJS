@@ -7,6 +7,9 @@ export const admins = pgTable("admins", {
   password: text("password").notNull(), // hashed
   name: text("name").notNull(),
   photoUrl: text("photo_url"), // small base64 data URL, set via profile page upload
+  // null = main admin (full access). A batch year (e.g. "2005") = batch admin, who can
+  // only manage that batch. Created by the main admin, max 2 per batch.
+  batch: text("batch"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

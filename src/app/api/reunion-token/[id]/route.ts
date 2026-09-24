@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db/client";
 import { reunionTokens } from "@/db/schema";
-import { getSession } from "@/lib/auth";
+import { getStaffAccess } from "@/lib/staff";
 import { eq } from "drizzle-orm";
 
 // Admin: edit a reunion's date/occasion/venue, or cancel/reactivate it.
 // Editing here never re-sends SMS/email — it only updates what students
 // and the homepage see (the /reunion page and countdown read live from this row).
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await getSession();
-  if (!session || session.role !== "admin") {
+  const access = await getStaffAccess();
+  if (!access) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -17,6 +17,13 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const tokenId = Number(id);
   if (!Number.isInteger(tokenId)) {
     return NextResponse.json({ error: "Invalid id" }, { status: 400 });
+  }
+
+  if (access.batch) {
+    const [existing] = await db.select({ batch: reunionTokens.batch }).from(reunionTokens).where(eq(reunionTokens.id, tokenId));
+    if (!existing || existing.batch !== access.batch) {
+      return NextResponse.json({ error: "এটি আপনার ব্যাচের রিইউনিয়ন নয়" }, { status: 403 });
+    }
   }
 
   const body = (await req.json()) as {

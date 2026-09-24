@@ -7,6 +7,8 @@ import { eq, desc } from "drizzle-orm";
 export async function GET(req: NextRequest) {
   const session = await getSession();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  // Batch admins have no access to school-wide records (main admin / the student themself only).
+  if (session.role === "batch_admin") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const url = new URL(req.url);
   const studentIdParam = url.searchParams.get("studentId");

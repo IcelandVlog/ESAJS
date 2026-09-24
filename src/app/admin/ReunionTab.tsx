@@ -163,13 +163,22 @@ function EditRow({
   );
 }
 
-export default function ReunionTab({ tokens, onChange }: { tokens: ReunionToken[]; onChange: () => void }) {
+export default function ReunionTab({
+  tokens,
+  onChange,
+  scopedBatch = null,
+}: {
+  tokens: ReunionToken[];
+  onChange: () => void;
+  /** Batch admins can only create reunions for their own batch. */
+  scopedBatch?: string | null;
+}) {
   const { t } = useLanguage();
   const confirm = useConfirm();
   const currentYear = new Date().getFullYear();
   const batchYears = Array.from({ length: currentYear - 1960 + 1 }, (_, i) => currentYear - i);
 
-  const [batch, setBatch] = useState("");
+  const [batch, setBatch] = useState(scopedBatch ?? "");
   const [occasion, setOccasion] = useState("");
   const [messageBody, setMessageBody] = useState("");
   const [venue, setVenue] = useState("");
@@ -235,7 +244,7 @@ export default function ReunionTab({ tokens, onChange }: { tokens: ReunionToken[
       .replace("{sms}", String(data.token.smsSent))
       .replace("{email}", String(data.token.emailSent));
     setSuccess(summary);
-    setBatch("");
+    setBatch(scopedBatch ?? "");
     setOccasion("");
     setMessageBody("");
     setVenue("");
@@ -275,15 +284,22 @@ export default function ReunionTab({ tokens, onChange }: { tokens: ReunionToken[
             <select
               required
               value={batch}
+              disabled={!!scopedBatch}
               onChange={(e) => setBatch(e.target.value)}
-              className="border border-line rounded px-3 py-2.5 min-w-[140px] focus:outline-none focus:ring-2 focus:ring-pine/40"
+              className="border border-line rounded px-3 py-2.5 min-w-[140px] focus:outline-none focus:ring-2 focus:ring-pine/40 disabled:opacity-70"
             >
-              <option value="">{t("reunion.selectBatch")}</option>
-              {batchYears.map((y) => (
-                <option key={y} value={y}>
-                  {y}
-                </option>
-              ))}
+              {scopedBatch ? (
+                <option value={scopedBatch}>{scopedBatch}</option>
+              ) : (
+                <>
+                  <option value="">{t("reunion.selectBatch")}</option>
+                  {batchYears.map((y) => (
+                    <option key={y} value={y}>
+                      {y}
+                    </option>
+                  ))}
+                </>
+              )}
             </select>
           </div>
           <div>

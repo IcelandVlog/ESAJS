@@ -20,6 +20,8 @@ type Props = {
   tokens: ReunionToken[];
   noticeCount: number;
   galleryCount: number;
+  /** Set for batch admins: they only see their own batch, so hide site-wide extras. */
+  scopedBatch?: string | null;
 };
 
 const NON_STUDENT = "other";
@@ -39,7 +41,7 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
   return <h3 className="font-display text-lg text-heading mb-3">{children}</h3>;
 }
 
-export default function DashboardTab({ students, tokens, noticeCount, galleryCount }: Props) {
+export default function DashboardTab({ students, tokens, noticeCount, galleryCount, scopedBatch = null }: Props) {
   const { t, lang } = useLanguage();
   const [attendees, setAttendees] = useState<Record<number, number>>({});
   // Birthday-wish test: which person(s) to preview, and a counter so each click replays the animation.
@@ -166,7 +168,7 @@ export default function DashboardTab({ students, tokens, noticeCount, galleryCou
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
           <StatCard label={t("dashboard.totalRegistrations")} value={stats.total} />
           <StatCard label={t("dashboard.schoolStudents")} value={stats.schoolStudents} tone="good" />
-          <StatCard label={t("dashboard.nonStudents")} value={stats.nonStudents} />
+          {!scopedBatch && <StatCard label={t("dashboard.nonStudents")} value={stats.nonStudents} />}
           <StatCard label={t("dashboard.approved")} value={stats.approved} tone="good" />
           <StatCard label={t("dashboard.pending")} value={stats.pending} tone={stats.pending > 0 ? "warn" : "default"} />
           <StatCard label={t("dashboard.birthdaysThisMonth")} value={stats.birthdays} />
@@ -285,13 +287,15 @@ export default function DashboardTab({ students, tokens, noticeCount, galleryCou
             {stats.bloodRows.length === 0 && <p className="text-sm text-ink/50 text-center py-2">{t("dashboard.noData")}</p>}
           </div>
         </div>
-        <div>
-          <SectionTitle>{t("dashboard.siteContent")}</SectionTitle>
-          <div className="grid grid-cols-2 gap-4">
-            <StatCard label={t("admin.tab.notices")} value={noticeCount} />
-            <StatCard label={t("admin.tab.gallery")} value={galleryCount} />
+        {!scopedBatch && (
+          <div>
+            <SectionTitle>{t("dashboard.siteContent")}</SectionTitle>
+            <div className="grid grid-cols-2 gap-4">
+              <StatCard label={t("admin.tab.notices")} value={noticeCount} />
+              <StatCard label={t("admin.tab.gallery")} value={galleryCount} />
+            </div>
           </div>
-        </div>
+        )}
       </section>
 
       {/* Birthday wish test */}

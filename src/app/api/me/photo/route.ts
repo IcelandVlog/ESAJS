@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db/client";
 import { admins, students } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { getSession } from "@/lib/auth";
+import { getSession, isStaffRole } from "@/lib/auth";
 
 // Photos are stored as base64 data URLs directly in the database — no extra
 // file storage service to configure. Keep a hard cap so a single upload
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "ছবির সাইজ অনেক বড়, আরেকটু ছোট ছবি দিন" }, { status: 400 });
   }
 
-  const table = session.role === "admin" ? admins : students;
+  const table = isStaffRole(session.role) ? admins : students;
   await db.update(table).set({ photoUrl }).where(eq(table.id, session.id));
 
   return NextResponse.json({ ok: true, photoUrl });
@@ -38,7 +38,7 @@ export async function DELETE() {
     return NextResponse.json({ error: "লগইন প্রয়োজন" }, { status: 401 });
   }
 
-  const table = session.role === "admin" ? admins : students;
+  const table = isStaffRole(session.role) ? admins : students;
   await db.update(table).set({ photoUrl: null }).where(eq(table.id, session.id));
 
   return NextResponse.json({ ok: true });

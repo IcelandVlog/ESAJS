@@ -8,6 +8,7 @@ import type { GalleryPhoto } from "@/lib/gallery";
 import GalleryTab from "./GalleryTab";
 import ReunionTab, { type ReunionToken } from "./ReunionTab";
 import DashboardTab from "./DashboardTab";
+import AdminsTab from "./AdminsTab";
 
 type Student = {
   id: number;
@@ -82,12 +83,21 @@ const TABS = [
   { key: "notices", labelKey: "admin.tab.notices" },
   { key: "gallery", labelKey: "admin.tab.gallery" },
   { key: "reunion", labelKey: "admin.tab.reunion" },
+  { key: "admins", labelKey: "admin.tab.admins" },
 ] as const;
+
+// Batch admins only get these tabs (notices, gallery and admin management are main-admin only).
+const BATCH_ADMIN_TABS: string[] = ["dashboard", "students", "pending", "reunion"];
 
 type TabKey = (typeof TABS)[number]["key"];
 
-export default function AdminDashboard() {
+// `batch` is null for the main admin, or the batch year for a batch admin, who only
+// sees and manages that one batch. (The server enforces this too — this only hides
+// what they cannot use anyway.)
+export default function AdminDashboard({ batch }: { batch: string | null }) {
   const { t } = useLanguage();
+  const scopedBatch = batch;
+  const visibleTabs = scopedBatch ? TABS.filter((x) => BATCH_ADMIN_TABS.includes(x.key)) : TABS;
   const [tab, setTab] = useState<TabKey>("dashboard");
   const [students, setStudents] = useState<Student[]>([]);
   const [notices, setNotices] = useState<Notice[]>([]);
@@ -99,8 +109,8 @@ export default function AdminDashboard() {
     setLoading(true);
     const [sRes, nRes, gRes, rtRes] = await Promise.all([
       fetch("/api/students").then((r) => r.json()),
-      fetch("/api/notices").then((r) => r.json()),
-      fetch("/api/gallery").then((r) => r.json()),
+      scopedBatch ? Promise.resolve({}) : fetch("/api/notices").then((r) => r.json()),
+      scopedBatch ? Promise.resolve({}) : fetch("/api/gallery").then((r) => r.json()),
       fetch("/api/reunion-token").then((r) => r.json()),
     ]);
     setStudents(sRes.students || []);
@@ -108,7 +118,7 @@ export default function AdminDashboard() {
     setGallery(gRes.photos || []);
     setReunionTokens(rtRes.tokens || []);
     setLoading(false);
-  }, []);
+  }, [scopedBatch]);
 
   useEffect(() => {
     loadAll();
@@ -116,8 +126,14 @@ export default function AdminDashboard() {
 
   return (
     <div>
+      {scopedBatch && (
+        <div className="mb-6 rounded-lg border border-sky-500/30 bg-sky-500/10 px-4 py-3 text-sm text-heading">
+          <span className="font-medium">{t("admin.batchAdminBanner").replace("{batch}", scopedBatch)}</span>
+          <span className="text-ink/70"> — {t("admin.batchAdminScope")}</span>
+        </div>
+      )}
       <div className="flex gap-1 border-b border-line mb-8 flex-wrap">
-        {TABS.map((tabItem) => {
+        {visibleTabs.map((tabItem) => {
           const pendingCount = students.filter((s) => !s.approved).length;
           return (
             <button
@@ -143,17 +159,24 @@ export default function AdminDashboard() {
       ) : (
         <>
           {tab === "dashboard" && (
-            <DashboardTab students={students} tokens={reunionTokens} noticeCount={notices.length} galleryCount={gallery.length} />
+            <DashboardTab
+              students={students}
+              tokens={reunionTokens}
+              noticeCount={notices.length}
+              galleryCount={gallery.length}
+              scopedBatch={scopedBatch}
+            />
           )}
           {tab === "students" && (
-            <StudentsTab students={students.filter((s) => s.approved)} onChange={loadAll} />
+            <StudentsTab students={students.filter((s) => s.approved)} onChange={loadAll} scopedBatch={scopedBatch} />
           )}
           {tab === "pending" && (
             <PendingTab students={students.filter((s) => !s.approved)} onChange={loadAll} />
           )}
           {tab === "notices" && <NoticesTab notices={notices} onChange={loadAll} />}
           {tab === "gallery" && <GalleryTab photos={gallery} onChange={loadAll} />}
-          {tab === "reunion" && <ReunionTab tokens={reunionTokens} onChange={loadAll} />}
+          {tab === "reunion" && <ReunionTab tokens={reunionTokens} onChange={loadAll} scopedBatch={scopedBatch} />}
+          {tab === "admins" && !scopedBatch && <AdminsTab />}
         </>
       )}
     </div>
@@ -161,7 +184,7 @@ export default function AdminDashboard() {
 }
 
 /* ---------------- Students ---------------- */
-function StudentsTab({ students, onChange }: { students: Student[]; onChange: () => void }) {
+function StudentsTab({ students, onChange, scopedBatch }: { students: Student[]; onChange: () => void; scopedBatch: string | null }) {
   const { t } = useLanguage();
   const confirm = useConfirm();
   const [open, setOpen] = useState(false);
@@ -170,7 +193,7 @@ function StudentsTab({ students, onChange }: { students: Student[]; onChange: ()
   const batchYears = Array.from({ length: currentYear - 1960 + 1 }, (_, i) => currentYear - i);
   const emptyForm = {
     name: "",
-    batch: "",
+    batch: scopedBatch ?? "",
     fatherName: "",
     motherName: "",
     phone: "",
@@ -254,16 +277,23 @@ function StudentsTab({ students, onChange }: { students: Student[]; onChange: ()
             <select
               required
               value={form.batch}
+              disabled={!!scopedBatch}
               onChange={(e) => setForm({ ...form, batch: e.target.value })}
-              className="w-full border border-line rounded px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-pine/40"
+              className="w-full border border-line rounded px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-pine/40 disabled:opacity-70"
             >
-              <option value="">{t("admin.selectPlaceholder")}</option>
-              {batchYears.map((y) => (
-                <option key={y} value={y}>
-                  {y}
-                </option>
-              ))}
-              <option value="other">{t("register.batchOtherOption")}</option>
+              {scopedBatch ? (
+                <option value={scopedBatch}>{scopedBatch}</option>
+              ) : (
+                <>
+                  <option value="">{t("admin.selectPlaceholder")}</option>
+                  {batchYears.map((y) => (
+                    <option key={y} value={y}>
+                      {y}
+                    </option>
+                  ))}
+                  <option value="other">{t("register.batchOtherOption")}</option>
+                </>
+              )}
             </select>
           </div>
           <Field label={t("admin.field.contact")} value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} required />

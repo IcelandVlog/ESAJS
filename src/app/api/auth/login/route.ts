@@ -22,7 +22,8 @@ export async function POST(req: NextRequest) {
     if (!admin || !(await verifyPassword(password, admin.password))) {
       return NextResponse.json({ error: "ভুল ইউজারনেম বা পাসওয়ার্ড" }, { status: 401 });
     }
-    const token = signSession({ role: "admin", id: admin.id, name: admin.name });
+    // A batch admin has a batch set; the main admin does not.
+    const token = signSession({ role: admin.batch ? "batch_admin" : "admin", id: admin.id, name: admin.name });
     const res = NextResponse.json({ ok: true, role: "admin", name: admin.name });
     res.cookies.set(COOKIE_NAME, token, {
       httpOnly: true,
