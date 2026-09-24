@@ -1,6 +1,9 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
+import { eq } from "drizzle-orm";
+import { db } from "@/db/client";
+import { admins, students } from "@/db/schema";
 
 const JWT_SECRET = process.env.JWT_SECRET || "dev-secret-change-me-in-production";
 export const COOKIE_NAME = "school_session";
@@ -42,7 +45,17 @@ export async function getSession(): Promise<SessionPayload | null> {
   const cookieStore = await cookies();
   const token = cookieStore.get(COOKIE_NAME)?.value;
   if (!token) return null;
-  return verifySession(token);
+  const payload = verifySession(token);
+  if (!payload) return null;
+
+  // The login cookie lasts 7 days, but the account may be gone by then (an admin
+  // deleted or rejected it). A deleted account counts as logged out right away, so
+  // that person has to register again instead of staying signed in.
+  const stillExists =
+    payload.role === "student"
+      ? (await db.select({ id: students.id }).from(students).where(eq(students.id, payload.id)).limit(1)).length > 0
+      : (await db.select({ id: admins.id }).from(admins).where(eq(admins.id, payload.id)).limit(1)).length > 0;
+  return stillExists ? payload : null;
 }
 
 // Short-lived token for the OAuth "just need your batch" step: a Google/Facebook

@@ -17,8 +17,6 @@ export type StudentDetails = {
   fatherName: string;
   motherName: string;
   address: string;
-  className: string;
-  section: string;
 };
 
 const inputClass =
@@ -90,8 +88,16 @@ export default function StudentView({ initialDetails }: { initialDetails: Studen
                 <input required type="email" className={inputClass} value={form.email} onChange={(e) => set("email", e.target.value)} />
               </Field>
 
-              <Field label={t("admin.field.phone")}>
-                <input type="tel" className={inputClass} value={form.phone} onChange={(e) => set("phone", e.target.value)} placeholder="01XXXXXXXXX" />
+              <Field label={t("student.mobile")} hint={t("student.mobileHint")}>
+                <input
+                  type="tel"
+                  inputMode="tel"
+                  autoComplete="tel"
+                  className={inputClass}
+                  value={form.phone}
+                  onChange={(e) => set("phone", e.target.value.replace(/[^\d+]/g, ""))}
+                  placeholder="01XXXXXXXXX"
+                />
               </Field>
 
               <Field label={t("register.batch")}>
@@ -131,13 +137,6 @@ export default function StudentView({ initialDetails }: { initialDetails: Studen
                 <input className={inputClass} value={form.motherName} onChange={(e) => set("motherName", e.target.value)} />
               </Field>
 
-              <Field label={t("admin.field.class")}>
-                <input className={inputClass} value={form.className} onChange={(e) => set("className", e.target.value)} />
-              </Field>
-
-              <Field label={t("admin.field.section")}>
-                <input className={inputClass} value={form.section} onChange={(e) => set("section", e.target.value)} />
-              </Field>
             </div>
 
             <Field label={t("admin.field.address")}>

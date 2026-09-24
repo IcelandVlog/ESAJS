@@ -3,7 +3,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { useConfirm } from "@/components/ConfirmDialog";
-import { FIRST_BATCH_YEAR } from "@/lib/validation";
+import { NON_STUDENT_BATCH } from "@/lib/validation";
+
+export type StudentOption = { id: number; name: string; roll: string; phone: string; batch: string | null; approved: boolean };
 
 type BatchAdmin = { id: number; name: string; username: string; batch: string | null; createdAt: string | null };
 
@@ -11,26 +13,22 @@ const inputClass =
   "w-full border border-line rounded px-3 py-2.5 bg-transparent focus:outline-none focus:ring-2 focus:ring-pine/40";
 
 // Main admin only: create / remove batch admins (max 2 per batch) and reset their password.
-export default function AdminsTab() {
+export default function AdminsTab({ students }: { students: StudentOption[] }) {
   const { t } = useLanguage();
   const confirm = useConfirm();
   const [list, setList] = useState<BatchAdmin[]>([]);
   const [max, setMax] = useState(2);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ name: "", username: "", password: "", batch: "" });
+  // The student the main admin picked to become a batch admin, plus a name filter for the dropdown.
+  const [studentId, setStudentId] = useState("");
+  const [filter, setFilter] = useState("");
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
   // Password reset: which admin is being reset + the new password typed in.
   const [resetId, setResetId] = useState<number | null>(null);
   const [resetPassword, setResetPassword] = useState("");
   const [resetError, setResetError] = useState("");
-
-  const batchYears = useMemo(() => {
-    const current = new Date().getFullYear();
-    return Array.from({ length: current - FIRST_BATCH_YEAR + 1 }, (_, i) => current - i);
-  }, []);
 
   const load = useCallback(async () => {
     const res = await fetch("/api/admins");
@@ -46,6 +44,27 @@ export default function AdminsTab() {
 
   const countFor = (batch: string) => list.filter((a) => a.batch === batch).length;
 
+  // Students who can be picked: approved, in a real batch (not "other"/empty), and not admins already.
+  // Their login id (email/roll) is the admin username, so that is how we spot existing admins.
+  const candidates = useMemo(() => {
+    const adminLogins = new Set(list.map((a) => a.username));
+    const q = filter.trim().toLowerCase();
+    return students
+      .filter((s) => s.approved && s.batch && s.batch !== NON_STUDENT_BATCH && /^\d{4}$/.test(s.batch))
+      .filter((s) => !adminLogins.has(s.roll))
+      .filter((s) => !q || s.name.toLowerCase().includes(q) || s.roll.toLowerCase().includes(q) || s.phone.toLowerCase().includes(q))
+      .sort((a, b) => Number(b.batch) - Number(a.batch) || a.name.localeCompare(b.name));
+  }, [students, list, filter]);
+
+  const candidatesByBatch = useMemo(() => {
+    const map = new Map<string, StudentOption[]>();
+    for (const s of candidates) map.set(s.batch as string, [...(map.get(s.batch as string) ?? []), s]);
+    return [...map.entries()];
+  }, [candidates]);
+
+  const selected = students.find((s) => String(s.id) === studentId) ?? null;
+  const contactOf = (s: StudentOption) => (s.roll.includes("@") ? s.roll : s.phone || s.roll);
+
   // Group by batch, newest batch first.
   const groups = useMemo(() => {
     const map = new Map<string, BatchAdmin[]>();
@@ -59,19 +78,21 @@ export default function AdminsTab() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+    if (!selected) return;
     setSaving(true);
     try {
       const res = await fetch("/api/admins", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ studentId: selected.id }),
       });
       const data = await res.json();
       if (!res.ok) {
         setError(data.error || t("admin.error"));
         return;
       }
-      setForm({ name: "", username: "", password: "", batch: "" });
+      setStudentId("");
+      setFilter("");
       setOpen(false);
       await load();
     } catch {
@@ -105,7 +126,7 @@ export default function AdminsTab() {
     setResetPassword("");
   }
 
-  const batchFull = form.batch !== "" && countFor(form.batch) >= max;
+  const batchFull = !!selected && countFor(selected.batch as string) >= max;
 
   return (
     <div>
@@ -126,64 +147,51 @@ export default function AdminsTab() {
       <p className="text-sm text-ink/60 mb-6">{t("admins.hint").replace("{max}", String(max))}</p>
 
       {open && (
-        <form onSubmit={submit} className="bg-surface border border-line rounded-lg p-5 mb-6 grid sm:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm text-ink/70 mb-1.5">{t("admin.field.name")}</label>
-            <input required className={inputClass} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-          </div>
-          <div>
-            <label className="block text-sm text-ink/70 mb-1.5">{t("admin.field.batch")}</label>
-            <select required className={inputClass} value={form.batch} onChange={(e) => setForm({ ...form, batch: e.target.value })}>
-              <option value="">{t("admin.selectPlaceholder")}</option>
-              {batchYears.map((y) => (
-                <option key={y} value={String(y)} disabled={countFor(String(y)) >= max}>
-                  {y} ({countFor(String(y))}/{max})
-                </option>
-              ))}
-            </select>
-            {batchFull && <p className="text-xs text-clay mt-1">{t("admins.batchFull").replace("{max}", String(max))}</p>}
-          </div>
-          <div>
-            <label className="block text-sm text-ink/70 mb-1.5">{t("admins.username")}</label>
-            <input
-              required
-              autoComplete="off"
-              className={inputClass}
-              value={form.username}
-              onChange={(e) => setForm({ ...form, username: e.target.value })}
-            />
-          </div>
-          <div>
-            <label className="block text-sm text-ink/70 mb-1.5">{t("admins.password")}</label>
-            <div className="flex gap-2">
-              <input
-                required
-                autoComplete="new-password"
-                type={showPassword ? "text" : "password"}
-                className={inputClass}
-                value={form.password}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword((v) => !v)}
-                className="px-3 rounded border border-line text-xs text-ink/70 hover:bg-ink/5 whitespace-nowrap"
-              >
-                {showPassword ? t("admins.hide") : t("admins.show")}
-              </button>
+        <form onSubmit={submit} className="bg-surface border border-line rounded-lg p-5 mb-6 space-y-4">
+          <h3 className="font-display text-lg text-heading">{t("admins.pickStudent")}</h3>
+          <input
+            type="search"
+            placeholder={t("admins.searchStudent")}
+            className={inputClass}
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+          />
+          <select required className={inputClass} value={studentId} onChange={(e) => setStudentId(e.target.value)} size={1}>
+            <option value="">{t("admins.selectStudent")}</option>
+            {candidatesByBatch.map(([batch, group]) => {
+              const full = countFor(batch) >= max;
+              return (
+                <optgroup key={batch} label={`${t("admin.field.batch")} ${batch} (${countFor(batch)}/${max})${full ? ` — ${t("admins.full")}` : ""}`}>
+                  {group.map((s) => (
+                    <option key={s.id} value={String(s.id)} disabled={full}>
+                      {s.name} — {contactOf(s)}
+                    </option>
+                  ))}
+                </optgroup>
+              );
+            })}
+          </select>
+          {candidates.length === 0 && <p className="text-xs text-ink/50">{t("admins.noCandidates")}</p>}
+
+          {selected && (
+            <div className="rounded-lg border border-line bg-ink/[0.03] p-3 text-sm">
+              <p className="font-medium text-heading">{selected.name}</p>
+              <p className="text-ink/60">
+                {t("admin.field.batch")} {selected.batch} · {contactOf(selected)}
+              </p>
             </div>
-            <p className="text-xs text-ink/50 mt-1">{t("admins.passwordHint")}</p>
-          </div>
-          {error && <p className="sm:col-span-2 text-clay text-sm bg-clay/10 border border-clay/20 rounded px-3 py-2">{error}</p>}
-          <div className="sm:col-span-2">
-            <button
-              type="submit"
-              disabled={saving || batchFull}
-              className="bg-pine text-on-navy px-6 py-2.5 rounded text-sm hover:bg-pine-dark transition-colors disabled:opacity-60"
-            >
-              {saving ? t("admin.saving") : t("admins.create")}
-            </button>
-          </div>
+          )}
+          {batchFull && <p className="text-xs text-clay">{t("admins.batchFull").replace("{max}", String(max))}</p>}
+          <p className="text-xs text-ink/50">{t("admins.loginNote")}</p>
+
+          {error && <p className="text-clay text-sm bg-clay/10 border border-clay/20 rounded px-3 py-2">{error}</p>}
+          <button
+            type="submit"
+            disabled={saving || !selected || batchFull}
+            className="bg-pine text-on-navy px-6 py-2.5 rounded text-sm hover:bg-pine-dark transition-colors disabled:opacity-60"
+          >
+            {saving ? t("admin.saving") : t("admins.create")}
+          </button>
         </form>
       )}
 

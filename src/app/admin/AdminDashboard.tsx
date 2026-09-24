@@ -176,7 +176,7 @@ export default function AdminDashboard({ batch }: { batch: string | null }) {
           {tab === "notices" && <NoticesTab notices={notices} onChange={loadAll} />}
           {tab === "gallery" && <GalleryTab photos={gallery} onChange={loadAll} />}
           {tab === "reunion" && <ReunionTab tokens={reunionTokens} onChange={loadAll} scopedBatch={scopedBatch} />}
-          {tab === "admins" && !scopedBatch && <AdminsTab />}
+          {tab === "admins" && !scopedBatch && <AdminsTab students={students} />}
         </>
       )}
     </div>

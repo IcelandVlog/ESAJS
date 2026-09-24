@@ -17,8 +17,6 @@ type Body = {
   fatherName?: string;
   motherName?: string;
   address?: string;
-  className?: string;
-  section?: string;
 };
 
 // A logged-in student edits their own details. Everything except the password
@@ -46,8 +44,6 @@ export async function PUT(req: NextRequest) {
   const fatherName = str(body.fatherName);
   const motherName = str(body.motherName);
   const address = str(body.address);
-  const className = str(body.className);
-  const section = str(body.section);
 
   if (!name) return NextResponse.json({ error: "নাম দিন" }, { status: 400 });
   if (!EMAIL_RULE.test(email)) return NextResponse.json({ error: "সঠিক ইমেইল দিন" }, { status: 400 });
@@ -62,7 +58,7 @@ export async function PUT(req: NextRequest) {
   if (bloodGroup && !BLOOD_GROUPS.includes(bloodGroup)) {
     return NextResponse.json({ error: "সঠিক ব্লাড গ্রুপ বাছাই করুন" }, { status: 400 });
   }
-  for (const v of [name, email, fatherName, motherName, address, className, section]) {
+  for (const v of [name, email, fatherName, motherName, address]) {
     if (v.length > MAX_TEXT) return NextResponse.json({ error: "লেখা অনেক বড়" }, { status: 400 });
   }
 
@@ -79,8 +75,6 @@ export async function PUT(req: NextRequest) {
         fatherName,
         motherName,
         address,
-        className,
-        section,
       })
       .where(eq(students.id, session.id))
       .returning();
@@ -99,8 +93,6 @@ export async function PUT(req: NextRequest) {
         fatherName: updated.fatherName ?? "",
         motherName: updated.motherName ?? "",
         address: updated.address ?? "",
-        className: updated.className ?? "",
-        section: updated.section ?? "",
       },
     });
     res.cookies.set(COOKIE_NAME, token, {

@@ -20,15 +20,15 @@ export default async function StudentPage() {
   const details = {
     name: student.name,
     email: student.roll,
-    phone: student.phone ?? "",
+    // Some older accounts have the email typed into the phone field — show an empty
+    // mobile box for those so the student can enter their real number.
+    phone: student.phone && !student.phone.includes("@") ? student.phone : "",
     batch: student.batch ?? "",
     dateOfBirth: student.dateOfBirth ?? "",
     bloodGroup: student.bloodGroup ?? "",
     fatherName: student.fatherName ?? "",
     motherName: student.motherName ?? "",
     address: student.address ?? "",
-    className: student.className ?? "",
-    section: student.section ?? "",
   };
 
   return <StudentView initialDetails={details} />;

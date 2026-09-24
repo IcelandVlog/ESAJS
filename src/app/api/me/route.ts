@@ -1,12 +1,21 @@
 import { NextResponse } from "next/server";
-import { getSession, isStaffRole } from "@/lib/auth";
+import { cookies } from "next/headers";
+import { COOKIE_NAME, getSession, isStaffRole } from "@/lib/auth";
 import { db } from "@/db/client";
 import { admins, students } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 export async function GET() {
   const session = await getSession();
-  if (!session) return NextResponse.json({ session: null });
+  if (!session) {
+    // No session — or the account was deleted while the cookie was still valid.
+    // Drop a leftover cookie so the browser is fully logged out.
+    const res = NextResponse.json({ session: null });
+    if ((await cookies()).get(COOKIE_NAME)?.value) {
+      res.cookies.set(COOKIE_NAME, "", { path: "/", maxAge: 0 });
+    }
+    return res;
+  }
 
   const table = isStaffRole(session.role) ? admins : students;
   const [row] = await db.select().from(table).where(eq(table.id, session.id));
