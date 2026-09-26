@@ -12,11 +12,24 @@ export type ReunionToken = {
   venue: string;
   reunionDate: string | null;
   cancelled: boolean;
+  feeAmount: number;
   token: string;
   recipientCount: number;
   smsSent: number;
   emailSent: number;
   failedCount: number;
+  createdAt: string | null;
+};
+
+type Registration = {
+  id: number;
+  studentName: string;
+  studentRoll: string;
+  paymentStatus: string;
+  paymentMethod: string;
+  transactionId: string;
+  senderNumber: string;
+  amountPaid: number;
   createdAt: string | null;
 };
 
@@ -81,6 +94,7 @@ function EditRow({
   const [occasion, setOccasion] = useState(tk.occasion);
   const [venue, setVenue] = useState(tk.venue);
   const [reunionDate, setReunionDate] = useState(toDatetimeLocalValue(tk.reunionDate));
+  const [feeAmount, setFeeAmount] = useState(String(tk.feeAmount || ""));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -95,6 +109,7 @@ function EditRow({
         occasion: occasion.trim(),
         venue: venue.trim(),
         reunionDate: new Date(reunionDate).toISOString(),
+        feeAmount: Number(feeAmount) || 0,
       }),
     });
     const data = await res.json();
@@ -133,6 +148,16 @@ function EditRow({
           onChange={(e) => setVenue(e.target.value)}
           className="w-full border border-line rounded px-2 py-1.5 text-sm"
           placeholder={t("reunion.venuePlaceholder")}
+        />
+      </td>
+      <td className="px-4 py-2.5 border-r border-line">
+        <input
+          type="number"
+          min={0}
+          value={feeAmount}
+          onChange={(e) => setFeeAmount(e.target.value)}
+          className="w-full border border-line rounded px-2 py-1.5 text-sm"
+          placeholder={t("reunion.feeAmountPlaceholder")}
         />
       </td>
       <td className="px-4 py-2.5 border-r border-line font-mono">{tk.token}</td>
@@ -183,11 +208,17 @@ export default function ReunionTab({
   const [messageBody, setMessageBody] = useState("");
   const [venue, setVenue] = useState("");
   const [reunionDate, setReunionDate] = useState("");
+  const [feeAmount, setFeeAmount] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
   const [busyId, setBusyId] = useState<number | null>(null);
+
+  const [regOpenId, setRegOpenId] = useState<number | null>(null);
+  const [regRows, setRegRows] = useState<Registration[]>([]);
+  const [regLoading, setRegLoading] = useState(false);
+  const [regBusyId, setRegBusyId] = useState<number | null>(null);
 
   const rows = tokens;
 
@@ -231,6 +262,7 @@ export default function ReunionTab({
         messageBody: messageBody.trim(),
         venue: venue.trim(),
         reunionDate: new Date(reunionDate).toISOString(),
+        feeAmount: Number(feeAmount) || 0,
       }),
     });
     const data = await res.json();
@@ -249,6 +281,7 @@ export default function ReunionTab({
     setMessageBody("");
     setVenue("");
     setReunionDate("");
+    setFeeAmount("");
     onChange();
   }
 
@@ -269,6 +302,37 @@ export default function ReunionTab({
     setBusyId(null);
     if (res.ok) {
       onChange();
+    }
+  }
+
+  async function toggleRegistrations(tk: ReunionToken) {
+    if (regOpenId === tk.id) {
+      setRegOpenId(null);
+      return;
+    }
+    setRegOpenId(tk.id);
+    setRegLoading(true);
+    const res = await fetch(`/api/reunion-token/${tk.id}/registrations`);
+    const data = await res.json();
+    setRegLoading(false);
+    if (res.ok) {
+      setRegRows(data.registrations ?? []);
+    }
+  }
+
+  async function actOnPayment(regId: number, action: "verify" | "reject") {
+    const msg = action === "verify" ? t("reunion.pay.confirmVerify") : t("reunion.pay.confirmReject");
+    if (!(await confirm(msg))) return;
+    setRegBusyId(regId);
+    const res = await fetch(`/api/reunion-registrations/${regId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action }),
+    });
+    setRegBusyId(null);
+    if (res.ok) {
+      const data = await res.json();
+      setRegRows((prev) => prev.map((r) => (r.id === regId ? { ...r, ...data.registration } : r)));
     }
   }
 
@@ -320,6 +384,17 @@ export default function ReunionTab({
               onChange={(e) => setVenue(e.target.value)}
               placeholder={t("reunion.venuePlaceholder")}
               className="w-full border border-line rounded px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-pine/40"
+            />
+          </div>
+          <div>
+            <label className="block text-sm text-ink/70 mb-1.5">{t("reunion.feeAmount")}</label>
+            <input
+              type="number"
+              min={0}
+              value={feeAmount}
+              onChange={(e) => setFeeAmount(e.target.value)}
+              placeholder={t("reunion.feeAmountPlaceholder")}
+              className="border border-line rounded px-3 py-2.5 w-40 focus:outline-none focus:ring-2 focus:ring-pine/40"
             />
           </div>
         </div>
@@ -375,6 +450,7 @@ export default function ReunionTab({
               <th className="px-4 py-2.5 font-normal border-r border-line">{t("reunion.col.occasion")}</th>
               <th className="px-4 py-2.5 font-normal border-r border-line">{t("reunion.col.eventDate")}</th>
               <th className="px-4 py-2.5 font-normal border-r border-line">{t("reunion.col.venue")}</th>
+              <th className="px-4 py-2.5 font-normal border-r border-line">{t("reunion.col.fee")}</th>
               <th className="px-4 py-2.5 font-normal border-r border-line">{t("reunion.col.token")}</th>
               <th className="px-4 py-2.5 font-normal border-r border-line">{t("reunion.col.date")}</th>
               <th className="px-4 py-2.5 font-normal border-r border-line">{t("reunion.col.recipients")}</th>
@@ -396,6 +472,9 @@ export default function ReunionTab({
                     {tk.reunionDate ? new Date(tk.reunionDate).toLocaleString() : "-"}
                   </td>
                   <td className="px-4 py-2.5 border-r border-line">{tk.venue || "-"}</td>
+                  <td className="px-4 py-2.5 border-r border-line">
+                    {tk.feeAmount > 0 ? `৳${tk.feeAmount}` : t("reunion.feeFree")}
+                  </td>
                   <td className="px-4 py-2.5 border-r border-line font-mono">{tk.token}</td>
                   <td className="px-4 py-2.5 border-r border-line">
                     {tk.createdAt ? new Date(tk.createdAt).toLocaleDateString() : "-"}
@@ -435,14 +514,101 @@ export default function ReunionTab({
                       >
                         {tk.cancelled ? t("reunion.reactivate") : t("reunion.cancelToken")}
                       </button>
+                      <button
+                        onClick={() => toggleRegistrations(tk)}
+                        className="border border-line px-2.5 py-1 rounded text-xs hover:bg-line/30"
+                      >
+                        {regOpenId === tk.id ? t("reunion.hideRegistrations") : t("reunion.viewRegistrations")}
+                      </button>
                     </div>
                   </td>
                 </tr>
               )
             )}
+            {regOpenId !== null &&
+              rows
+                .filter((tk) => tk.id === regOpenId)
+                .map((tk) => (
+                  <tr key={`reg-${tk.id}`} className="border-b border-line bg-line/10">
+                    <td colSpan={12} className="px-4 py-4">
+                      <h4 className="font-display text-sm text-heading mb-2">{t("reunion.registrationsTitle")}</h4>
+                      {regLoading ? (
+                        <p className="text-xs text-ink/50">{t("reunionPage.loading")}</p>
+                      ) : regRows.length === 0 ? (
+                        <p className="text-xs text-ink/50">{t("reunion.regEmpty")}</p>
+                      ) : (
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-xs min-w-[820px]">
+                            <thead>
+                              <tr className="text-left text-ink/50 border-b border-line">
+                                <th className="px-3 py-1.5 font-normal">{t("reunion.regCol.name")}</th>
+                                <th className="px-3 py-1.5 font-normal">{t("reunion.regCol.roll")}</th>
+                                <th className="px-3 py-1.5 font-normal">{t("reunion.regCol.method")}</th>
+                                <th className="px-3 py-1.5 font-normal">{t("reunion.regCol.trxId")}</th>
+                                <th className="px-3 py-1.5 font-normal">{t("reunion.regCol.sender")}</th>
+                                <th className="px-3 py-1.5 font-normal">{t("reunion.regCol.amount")}</th>
+                                <th className="px-3 py-1.5 font-normal">{t("reunion.regCol.status")}</th>
+                                <th className="px-3 py-1.5 font-normal">{t("reunion.regCol.action")}</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {regRows.map((r) => (
+                                <tr key={r.id} className="border-b border-line/60">
+                                  <td className="px-3 py-1.5">{r.studentName}</td>
+                                  <td className="px-3 py-1.5">{r.studentRoll}</td>
+                                  <td className="px-3 py-1.5">{r.paymentMethod || "-"}</td>
+                                  <td className="px-3 py-1.5 font-mono">{r.transactionId || "-"}</td>
+                                  <td className="px-3 py-1.5 font-mono">{r.senderNumber || "-"}</td>
+                                  <td className="px-3 py-1.5">{r.amountPaid > 0 ? `৳${r.amountPaid}` : "-"}</td>
+                                  <td className="px-3 py-1.5">
+                                    <span
+                                      className={`px-2 py-0.5 rounded text-xs font-medium ${
+                                        r.paymentStatus === "paid"
+                                          ? "bg-pine/10 text-heading"
+                                          : r.paymentStatus === "pending"
+                                            ? "bg-amber-500/10 text-amber-700"
+                                            : "bg-line/30 text-ink/60"
+                                      }`}
+                                    >
+                                      {r.paymentStatus === "paid"
+                                        ? t("reunion.pay.paid")
+                                        : r.paymentStatus === "pending"
+                                          ? t("reunion.pay.pending")
+                                          : t("reunion.pay.unpaid")}
+                                    </span>
+                                  </td>
+                                  <td className="px-3 py-1.5">
+                                    {r.paymentStatus === "pending" && r.paymentMethod !== "online" && (
+                                      <div className="flex gap-1.5">
+                                        <button
+                                          onClick={() => actOnPayment(r.id, "verify")}
+                                          disabled={regBusyId === r.id}
+                                          className="border border-pine/30 text-heading px-2 py-0.5 rounded text-xs hover:bg-pine/10 disabled:opacity-60"
+                                        >
+                                          {t("reunion.pay.verify")}
+                                        </button>
+                                        <button
+                                          onClick={() => actOnPayment(r.id, "reject")}
+                                          disabled={regBusyId === r.id}
+                                          className="border border-clay/30 text-clay px-2 py-0.5 rounded text-xs hover:bg-clay/10 disabled:opacity-60"
+                                        >
+                                          {t("reunion.pay.reject")}
+                                        </button>
+                                      </div>
+                                    )}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))}
             {rows.length === 0 && (
               <tr>
-                <td colSpan={11} className="px-4 py-6 text-center text-ink/50">
+                <td colSpan={12} className="px-4 py-6 text-center text-ink/50">
                   {t("reunion.empty")}
                 </td>
               </tr>

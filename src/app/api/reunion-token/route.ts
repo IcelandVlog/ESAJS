@@ -29,12 +29,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { batch, occasion, messageBody, venue, reunionDate } = (await req.json()) as {
+  const { batch, occasion, messageBody, venue, reunionDate, feeAmount } = (await req.json()) as {
     batch?: string;
     occasion?: string;
     messageBody?: string;
     venue?: string;
     reunionDate?: string;
+    feeAmount?: number;
   };
   if (!batch) {
     return NextResponse.json({ error: "ব্যাচ বাছাই করুন" }, { status: 400 });
@@ -52,6 +53,7 @@ export async function POST(req: NextRequest) {
   if (!reunionDateObj || Number.isNaN(reunionDateObj.getTime())) {
     return NextResponse.json({ error: "রিইউনিয়নের তারিখ ও সময় দিন" }, { status: 400 });
   }
+  const feeAmountNum = Math.max(0, Math.round(Number(feeAmount) || 0));
 
   // One active (non-cancelled) token per batch per calendar day.
   const startOfToday = new Date();
@@ -117,6 +119,7 @@ export async function POST(req: NextRequest) {
       messageBody: messageBodyText,
       venue: venueText,
       reunionDate: reunionDateObj,
+      feeAmount: feeAmountNum,
       token,
       recipientCount: members.length,
       smsSent,

@@ -32,6 +32,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     venue?: string;
     reunionDate?: string;
     cancelled?: boolean;
+    feeAmount?: number;
   };
 
   const updates: Partial<typeof reunionTokens.$inferInsert> = {};
@@ -53,6 +54,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     updates.reunionDate = d;
   }
   if (body.cancelled !== undefined) updates.cancelled = body.cancelled;
+  if (body.feeAmount !== undefined) updates.feeAmount = Math.max(0, Math.round(Number(body.feeAmount) || 0));
 
   if (Object.keys(updates).length === 0) {
     return NextResponse.json({ error: "কিছু পরিবর্তন করার জন্য দিন" }, { status: 400 });

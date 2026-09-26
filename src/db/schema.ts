@@ -87,6 +87,8 @@ export const reunionTokens = pgTable("reunion_tokens", {
   venue: text("venue").notNull().default(""), // where the reunion is happening, shown on the reunion card
   reunionDate: timestamp("reunion_date").notNull(), // when the actual reunion event happens; powers the homepage countdown
   cancelled: boolean("cancelled").notNull().default(false), // admin can cancel; hidden from students/homepage when true
+  // Reunion fee in BDT (whole taka). 0 = free, no payment step shown to students.
+  feeAmount: integer("fee_amount").notNull().default(0),
   token: text("token").notNull(),
   recipientCount: integer("recipient_count").notNull().default(0),
   smsSent: integer("sms_sent").notNull().default(0),
@@ -102,5 +104,19 @@ export const reunionRegistrations = pgTable("reunion_registrations", {
   id: serial("id").primaryKey(),
   studentId: integer("student_id").notNull().references(() => students.id, { onDelete: "cascade" }),
   reunionTokenId: integer("reunion_token_id").notNull().references(() => reunionTokens.id, { onDelete: "cascade" }),
+
+  // ---- Reunion fee payment (only meaningful when the token's feeAmount > 0) ----
+  // "unpaid": nothing submitted yet. "pending": offline (bKash/Nagad/Rocket) TrxID submitted,
+  // waiting for admin to verify against their own account. "paid": confirmed (online: gateway
+  // validated automatically; offline: admin verified manually).
+  paymentStatus: text("payment_status").notNull().default("unpaid"),
+  // "online" (SSLCommerz gateway) | "bkash" | "nagad" | "rocket" (manual/offline)
+  paymentMethod: text("payment_method").notNull().default(""),
+  transactionId: text("transaction_id").notNull().default(""), // gateway tran_id, or the TrxID the student typed in for offline payments
+  senderNumber: text("sender_number").notNull().default(""), // the bKash/Nagad/Rocket number the student sent money FROM (offline only)
+  amountPaid: integer("amount_paid").notNull().default(0),
+  valId: text("val_id").notNull().default(""), // SSLCommerz val_id, kept for re-verification/support
+  paidAt: timestamp("paid_at"),
+
   createdAt: timestamp("created_at").defaultNow(),
 });

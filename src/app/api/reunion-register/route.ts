@@ -1,26 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db/client";
-import { reunionTokens, reunionRegistrations, students } from "@/db/schema";
+import { reunionTokens, reunionRegistrations } from "@/db/schema";
 import { getSession } from "@/lib/auth";
-import { and, asc, eq, gte } from "drizzle-orm";
-import { REUNION_VISIBLE_AFTER_MS, hasReunionEnded } from "@/lib/reunion";
+import { eq } from "drizzle-orm";
+import { hasReunionEnded, studentById, currentTokenForBatch, findRegistration } from "@/lib/reunion";
+import { getOfflineNumbers, getOfflinePayeeName, isOnlinePaymentConfigured } from "@/lib/payment";
 
-async function currentStudent(sessionId: number) {
-  const [student] = await db.select().from(students).where(eq(students.id, sessionId));
-  return student ?? null;
+function paymentInfo() {
+  return {
+    onlineAvailable: isOnlinePaymentConfigured(),
+    offlineNumbers: getOfflineNumbers(),
+    payeeName: getOfflinePayeeName(),
+  };
 }
 
-// The batch's current reunion: not cancelled and not yet finished. When there is
-// more than one, the soonest one wins. Finished reunions never come back.
-async function currentTokenForBatch(batch: string) {
-  const cutoff = new Date(Date.now() - REUNION_VISIBLE_AFTER_MS);
-  const [row] = await db
-    .select()
-    .from(reunionTokens)
-    .where(and(eq(reunionTokens.batch, batch), eq(reunionTokens.cancelled, false), gte(reunionTokens.reunionDate, cutoff)))
-    .orderBy(asc(reunionTokens.reunionDate))
-    .limit(1);
-  return row ?? null;
+function registrationPayment(row: typeof reunionRegistrations.$inferSelect | null | undefined) {
+  if (!row) return null;
+  return {
+    paymentStatus: row.paymentStatus,
+    paymentMethod: row.paymentMethod,
+    transactionId: row.transactionId,
+    amountPaid: row.amountPaid,
+  };
 }
 
 // Student view: is there a reunion announced for my batch, and have I registered for it?
@@ -30,7 +31,7 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const student = await currentStudent(session.id);
+  const student = await studentById(session.id);
   if (!student || !student.batch) {
     return NextResponse.json({ reunion: null, registered: false });
   }
@@ -40,18 +41,18 @@ export async function GET() {
     return NextResponse.json({ reunion: null, registered: false });
   }
 
-  const [existing] = await db
-    .select()
-    .from(reunionRegistrations)
-    .where(and(eq(reunionRegistrations.studentId, student.id), eq(reunionRegistrations.reunionTokenId, tokenRow.id)));
+  const existing = await findRegistration(student.id, tokenRow.id);
 
   return NextResponse.json({
     reunion: {
       occasion: tokenRow.occasion,
       venue: tokenRow.venue,
       reunionDate: tokenRow.reunionDate,
+      feeAmount: tokenRow.feeAmount,
     },
     registered: !!existing,
+    payment: registrationPayment(existing),
+    paymentOptions: tokenRow.feeAmount > 0 ? paymentInfo() : null,
   });
 }
 
@@ -62,7 +63,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const student = await currentStudent(session.id);
+  const student = await studentById(session.id);
   if (!student) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -88,13 +89,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "এই রিইউনিয়নটি শেষ হয়ে গেছে" }, { status: 410 });
   }
 
-  const [existing] = await db
-    .select()
-    .from(reunionRegistrations)
-    .where(and(eq(reunionRegistrations.studentId, student.id), eq(reunionRegistrations.reunionTokenId, tokenRow.id)));
+  const existing = await findRegistration(student.id, tokenRow.id);
 
+  let saved = existing;
   if (!existing) {
-    await db.insert(reunionRegistrations).values({ studentId: student.id, reunionTokenId: tokenRow.id });
+    const [inserted] = await db
+      .insert(reunionRegistrations)
+      .values({ studentId: student.id, reunionTokenId: tokenRow.id })
+      .returning();
+    saved = inserted;
   }
 
   return NextResponse.json({
@@ -102,8 +105,11 @@ export async function POST(req: NextRequest) {
       occasion: tokenRow.occasion,
       venue: tokenRow.venue,
       reunionDate: tokenRow.reunionDate,
+      feeAmount: tokenRow.feeAmount,
     },
     registered: true,
     alreadyRegistered: !!existing,
+    payment: registrationPayment(saved),
+    paymentOptions: tokenRow.feeAmount > 0 ? paymentInfo() : null,
   });
 }
