@@ -4,13 +4,13 @@ import { reunionTokens, reunionRegistrations } from "@/db/schema";
 import { getSession } from "@/lib/auth";
 import { eq } from "drizzle-orm";
 import { hasReunionEnded, studentById, currentTokenForBatch, findRegistration } from "@/lib/reunion";
-import { getOfflineNumbers, getOfflinePayeeName, isOnlinePaymentConfigured } from "@/lib/payment";
+import { getOfflineNumbers, getOfflinePayeeName, OFFLINE_USSD_CODES } from "@/lib/payment";
 
 function paymentInfo() {
   return {
-    onlineAvailable: isOnlinePaymentConfigured(),
     offlineNumbers: getOfflineNumbers(),
     payeeName: getOfflinePayeeName(),
+    ussdCodes: OFFLINE_USSD_CODES,
   };
 }
 

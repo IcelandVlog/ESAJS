@@ -20,13 +20,13 @@ type PaymentInfo = {
 };
 
 type PaymentOptions = {
-  onlineAvailable: boolean;
   offlineNumbers: { bkash: string; nagad: string; rocket: string };
   payeeName: string;
 };
 
 type OfflineMethod = "bkash" | "nagad" | "rocket";
 const OFFLINE_LABELS: Record<OfflineMethod, string> = { bkash: "bKash", nagad: "Nagad", rocket: "Rocket" };
+const OFFLINE_USSD: Record<OfflineMethod, string> = { bkash: "*247#", nagad: "*167#", rocket: "*322#" };
 
 function useCountdown(target: string | null) {
   const [remaining, setRemaining] = useState<number | null>(null);
@@ -86,8 +86,19 @@ export default function ReunionRegisterView({ name }: { name: string }) {
   const [senderNumber, setSenderNumber] = useState("");
   const [trxId, setTrxId] = useState("");
   const [payError, setPayError] = useState("");
-  const [payBusy, setPayBusy] = useState<"online" | "offline" | null>(null);
-  const [gatewayNotice, setGatewayNotice] = useState("");
+  const [payBusy, setPayBusy] = useState(false);
+  const [copiedField, setCopiedField] = useState<"number" | "amount" | null>(null);
+
+  async function copyText(text: string, field: "number" | "amount") {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedField(field);
+      setTimeout(() => setCopiedField(null), 1500);
+    } catch {
+      // Clipboard API can fail (permissions/older browsers) — the number/amount is
+      // still shown on screen, so the student can just select & copy it manually.
+    }
+  }
 
   function loadStatus() {
     fetch("/api/reunion-register")
@@ -103,46 +114,20 @@ export default function ReunionRegisterView({ name }: { name: string }) {
 
   useEffect(() => {
     loadStatus();
-    const params = new URLSearchParams(window.location.search);
-    const paymentResult = params.get("payment");
-    if (paymentResult) {
-      const messages: Record<string, string> = {
-        success: t("reunionPage.payment.success"),
-        fail: t("reunionPage.payment.fail"),
-        cancel: t("reunionPage.payment.cancel"),
-      };
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time read of the gateway redirect's query param on mount
-      setGatewayNotice(messages[paymentResult] ?? "");
-      window.history.replaceState({}, "", window.location.pathname);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  async function payOnline() {
-    setPayError("");
-    setPayBusy("online");
-    const res = await fetch("/api/reunion-payment/init", { method: "POST" });
-    const data = await res.json();
-    if (!res.ok) {
-      setPayError(data.error || t("admin.error"));
-      setPayBusy(null);
-      return;
-    }
-    window.location.href = data.url;
-  }
 
   async function submitOffline(e: React.FormEvent) {
     e.preventDefault();
     setPayError("");
     if (!offlineMethod || !senderNumber.trim() || !trxId.trim()) return;
-    setPayBusy("offline");
+    setPayBusy(true);
     const res = await fetch("/api/reunion-payment/manual", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ method: offlineMethod, senderNumber: senderNumber.trim(), transactionId: trxId.trim() }),
     });
     const data = await res.json();
-    setPayBusy(null);
+    setPayBusy(false);
     if (!res.ok) {
       setPayError(data.error || t("admin.error"));
       return;
@@ -246,10 +231,6 @@ export default function ReunionRegisterView({ name }: { name: string }) {
                 )}
               </div>
 
-              {gatewayNotice && (
-                <p className="text-sm mb-4 bg-surface border border-line rounded px-3 py-2 text-center">{gatewayNotice}</p>
-              )}
-
               {/* Registration */}
               {registered ? (
                 <>
@@ -272,24 +253,13 @@ export default function ReunionRegisterView({ name }: { name: string }) {
                           {t("reunionPage.fee.pending").replace("{trxId}", payment.transactionId)}
                         </p>
                       ) : !paymentOptions ||
-                        (!paymentOptions.onlineAvailable &&
-                          !paymentOptions.offlineNumbers.bkash &&
+                        (!paymentOptions.offlineNumbers.bkash &&
                           !paymentOptions.offlineNumbers.nagad &&
                           !paymentOptions.offlineNumbers.rocket) ? (
                         <p className="text-sm text-ink/60">{t("reunionPage.fee.noneAvailable")}</p>
                       ) : (
                         <div className="flex flex-col gap-4">
                           <p className="text-sm text-ink/70">{t("reunionPage.fee.chooseMethod")}</p>
-
-                          {paymentOptions.onlineAvailable && (
-                            <button
-                              onClick={payOnline}
-                              disabled={payBusy !== null}
-                              className="bg-pine text-on-navy px-5 py-2.5 rounded text-sm hover:bg-pine-dark disabled:opacity-60 self-start"
-                            >
-                              {payBusy === "online" ? t("reunionPage.fee.onlineRedirecting") : t("reunionPage.fee.online")}
-                            </button>
-                          )}
 
                           {(paymentOptions.offlineNumbers.bkash ||
                             paymentOptions.offlineNumbers.nagad ||
@@ -316,11 +286,36 @@ export default function ReunionRegisterView({ name }: { name: string }) {
                               </div>
 
                               {offlineMethod && (
-                                <p className="text-sm bg-line/20 rounded px-3 py-2">
-                                  {t("reunionPage.fee.sendTo").replace("{amount}", String(reunion.feeAmount))}:{" "}
-                                  <span className="font-mono font-medium">{paymentOptions.offlineNumbers[offlineMethod]}</span>
-                                  {paymentOptions.payeeName ? ` (${paymentOptions.payeeName})` : ""}
-                                </p>
+                                <div className="bg-line/20 rounded px-3 py-3 flex flex-col gap-2">
+                                  <p className="text-sm">
+                                    {t("reunionPage.fee.sendTo").replace("{amount}", String(reunion.feeAmount))}:{" "}
+                                    <span className="font-mono font-medium">{paymentOptions.offlineNumbers[offlineMethod]}</span>
+                                    {paymentOptions.payeeName ? ` (${paymentOptions.payeeName})` : ""}
+                                  </p>
+                                  <div className="flex flex-wrap gap-2">
+                                    <a
+                                      href={`tel:${encodeURIComponent(OFFLINE_USSD[offlineMethod])}`}
+                                      className="border border-pine/40 text-heading px-3 py-1.5 rounded text-xs hover:bg-pine/10"
+                                    >
+                                      📞 {t("reunionPage.fee.dialUssd").replace("{code}", OFFLINE_USSD[offlineMethod])}
+                                    </a>
+                                    <button
+                                      type="button"
+                                      onClick={() => copyText(paymentOptions.offlineNumbers[offlineMethod], "number")}
+                                      className="border border-line px-3 py-1.5 rounded text-xs hover:bg-line/30"
+                                    >
+                                      {copiedField === "number" ? t("reunionPage.fee.copied") : t("reunionPage.fee.copyNumber")}
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => copyText(String(reunion.feeAmount), "amount")}
+                                      className="border border-line px-3 py-1.5 rounded text-xs hover:bg-line/30"
+                                    >
+                                      {copiedField === "amount" ? t("reunionPage.fee.copied") : t("reunionPage.fee.copyAmount")}
+                                    </button>
+                                  </div>
+                                  <p className="text-xs text-ink/50">{t("reunionPage.fee.ussdHint")}</p>
+                                </div>
                               )}
 
                               <div>
@@ -348,10 +343,10 @@ export default function ReunionRegisterView({ name }: { name: string }) {
                                 />
                               </div>
                               <button
-                                disabled={payBusy !== null}
+                                disabled={payBusy}
                                 className="border border-pine/40 text-heading px-5 py-2 rounded text-sm hover:bg-pine/10 disabled:opacity-60 self-start"
                               >
-                                {payBusy === "offline" ? t("reunionPage.fee.submitting") : t("reunionPage.fee.submit")}
+                                {payBusy ? t("reunionPage.fee.submitting") : t("reunionPage.fee.submit")}
                               </button>
                             </form>
                           )}
