@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useConfirm } from "@/components/ConfirmDialog";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
@@ -31,6 +31,32 @@ type Registration = {
   senderNumber: string;
   amountPaid: number;
   createdAt: string | null;
+};
+
+type Expense = {
+  id: number;
+  title: string;
+  amount: number;
+  createdAt: string | null;
+};
+
+type TokenFinance = {
+  feeAmount: number;
+  collected: number;
+  due: number;
+  totalExpense: number;
+  net: number;
+};
+
+type FinanceRow = {
+  tokenId: number;
+  batch: string;
+  occasion: string;
+  feeAmount: number;
+  collected: number;
+  due: number;
+  totalExpense: number;
+  net: number;
 };
 
 const EMOJIS = ["🎉", "🎓", "🏫", "📅", "⏰", "🎊", "👋", "❤️", "😊", "✨", "🎈", "📢", "🥳", "🤝", "📍", "🕰️"];
@@ -219,6 +245,29 @@ export default function ReunionTab({
   const [regRows, setRegRows] = useState<Registration[]>([]);
   const [regLoading, setRegLoading] = useState(false);
   const [regBusyId, setRegBusyId] = useState<number | null>(null);
+  const [tokenFinance, setTokenFinance] = useState<TokenFinance | null>(null);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [expTitle, setExpTitle] = useState("");
+  const [expAmount, setExpAmount] = useState("");
+  const [expBusy, setExpBusy] = useState(false);
+
+  const [financeRows, setFinanceRows] = useState<FinanceRow[]>([]);
+  const [financeGrandTotal, setFinanceGrandTotal] = useState<TokenFinance | null>(null);
+  const [financeIsMainAdmin, setFinanceIsMainAdmin] = useState(false);
+
+  function loadFinanceSummary() {
+    fetch("/api/reunion-finance-summary")
+      .then((res) => res.json())
+      .then((data) => {
+        setFinanceRows(data.perToken ?? []);
+        setFinanceGrandTotal(data.grandTotal ?? null);
+        setFinanceIsMainAdmin(!!data.isMainAdmin);
+      });
+  }
+
+  useEffect(() => {
+    loadFinanceSummary();
+  }, []);
 
   const rows = tokens;
 
@@ -283,11 +332,13 @@ export default function ReunionTab({
     setReunionDate("");
     setFeeAmount("");
     onChange();
+    loadFinanceSummary();
   }
 
   function applyLocalUpdate() {
     setEditingId(null);
     onChange();
+    loadFinanceSummary();
   }
 
   async function toggleCancel(tk: ReunionToken) {
@@ -302,6 +353,7 @@ export default function ReunionTab({
     setBusyId(null);
     if (res.ok) {
       onChange();
+      loadFinanceSummary();
     }
   }
 
@@ -317,6 +369,8 @@ export default function ReunionTab({
     setRegLoading(false);
     if (res.ok) {
       setRegRows(data.registrations ?? []);
+      setExpenses(data.expenses ?? []);
+      setTokenFinance(data.summary ?? null);
     }
   }
 
@@ -333,6 +387,51 @@ export default function ReunionTab({
     if (res.ok) {
       const data = await res.json();
       setRegRows((prev) => prev.map((r) => (r.id === regId ? { ...r, ...data.registration } : r)));
+      if (regOpenId !== null) {
+        const tk = rows.find((r) => r.id === regOpenId);
+        if (tk) await toggleAndReload(tk);
+      }
+      loadFinanceSummary();
+    }
+  }
+
+  // Re-fetches the currently-open registrations panel without toggling it closed
+  // (used after an action changes the numbers shown there).
+  async function toggleAndReload(tk: ReunionToken) {
+    const res = await fetch(`/api/reunion-token/${tk.id}/registrations`);
+    const data = await res.json();
+    if (res.ok) {
+      setRegRows(data.registrations ?? []);
+      setExpenses(data.expenses ?? []);
+      setTokenFinance(data.summary ?? null);
+    }
+  }
+
+  async function addExpense(tokenId: number) {
+    if (!expTitle.trim() || !expAmount || Number(expAmount) <= 0) return;
+    setExpBusy(true);
+    const res = await fetch(`/api/reunion-token/${tokenId}/expenses`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: expTitle.trim(), amount: Number(expAmount) }),
+    });
+    setExpBusy(false);
+    if (res.ok) {
+      setExpTitle("");
+      setExpAmount("");
+      const tk = rows.find((r) => r.id === tokenId);
+      if (tk) await toggleAndReload(tk);
+      loadFinanceSummary();
+    }
+  }
+
+  async function deleteExpense(expenseId: number, tokenId: number) {
+    if (!(await confirm(t("reunion.finance.confirmDeleteExpense")))) return;
+    const res = await fetch(`/api/reunion-expenses/${expenseId}`, { method: "DELETE" });
+    if (res.ok) {
+      const tk = rows.find((r) => r.id === tokenId);
+      if (tk) await toggleAndReload(tk);
+      loadFinanceSummary();
     }
   }
 
@@ -340,6 +439,61 @@ export default function ReunionTab({
     <div>
       <h2 className="font-display text-xl text-heading mb-1">{t("reunion.title")}</h2>
       <p className="text-sm text-ink/60 mb-4">{t("reunion.subtitle")}</p>
+
+      {financeGrandTotal && (
+        <div className="bg-surface border border-line rounded-lg p-5 mb-6">
+          <h3 className="font-display text-lg text-heading mb-3">
+            {financeIsMainAdmin ? t("reunion.finance.overviewAll") : t("reunion.finance.overviewBatch")}
+          </h3>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+            <div className="bg-pine/10 rounded-lg p-3">
+              <p className="text-xs text-ink/60">{t("reunion.finance.collected")}</p>
+              <p className="font-display text-lg text-heading">৳{financeGrandTotal.collected}</p>
+            </div>
+            <div className="bg-amber-500/10 rounded-lg p-3">
+              <p className="text-xs text-ink/60">{t("reunion.finance.due")}</p>
+              <p className="font-display text-lg text-heading">৳{financeGrandTotal.due}</p>
+            </div>
+            <div className="bg-clay/10 rounded-lg p-3">
+              <p className="text-xs text-ink/60">{t("reunion.finance.expense")}</p>
+              <p className="font-display text-lg text-heading">৳{financeGrandTotal.totalExpense}</p>
+            </div>
+            <div className="bg-line/30 rounded-lg p-3">
+              <p className="text-xs text-ink/60">{t("reunion.finance.net")}</p>
+              <p className="font-display text-lg text-heading">৳{financeGrandTotal.net}</p>
+            </div>
+          </div>
+
+          {financeRows.length > 0 && (
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs min-w-[560px]">
+                <thead>
+                  <tr className="text-left text-ink/50 border-b border-line">
+                    {financeIsMainAdmin && <th className="px-3 py-1.5 font-normal">{t("reunion.col.batch")}</th>}
+                    <th className="px-3 py-1.5 font-normal">{t("reunion.col.occasion")}</th>
+                    <th className="px-3 py-1.5 font-normal">{t("reunion.finance.collected")}</th>
+                    <th className="px-3 py-1.5 font-normal">{t("reunion.finance.due")}</th>
+                    <th className="px-3 py-1.5 font-normal">{t("reunion.finance.expense")}</th>
+                    <th className="px-3 py-1.5 font-normal">{t("reunion.finance.net")}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {financeRows.map((r) => (
+                    <tr key={r.tokenId} className="border-b border-line/60">
+                      {financeIsMainAdmin && <td className="px-3 py-1.5">{r.batch}</td>}
+                      <td className="px-3 py-1.5">{r.occasion || "-"}</td>
+                      <td className="px-3 py-1.5">৳{r.collected}</td>
+                      <td className="px-3 py-1.5">৳{r.due}</td>
+                      <td className="px-3 py-1.5">৳{r.totalExpense}</td>
+                      <td className="px-3 py-1.5 font-medium">৳{r.net}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
 
       <form onSubmit={generate} className="bg-surface border border-line rounded-lg p-5 mb-6 flex flex-col gap-4">
         <div className="flex flex-wrap items-end gap-3">
@@ -603,6 +757,76 @@ export default function ReunionTab({
                           </table>
                         </div>
                       )}
+
+                      <div className="mt-4 border-t border-line pt-3">
+                        <h4 className="font-display text-sm text-heading mb-2">{t("reunion.finance.expensesTitle")}</h4>
+                        {tokenFinance && (
+                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3 text-xs">
+                            <div>
+                              <p className="text-ink/50">{t("reunion.finance.collected")}</p>
+                              <p className="font-medium">৳{tokenFinance.collected}</p>
+                            </div>
+                            <div>
+                              <p className="text-ink/50">{t("reunion.finance.due")}</p>
+                              <p className="font-medium">৳{tokenFinance.due}</p>
+                            </div>
+                            <div>
+                              <p className="text-ink/50">{t("reunion.finance.expense")}</p>
+                              <p className="font-medium">৳{tokenFinance.totalExpense}</p>
+                            </div>
+                            <div>
+                              <p className="text-ink/50">{t("reunion.finance.net")}</p>
+                              <p className="font-medium">৳{tokenFinance.net}</p>
+                            </div>
+                          </div>
+                        )}
+
+                        {expenses.length === 0 ? (
+                          <p className="text-xs text-ink/50 mb-3">{t("reunion.expense.empty")}</p>
+                        ) : (
+                          <ul className="text-xs mb-3 flex flex-col gap-1">
+                            {expenses.map((e) => (
+                              <li key={e.id} className="flex items-center justify-between border-b border-line/60 py-1">
+                                <span>{e.title}</span>
+                                <span className="flex items-center gap-2">
+                                  ৳{e.amount}
+                                  <button
+                                    onClick={() => deleteExpense(e.id, tk.id)}
+                                    className="text-clay hover:underline"
+                                  >
+                                    {t("reunion.expense.delete")}
+                                  </button>
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+
+                        <div className="flex flex-wrap gap-2">
+                          <input
+                            type="text"
+                            value={expTitle}
+                            onChange={(e) => setExpTitle(e.target.value)}
+                            placeholder={t("reunion.expense.titlePlaceholder")}
+                            className="border border-line rounded px-2 py-1.5 text-xs flex-1 min-w-[160px]"
+                          />
+                          <input
+                            type="number"
+                            min={0}
+                            value={expAmount}
+                            onChange={(e) => setExpAmount(e.target.value)}
+                            placeholder={t("reunion.expense.amountPlaceholder")}
+                            className="border border-line rounded px-2 py-1.5 text-xs w-24"
+                          />
+                          <button
+                            onClick={() => addExpense(tk.id)}
+                            disabled={expBusy}
+                            className="border border-pine/40 text-heading px-3 py-1.5 rounded text-xs hover:bg-pine/10 disabled:opacity-60"
+                          >
+                            {expBusy ? t("reunion.expense.adding") : t("reunion.expense.add")}
+                          </button>
+                        </div>
+                      </div>
                     </td>
                   </tr>
                 ))}

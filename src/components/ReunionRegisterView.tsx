@@ -274,7 +274,7 @@ export default function ReunionRegisterView({ name }: { name: string }) {
                                   onChange={(e) => setOfflineMethod(e.target.value as OfflineMethod)}
                                   className="border border-line rounded px-3 py-2 text-sm"
                                 >
-                                  <option value="">-</option>
+                                  <option value="">{t("reunionPage.fee.selectOfflinePlaceholder")}</option>
                                   {(Object.keys(paymentOptions.offlineNumbers) as OfflineMethod[])
                                     .filter((m) => paymentOptions.offlineNumbers[m])
                                     .map((m) => (

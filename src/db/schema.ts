@@ -107,16 +107,26 @@ export const reunionRegistrations = pgTable("reunion_registrations", {
 
   // ---- Reunion fee payment (only meaningful when the token's feeAmount > 0) ----
   // "unpaid": nothing submitted yet. "pending": offline (bKash/Nagad/Rocket) TrxID submitted,
-  // waiting for admin to verify against their own account. "paid": confirmed (online: gateway
-  // validated automatically; offline: admin verified manually).
+  // waiting for admin to verify against their own account. "paid": admin verified it.
   paymentStatus: text("payment_status").notNull().default("unpaid"),
-  // "online" (SSLCommerz gateway) | "bkash" | "nagad" | "rocket" (manual/offline)
+  // "bkash" | "nagad" | "rocket" (which one the student sent the fee through)
   paymentMethod: text("payment_method").notNull().default(""),
-  transactionId: text("transaction_id").notNull().default(""), // gateway tran_id, or the TrxID the student typed in for offline payments
-  senderNumber: text("sender_number").notNull().default(""), // the bKash/Nagad/Rocket number the student sent money FROM (offline only)
+  transactionId: text("transaction_id").notNull().default(""), // the TrxID the student typed in
+  senderNumber: text("sender_number").notNull().default(""), // the bKash/Nagad/Rocket number the student sent money FROM
   amountPaid: integer("amount_paid").notNull().default(0),
-  valId: text("val_id").notNull().default(""), // SSLCommerz val_id, kept for re-verification/support
+  valId: text("val_id").notNull().default(""), // unused (kept so no migration is needed if online payment ever comes back)
   paidAt: timestamp("paid_at"),
 
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// ---------- Reunion expenses ----------
+// Admin-logged costs against a reunion (venue rent, food, decoration, etc.), so the
+// admin dashboard can show collected fees vs. money spent per reunion.
+export const reunionExpenses = pgTable("reunion_expenses", {
+  id: serial("id").primaryKey(),
+  reunionTokenId: integer("reunion_token_id").notNull().references(() => reunionTokens.id, { onDelete: "cascade" }),
+  title: text("title").notNull().default(""), // what the money was spent on, e.g. "Venue rent"
+  amount: integer("amount").notNull().default(0), // BDT, whole taka
   createdAt: timestamp("created_at").defaultNow(),
 });

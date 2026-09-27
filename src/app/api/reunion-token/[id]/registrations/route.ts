@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db/client";
-import { reunionTokens, reunionRegistrations, students } from "@/db/schema";
+import { reunionTokens, reunionRegistrations, reunionExpenses, students } from "@/db/schema";
 import { getStaffAccess } from "@/lib/staff";
 import { eq } from "drizzle-orm";
 
@@ -41,5 +41,25 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     .where(eq(reunionRegistrations.reunionTokenId, tokenId))
     .orderBy(reunionRegistrations.id);
 
-  return NextResponse.json({ registrations: rows.reverse() });
+  const expenseRows = await db
+    .select()
+    .from(reunionExpenses)
+    .where(eq(reunionExpenses.reunionTokenId, tokenId))
+    .orderBy(reunionExpenses.id);
+
+  const collected = rows.filter((r) => r.paymentStatus === "paid").reduce((sum, r) => sum + r.amountPaid, 0);
+  const dueCount = rows.filter((r) => r.paymentStatus !== "paid").length;
+  const totalExpense = expenseRows.reduce((sum, e) => sum + e.amount, 0);
+
+  return NextResponse.json({
+    registrations: rows.reverse(),
+    expenses: expenseRows.reverse(),
+    summary: {
+      feeAmount: tokenRow.feeAmount,
+      collected,
+      due: dueCount * tokenRow.feeAmount,
+      totalExpense,
+      net: collected - totalExpense,
+    },
+  });
 }
