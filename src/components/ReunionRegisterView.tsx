@@ -89,6 +89,7 @@ export default function ReunionRegisterView({ name }: { name: string }) {
   const [payment, setPayment] = useState<PaymentInfo | null>(null);
   const [paymentOptions, setPaymentOptions] = useState<PaymentOptions | null>(null);
   const [offlineMethod, setOfflineMethod] = useState<OfflineMethod | "">("");
+  const [cashSelected, setCashSelected] = useState(false);
   const [senderNumber, setSenderNumber] = useState("");
   const [trxId, setTrxId] = useState("");
   const [payError, setPayError] = useState("");
@@ -262,77 +263,101 @@ export default function ReunionRegisterView({ name }: { name: string }) {
                         <div className="flex flex-col gap-4">
                           <p className="text-sm text-ink/70">{t("reunionPage.fee.chooseMethod")}</p>
 
-                          {paymentOptions &&
-                            (paymentOptions.offlineNumbers.bkash ||
-                              paymentOptions.offlineNumbers.nagad ||
-                              paymentOptions.offlineNumbers.rocket) && (
-                            <form onSubmit={submitOffline} className="border-t border-line pt-4 flex flex-col gap-3">
-                              <p className="text-sm font-medium text-heading">{t("reunionPage.fee.offline")}</p>
-                              <div>
-                                <p className="block text-xs text-ink/60 mb-2">{t("reunionPage.fee.selectOffline")}</p>
-                                <div className="grid grid-cols-3 gap-3" role="radiogroup">
-                                  {(Object.keys(OFFLINE_BRANDS) as OfflineMethod[])
-                                    .filter((m) => paymentOptions.offlineNumbers[m])
-                                    .map((m) => {
-                                      const brand = OFFLINE_BRANDS[m];
-                                      const active = offlineMethod === m;
-                                      return (
-                                        <button
-                                          key={m}
-                                          type="button"
-                                          role="radio"
-                                          aria-checked={active}
-                                          aria-label={OFFLINE_LABELS[m]}
-                                          onClick={() => setOfflineMethod(m)}
-                                          className={`rounded-lg border-2 p-2 flex flex-col items-center gap-1.5 transition ${
-                                            active ? "border-pine bg-pine/10" : "border-line hover:border-pine/50"
-                                          }`}
-                                        >
-                                          <span
-                                            className="w-full h-11 rounded-md flex items-center justify-center text-white font-bold text-base tracking-wide"
-                                            style={{ background: brand.bg }}
-                                          >
-                                            {brand.mark}
-                                          </span>
-                                          <span className="text-xs text-heading">{OFFLINE_LABELS[m]}</span>
-                                        </button>
-                                      );
-                                    })}
-                                </div>
-                              </div>
+                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3" role="radiogroup">
+                            {(Object.keys(OFFLINE_BRANDS) as OfflineMethod[])
+                              .filter((m) => paymentOptions?.offlineNumbers[m])
+                              .map((m) => {
+                                const brand = OFFLINE_BRANDS[m];
+                                const active = offlineMethod === m;
+                                return (
+                                  <button
+                                    key={m}
+                                    type="button"
+                                    role="radio"
+                                    aria-checked={active}
+                                    aria-label={OFFLINE_LABELS[m]}
+                                    onClick={() => {
+                                      setOfflineMethod(m);
+                                      setCashSelected(false);
+                                    }}
+                                    className={`rounded-lg border-2 p-2 flex flex-col items-center gap-1.5 transition ${
+                                      active ? "border-pine bg-pine/10" : "border-line hover:border-pine/50"
+                                    }`}
+                                  >
+                                    <span
+                                      className="w-full h-11 rounded-md flex items-center justify-center text-white font-bold text-base tracking-wide"
+                                      style={{ background: brand.bg }}
+                                    >
+                                      {brand.mark}
+                                    </span>
+                                    <span className="text-xs text-heading">{OFFLINE_LABELS[m]}</span>
+                                  </button>
+                                );
+                              })}
 
-                              {offlineMethod && (
-                                <div className="bg-line/20 rounded px-3 py-3 flex flex-col gap-2">
-                                  <p className="text-sm">
-                                    {t("reunionPage.fee.sendTo").replace("{amount}", String(reunion.feeAmount))}:{" "}
-                                    <span className="font-mono font-medium">{paymentOptions.offlineNumbers[offlineMethod]}</span>
-                                    {paymentOptions.payeeName ? ` (${paymentOptions.payeeName})` : ""}
-                                  </p>
-                                  <div className="flex flex-wrap gap-2">
-                                    <a
-                                      href={`tel:${encodeURIComponent(OFFLINE_USSD[offlineMethod])}`}
-                                      className="border border-pine/40 text-heading px-3 py-1.5 rounded text-xs hover:bg-pine/10"
-                                    >
-                                      📞 {t("reunionPage.fee.dialUssd").replace("{code}", OFFLINE_USSD[offlineMethod])}
-                                    </a>
-                                    <button
-                                      type="button"
-                                      onClick={() => copyText(paymentOptions.offlineNumbers[offlineMethod], "number")}
-                                      className="border border-line px-3 py-1.5 rounded text-xs hover:bg-line/30"
-                                    >
-                                      {copiedField === "number" ? t("reunionPage.fee.copied") : t("reunionPage.fee.copyNumber")}
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={() => copyText(String(reunion.feeAmount), "amount")}
-                                      className="border border-line px-3 py-1.5 rounded text-xs hover:bg-line/30"
-                                    >
-                                      {copiedField === "amount" ? t("reunionPage.fee.copied") : t("reunionPage.fee.copyAmount")}
-                                    </button>
-                                  </div>
-                                  <p className="text-xs text-ink/50">{t("reunionPage.fee.ussdHint")}</p>
+                            <button
+                              type="button"
+                              role="radio"
+                              aria-checked={cashSelected}
+                              onClick={() => {
+                                setCashSelected(true);
+                                setOfflineMethod("");
+                              }}
+                              className={`rounded-lg border-2 p-2 flex flex-col items-center gap-1.5 transition ${
+                                cashSelected ? "border-pine bg-pine/10" : "border-line hover:border-pine/50"
+                              }`}
+                            >
+                              <span
+                                className="w-full h-11 rounded-md flex items-center justify-center text-white font-bold text-base tracking-wide"
+                                style={{ background: "#0f766e" }}
+                              >
+                                Cash
+                              </span>
+                              <span className="text-xs text-heading">{t("reunionPage.fee.cashLabel")}</span>
+                            </button>
+                          </div>
+
+                          {cashSelected && (
+                            <div className="bg-line/20 rounded px-3 py-3">
+                              <p className="text-sm font-medium text-heading mb-1">{t("reunionPage.fee.cashTitle")}</p>
+                              <p className="text-xs text-ink/60">
+                                {t("reunionPage.fee.cashHint").replace("{amount}", String(reunion.feeAmount))}
+                              </p>
+                            </div>
+                          )}
+
+                          {offlineMethod && paymentOptions && (
+                            <form onSubmit={submitOffline} className="flex flex-col gap-3">
+                              <div className="bg-line/20 rounded px-3 py-3 flex flex-col gap-2">
+                                <p className="text-sm">
+                                  {t("reunionPage.fee.sendTo").replace("{amount}", String(reunion.feeAmount))}:{" "}
+                                  <span className="font-mono font-medium">{paymentOptions.offlineNumbers[offlineMethod]}</span>
+                                  {paymentOptions.payeeName ? ` (${paymentOptions.payeeName})` : ""}
+                                </p>
+                                <div className="flex flex-wrap gap-2">
+                                  <a
+                                    href={`tel:${encodeURIComponent(OFFLINE_USSD[offlineMethod])}`}
+                                    className="border border-pine/40 text-heading px-3 py-1.5 rounded text-xs hover:bg-pine/10"
+                                  >
+                                    📞 {t("reunionPage.fee.dialUssd").replace("{code}", OFFLINE_USSD[offlineMethod])}
+                                  </a>
+                                  <button
+                                    type="button"
+                                    onClick={() => copyText(paymentOptions.offlineNumbers[offlineMethod], "number")}
+                                    className="border border-line px-3 py-1.5 rounded text-xs hover:bg-line/30"
+                                  >
+                                    {copiedField === "number" ? t("reunionPage.fee.copied") : t("reunionPage.fee.copyNumber")}
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => copyText(String(reunion.feeAmount), "amount")}
+                                    className="border border-line px-3 py-1.5 rounded text-xs hover:bg-line/30"
+                                  >
+                                    {copiedField === "amount" ? t("reunionPage.fee.copied") : t("reunionPage.fee.copyAmount")}
+                                  </button>
                                 </div>
-                              )}
+                                <p className="text-xs text-ink/50">{t("reunionPage.fee.ussdHint")}</p>
+                              </div>
 
                               <div>
                                 <label className="block text-xs text-ink/60 mb-1">
@@ -366,13 +391,6 @@ export default function ReunionRegisterView({ name }: { name: string }) {
                               </button>
                             </form>
                           )}
-
-                          <div className="border-t border-line pt-4">
-                            <p className="text-sm font-medium text-heading mb-1">{t("reunionPage.fee.cashTitle")}</p>
-                            <p className="text-xs text-ink/60">
-                              {t("reunionPage.fee.cashHint").replace("{amount}", String(reunion.feeAmount))}
-                            </p>
-                          </div>
 
                           {payError && <p className="text-clay text-sm">{payError}</p>}
                         </div>
