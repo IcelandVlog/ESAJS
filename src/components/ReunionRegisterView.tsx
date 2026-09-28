@@ -25,6 +25,12 @@ type PaymentOptions = {
 };
 
 type OfflineMethod = "bkash" | "nagad" | "rocket";
+// Brand-coloured badges (text wordmarks, not the official logo artwork).
+const OFFLINE_BRANDS: Record<OfflineMethod, { bg: string; mark: string }> = {
+  bkash: { bg: "#E2136E", mark: "bKash" },
+  nagad: { bg: "linear-gradient(135deg,#F6921E,#ED1C24)", mark: "Nagad" },
+  rocket: { bg: "#8C3494", mark: "Rocket" },
+};
 const OFFLINE_LABELS: Record<OfflineMethod, string> = { bkash: "bKash", nagad: "Nagad", rocket: "Rocket" };
 const OFFLINE_USSD: Record<OfflineMethod, string> = { bkash: "*247#", nagad: "*167#", rocket: "*322#" };
 
@@ -267,22 +273,36 @@ export default function ReunionRegisterView({ name }: { name: string }) {
                             <form onSubmit={submitOffline} className="border-t border-line pt-4 flex flex-col gap-3">
                               <p className="text-sm font-medium text-heading">{t("reunionPage.fee.offline")}</p>
                               <div>
-                                <label className="block text-xs text-ink/60 mb-1">{t("reunionPage.fee.selectOffline")}</label>
-                                <select
-                                  required
-                                  value={offlineMethod}
-                                  onChange={(e) => setOfflineMethod(e.target.value as OfflineMethod)}
-                                  className="border border-line rounded px-3 py-2 text-sm"
-                                >
-                                  <option value="">{t("reunionPage.fee.selectOfflinePlaceholder")}</option>
-                                  {(Object.keys(paymentOptions.offlineNumbers) as OfflineMethod[])
+                                <p className="block text-xs text-ink/60 mb-2">{t("reunionPage.fee.selectOffline")}</p>
+                                <div className="grid grid-cols-3 gap-3" role="radiogroup">
+                                  {(Object.keys(OFFLINE_BRANDS) as OfflineMethod[])
                                     .filter((m) => paymentOptions.offlineNumbers[m])
-                                    .map((m) => (
-                                      <option key={m} value={m}>
-                                        {OFFLINE_LABELS[m]}
-                                      </option>
-                                    ))}
-                                </select>
+                                    .map((m) => {
+                                      const brand = OFFLINE_BRANDS[m];
+                                      const active = offlineMethod === m;
+                                      return (
+                                        <button
+                                          key={m}
+                                          type="button"
+                                          role="radio"
+                                          aria-checked={active}
+                                          aria-label={OFFLINE_LABELS[m]}
+                                          onClick={() => setOfflineMethod(m)}
+                                          className={`rounded-lg border-2 p-2 flex flex-col items-center gap-1.5 transition ${
+                                            active ? "border-pine bg-pine/10" : "border-line hover:border-pine/50"
+                                          }`}
+                                        >
+                                          <span
+                                            className="w-full h-11 rounded-md flex items-center justify-center text-white font-bold text-base tracking-wide"
+                                            style={{ background: brand.bg }}
+                                          >
+                                            {brand.mark}
+                                          </span>
+                                          <span className="text-xs text-heading">{OFFLINE_LABELS[m]}</span>
+                                        </button>
+                                      );
+                                    })}
+                                </div>
                               </div>
 
                               {offlineMethod && (
