@@ -123,6 +123,24 @@ export default function ReunionRegisterView({ name }: { name: string }) {
     loadStatus();
   }, []);
 
+  async function confirmCash() {
+    setPayError("");
+    setPayBusy(true);
+    const res = await fetch("/api/reunion-payment/manual", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ method: "cash" }),
+    });
+    const data = await res.json();
+    setPayBusy(false);
+    if (!res.ok) {
+      setPayError(data.error || t("admin.error"));
+      return;
+    }
+    setPayment(data.payment);
+    setCashSelected(false);
+  }
+
   async function submitOffline(e: React.FormEvent) {
     e.preventDefault();
     setPayError("");
@@ -257,7 +275,9 @@ export default function ReunionRegisterView({ name }: { name: string }) {
                         <p className="text-pine font-medium">{t("reunionPage.fee.paid")}</p>
                       ) : payment?.paymentStatus === "pending" ? (
                         <p className="text-sm text-ink/70">
-                          {t("reunionPage.fee.pending").replace("{trxId}", payment.transactionId)}
+                          {payment.paymentMethod === "cash"
+                            ? t("reunionPage.fee.pendingCash")
+                            : t("reunionPage.fee.pending").replace("{trxId}", payment.transactionId)}
                         </p>
                       ) : (
                         <div className="flex flex-col gap-4">
@@ -320,9 +340,17 @@ export default function ReunionRegisterView({ name }: { name: string }) {
                           {cashSelected && (
                             <div className="bg-line/20 rounded px-3 py-3">
                               <p className="text-sm font-medium text-heading mb-1">{t("reunionPage.fee.cashTitle")}</p>
-                              <p className="text-xs text-ink/60">
+                              <p className="text-xs text-ink/60 mb-3">
                                 {t("reunionPage.fee.cashHint").replace("{amount}", String(reunion.feeAmount))}
                               </p>
+                              <button
+                                type="button"
+                                onClick={confirmCash}
+                                disabled={payBusy}
+                                className="bg-pine text-on-navy px-5 py-2 rounded text-sm hover:bg-pine-dark disabled:opacity-60"
+                              >
+                                {payBusy ? t("reunionPage.fee.cashConfirming") : t("reunionPage.fee.cashConfirm")}
+                              </button>
                             </div>
                           )}
 

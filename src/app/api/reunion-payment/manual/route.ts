@@ -8,8 +8,8 @@ import { getOfflineNumbers, type OfflineMethod } from "@/lib/payment";
 
 const VALID_METHODS: OfflineMethod[] = ["bkash", "nagad", "rocket"];
 
-// Student sent the fee by hand to the school's bKash/Nagad/Rocket number and is now
-// submitting the TrxID + the number they sent it from, for an admin to verify later.
+// Student payment submission for an admin to verify later: either a bKash/Nagad/Rocket
+// TrxID (+ the number it was sent from), or a "cash" confirmation (paid in person).
 export async function POST(req: NextRequest) {
   const session = await getSession();
   if (!session || session.role !== "student") {
@@ -39,6 +39,30 @@ export async function POST(req: NextRequest) {
     senderNumber?: string;
     transactionId?: string;
   };
+
+  // Cash: the student confirms they'll hand (or have handed) the fee to an admin in
+  // person. No TrxID — it stays "pending" until an admin marks it received.
+  if (method === "cash") {
+    const [cashUpdated] = await db
+      .update(reunionRegistrations)
+      .set({
+        paymentMethod: "cash",
+        senderNumber: "",
+        transactionId: "",
+        paymentStatus: "pending",
+        amountPaid: tokenRow.feeAmount,
+      })
+      .where(eq(reunionRegistrations.id, registration.id))
+      .returning();
+    return NextResponse.json({
+      payment: {
+        paymentStatus: cashUpdated.paymentStatus,
+        paymentMethod: cashUpdated.paymentMethod,
+        transactionId: cashUpdated.transactionId,
+        amountPaid: cashUpdated.amountPaid,
+      },
+    });
+  }
 
   if (!method || !VALID_METHODS.includes(method as OfflineMethod)) {
     return NextResponse.json({ error: "পেমেন্ট মাধ্যম বাছাই করুন" }, { status: 400 });
