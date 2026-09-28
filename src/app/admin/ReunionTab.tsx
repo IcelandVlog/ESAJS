@@ -270,6 +270,9 @@ export default function ReunionTab({
   }, []);
 
   const rows = tokens;
+  // Once the reunion date has passed it is history: no more editing or cancelling.
+  const [nowMs] = useState(() => Date.now());
+  const isHeld = (tk: ReunionToken) => !!tk.reunionDate && new Date(tk.reunionDate).getTime() < nowMs;
 
   const occasionRef = useRef<HTMLInputElement>(null);
   const bodyRef = useRef<HTMLTextAreaElement>(null);
@@ -374,8 +377,15 @@ export default function ReunionTab({
     }
   }
 
-  async function actOnPayment(regId: number, action: "verify" | "reject") {
-    const msg = action === "verify" ? t("reunion.pay.confirmVerify") : t("reunion.pay.confirmReject");
+  async function actOnPayment(regId: number, action: "verify" | "reject" | "markCash" | "markUnpaid") {
+    const msg =
+      action === "verify"
+        ? t("reunion.pay.confirmVerify")
+        : action === "reject"
+          ? t("reunion.pay.confirmReject")
+          : action === "markCash"
+            ? t("reunion.pay.confirmMarkCash")
+            : t("reunion.pay.confirmMarkUnpaid");
     if (!(await confirm(msg))) return;
     setRegBusyId(regId);
     const res = await fetch(`/api/reunion-registrations/${regId}`, {
@@ -641,6 +651,10 @@ export default function ReunionTab({
                       <span className="px-2 py-0.5 rounded text-xs font-medium bg-clay/10 text-clay">
                         {t("reunion.status.cancelled")}
                       </span>
+                    ) : isHeld(tk) ? (
+                      <span className="px-2 py-0.5 rounded text-xs font-medium bg-line/30 text-ink/70">
+                        {t("dashboard.status.held")}
+                      </span>
                     ) : (
                       <span className="px-2 py-0.5 rounded text-xs font-medium bg-pine/10 text-heading">
                         {t("reunion.status.active")}
@@ -649,7 +663,7 @@ export default function ReunionTab({
                   </td>
                   <td className="px-4 py-2.5">
                     <div className="flex gap-1.5 flex-wrap">
-                      {!tk.cancelled && (
+                      {!tk.cancelled && !isHeld(tk) && (
                         <button
                           onClick={() => setEditingId(tk.id)}
                           className="border border-line px-2.5 py-1 rounded text-xs hover:bg-line/30"
@@ -657,6 +671,7 @@ export default function ReunionTab({
                           {t("reunion.edit")}
                         </button>
                       )}
+                      {!isHeld(tk) && (
                       <button
                         onClick={() => toggleCancel(tk)}
                         disabled={busyId === tk.id}
@@ -668,6 +683,7 @@ export default function ReunionTab({
                       >
                         {tk.cancelled ? t("reunion.reactivate") : t("reunion.cancelToken")}
                       </button>
+                      )}
                       <button
                         onClick={() => toggleRegistrations(tk)}
                         className="border border-line px-2.5 py-1 rounded text-xs hover:bg-line/30"
@@ -710,7 +726,7 @@ export default function ReunionTab({
                                 <tr key={r.id} className="border-b border-line/60">
                                   <td className="px-3 py-1.5">{r.studentName}</td>
                                   <td className="px-3 py-1.5">{r.studentRoll}</td>
-                                  <td className="px-3 py-1.5">{r.paymentMethod || "-"}</td>
+                                  <td className="px-3 py-1.5">{r.paymentMethod === "cash" ? t("reunion.pay.method.cash") : r.paymentMethod || "-"}</td>
                                   <td className="px-3 py-1.5 font-mono">{r.transactionId || "-"}</td>
                                   <td className="px-3 py-1.5 font-mono">{r.senderNumber || "-"}</td>
                                   <td className="px-3 py-1.5">{r.amountPaid > 0 ? `৳${r.amountPaid}` : "-"}</td>
@@ -732,7 +748,7 @@ export default function ReunionTab({
                                     </span>
                                   </td>
                                   <td className="px-3 py-1.5">
-                                    {r.paymentStatus === "pending" && r.paymentMethod !== "online" && (
+                                    {r.paymentStatus === "pending" && (
                                       <div className="flex gap-1.5">
                                         <button
                                           onClick={() => actOnPayment(r.id, "verify")}
@@ -749,6 +765,24 @@ export default function ReunionTab({
                                           {t("reunion.pay.reject")}
                                         </button>
                                       </div>
+                                    )}
+                                    {r.paymentStatus === "unpaid" && (
+                                      <button
+                                        onClick={() => actOnPayment(r.id, "markCash")}
+                                        disabled={regBusyId === r.id}
+                                        className="border border-pine/30 text-heading px-2 py-0.5 rounded text-xs hover:bg-pine/10 disabled:opacity-60"
+                                      >
+                                        {t("reunion.pay.markCash")}
+                                      </button>
+                                    )}
+                                    {r.paymentStatus === "paid" && (
+                                      <button
+                                        onClick={() => actOnPayment(r.id, "markUnpaid")}
+                                        disabled={regBusyId === r.id}
+                                        className="border border-line text-ink/70 px-2 py-0.5 rounded text-xs hover:bg-line/30 disabled:opacity-60"
+                                      >
+                                        {t("reunion.pay.markUnpaid")}
+                                      </button>
                                     )}
                                   </td>
                                 </tr>

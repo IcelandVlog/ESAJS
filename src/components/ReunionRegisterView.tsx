@@ -258,18 +258,14 @@ export default function ReunionRegisterView({ name }: { name: string }) {
                         <p className="text-sm text-ink/70">
                           {t("reunionPage.fee.pending").replace("{trxId}", payment.transactionId)}
                         </p>
-                      ) : !paymentOptions ||
-                        (!paymentOptions.offlineNumbers.bkash &&
-                          !paymentOptions.offlineNumbers.nagad &&
-                          !paymentOptions.offlineNumbers.rocket) ? (
-                        <p className="text-sm text-ink/60">{t("reunionPage.fee.noneAvailable")}</p>
                       ) : (
                         <div className="flex flex-col gap-4">
                           <p className="text-sm text-ink/70">{t("reunionPage.fee.chooseMethod")}</p>
 
-                          {(paymentOptions.offlineNumbers.bkash ||
-                            paymentOptions.offlineNumbers.nagad ||
-                            paymentOptions.offlineNumbers.rocket) && (
+                          {paymentOptions &&
+                            (paymentOptions.offlineNumbers.bkash ||
+                              paymentOptions.offlineNumbers.nagad ||
+                              paymentOptions.offlineNumbers.rocket) && (
                             <form onSubmit={submitOffline} className="border-t border-line pt-4 flex flex-col gap-3">
                               <p className="text-sm font-medium text-heading">{t("reunionPage.fee.offline")}</p>
                               <div>
@@ -370,6 +366,13 @@ export default function ReunionRegisterView({ name }: { name: string }) {
                               </button>
                             </form>
                           )}
+
+                          <div className="border-t border-line pt-4">
+                            <p className="text-sm font-medium text-heading mb-1">{t("reunionPage.fee.cashTitle")}</p>
+                            <p className="text-xs text-ink/60">
+                              {t("reunionPage.fee.cashHint").replace("{amount}", String(reunion.feeAmount))}
+                            </p>
+                          </div>
 
                           {payError && <p className="text-clay text-sm">{payError}</p>}
                         </div>

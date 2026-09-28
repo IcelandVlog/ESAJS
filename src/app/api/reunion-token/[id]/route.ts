@@ -19,11 +19,19 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     return NextResponse.json({ error: "Invalid id" }, { status: 400 });
   }
 
-  if (access.batch) {
-    const [existing] = await db.select({ batch: reunionTokens.batch }).from(reunionTokens).where(eq(reunionTokens.id, tokenId));
-    if (!existing || existing.batch !== access.batch) {
-      return NextResponse.json({ error: "এটি আপনার ব্যাচের রিইউনিয়ন নয়" }, { status: 403 });
-    }
+  const [existing] = await db
+    .select({ batch: reunionTokens.batch, reunionDate: reunionTokens.reunionDate })
+    .from(reunionTokens)
+    .where(eq(reunionTokens.id, tokenId));
+  if (!existing) {
+    return NextResponse.json({ error: "টোকেন পাওয়া যায়নি" }, { status: 404 });
+  }
+  if (access.batch && existing.batch !== access.batch) {
+    return NextResponse.json({ error: "এটি আপনার ব্যাচের রিইউনিয়ন নয়" }, { status: 403 });
+  }
+  // A reunion whose date has passed is history — no more edits, cancelling or reactivating.
+  if (existing.reunionDate.getTime() < Date.now()) {
+    return NextResponse.json({ error: "রিইউনিয়নের তারিখ পেরিয়ে গেছে, আর পরিবর্তন করা যাবে না" }, { status: 400 });
   }
 
   const body = (await req.json()) as {
