@@ -124,7 +124,7 @@ export async function POST(req: NextRequest) {
 
   // `batch` is a batch year, or "all" (main admin only) to create one token per batch.
   // `feeAmount` is the default fee; `batchFees` optionally overrides it per batch year.
-  const { batch, occasion, messageBody, venue, reunionDate, feeAmount, batchFees } = (await req.json()) as {
+  const { batch, occasion, messageBody, venue, reunionDate, feeAmount, batchFees, excludeBatches } = (await req.json()) as {
     batch?: string;
     occasion?: string;
     messageBody?: string;
@@ -132,6 +132,7 @@ export async function POST(req: NextRequest) {
     reunionDate?: string;
     feeAmount?: number;
     batchFees?: Record<string, number | string | null>;
+    excludeBatches?: string[]; // "all" only: batches to leave out of this reunion
   };
   if (!batch) {
     return NextResponse.json({ error: "ব্যাচ বাছাই করুন" }, { status: 400 });
@@ -168,9 +169,10 @@ export async function POST(req: NextRequest) {
     .selectDistinct({ batch: students.batch })
     .from(students)
     .where(and(eq(students.approved, true), isNotNull(students.batch)));
-  const batches = batchRows.map((r) => r.batch as string).filter(Boolean);
+  const excluded = new Set((excludeBatches ?? []).map(String));
+  const batches = batchRows.map((r) => r.batch as string).filter((b) => b && !excluded.has(b));
   if (batches.length === 0) {
-    return NextResponse.json({ error: "কোনো ব্যাচে অনুমোদিত সদস্য নেই" }, { status: 400 });
+    return NextResponse.json({ error: "অন্তত একটি ব্যাচ রাখুন — কোনো ব্যাচ বাছাই করা নেই" }, { status: 400 });
   }
 
   const created: (typeof reunionTokens.$inferSelect)[] = [];

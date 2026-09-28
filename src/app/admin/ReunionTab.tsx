@@ -237,6 +237,7 @@ export default function ReunionTab({
   const [feeAmount, setFeeAmount] = useState("");
   const [allBatches, setAllBatches] = useState<{ batch: string; count: number }[]>([]);
   const [batchFees, setBatchFees] = useState<Record<string, string>>({});
+  const [excludedBatches, setExcludedBatches] = useState<Record<string, boolean>>({});
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -328,6 +329,7 @@ export default function ReunionTab({
         feeAmount: Number(feeAmount) || 0,
         ...(batch === "all"
           ? {
+              excludeBatches: Object.keys(excludedBatches).filter((b) => excludedBatches[b]),
               batchFees: Object.fromEntries(
                 Object.entries(batchFees).filter(([, v]) => v.trim() !== "").map(([b, v]) => [b, Number(v) || 0])
               ),
@@ -357,6 +359,7 @@ export default function ReunionTab({
     setReunionDate("");
     setFeeAmount("");
     setBatchFees({});
+    setExcludedBatches({});
     onChange();
     loadFinanceSummary();
   }
@@ -595,21 +598,33 @@ export default function ReunionTab({
               <p className="text-xs text-ink/50">{t("reunionPage.loading")}</p>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
-                {allBatches.map((b) => (
-                  <div key={b.batch} className="flex items-center justify-between gap-3">
-                    <span className="text-sm">
-                      {b.batch} <span className="text-xs text-ink/50">({t("reunion.batchMembers").replace("{n}", String(b.count))})</span>
-                    </span>
-                    <input
-                      type="number"
-                      min={0}
-                      value={batchFees[b.batch] ?? ""}
-                      onChange={(e) => setBatchFees((prev) => ({ ...prev, [b.batch]: e.target.value }))}
-                      placeholder={feeAmount || "0"}
-                      className="border border-line rounded px-2 py-1.5 text-sm w-28"
-                    />
-                  </div>
-                ))}
+                {allBatches.map((b) => {
+                  const out = !!excludedBatches[b.batch];
+                  return (
+                    <div key={b.batch} className="flex items-center justify-between gap-3">
+                      <label className={`flex items-center gap-2 text-sm cursor-pointer ${out ? "opacity-50" : ""}`}>
+                        <input
+                          type="checkbox"
+                          checked={!out}
+                          onChange={(e) => setExcludedBatches((prev) => ({ ...prev, [b.batch]: !e.target.checked }))}
+                        />
+                        <span>
+                          {b.batch}{" "}
+                          <span className="text-xs text-ink/50">({t("reunion.batchMembers").replace("{n}", String(b.count))})</span>
+                        </span>
+                      </label>
+                      <input
+                        type="number"
+                        min={0}
+                        disabled={out}
+                        value={batchFees[b.batch] ?? ""}
+                        onChange={(e) => setBatchFees((prev) => ({ ...prev, [b.batch]: e.target.value }))}
+                        placeholder={feeAmount || "0"}
+                        className="border border-line rounded px-2 py-1.5 text-sm w-28 disabled:opacity-40"
+                      />
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
