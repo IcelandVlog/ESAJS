@@ -235,6 +235,8 @@ export default function ReunionTab({
   const [venue, setVenue] = useState("");
   const [reunionDate, setReunionDate] = useState("");
   const [feeAmount, setFeeAmount] = useState("");
+  const [allBatches, setAllBatches] = useState<{ batch: string; count: number }[]>([]);
+  const [batchFees, setBatchFees] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -299,6 +301,15 @@ export default function ReunionTab({
     });
   }
 
+  function changeBatch(value: string) {
+    setBatch(value);
+    if (value === "all" && allBatches.length === 0) {
+      fetch("/api/reunion-batches")
+        .then((res) => res.json())
+        .then((data) => setAllBatches(data.batches ?? []));
+    }
+  }
+
   async function generate(e: React.FormEvent) {
     e.preventDefault();
     setError("");
@@ -315,6 +326,13 @@ export default function ReunionTab({
         venue: venue.trim(),
         reunionDate: new Date(reunionDate).toISOString(),
         feeAmount: Number(feeAmount) || 0,
+        ...(batch === "all"
+          ? {
+              batchFees: Object.fromEntries(
+                Object.entries(batchFees).filter(([, v]) => v.trim() !== "").map(([b, v]) => [b, Number(v) || 0])
+              ),
+            }
+          : {}),
       }),
     });
     const data = await res.json();
@@ -323,10 +341,14 @@ export default function ReunionTab({
       setError(data.error || t("admin.error"));
       return;
     }
-    const summary = t("reunion.successSummary")
-      .replace("{token}", data.token.token)
-      .replace("{sms}", String(data.token.smsSent))
-      .replace("{email}", String(data.token.emailSent));
+    const summary = data.tokens
+      ? t("reunion.successAll")
+          .replace("{created}", String(data.tokens.length))
+          .replace("{skipped}", String(data.skipped?.length ?? 0))
+      : t("reunion.successSummary")
+          .replace("{token}", data.token.token)
+          .replace("{sms}", String(data.token.smsSent))
+          .replace("{email}", String(data.token.emailSent));
     setSuccess(summary);
     setBatch(scopedBatch ?? "");
     setOccasion("");
@@ -334,6 +356,7 @@ export default function ReunionTab({
     setVenue("");
     setReunionDate("");
     setFeeAmount("");
+    setBatchFees({});
     onChange();
     loadFinanceSummary();
   }
@@ -513,7 +536,7 @@ export default function ReunionTab({
               required
               value={batch}
               disabled={!!scopedBatch}
-              onChange={(e) => setBatch(e.target.value)}
+              onChange={(e) => changeBatch(e.target.value)}
               className="border border-line rounded px-3 py-2.5 min-w-[140px] focus:outline-none focus:ring-2 focus:ring-pine/40 disabled:opacity-70"
             >
               {scopedBatch ? (
@@ -521,6 +544,7 @@ export default function ReunionTab({
               ) : (
                 <>
                   <option value="">{t("reunion.selectBatch")}</option>
+                  <option value="all">{t("reunion.allBatches")}</option>
                   {batchYears.map((y) => (
                     <option key={y} value={y}>
                       {y}
@@ -562,6 +586,34 @@ export default function ReunionTab({
             />
           </div>
         </div>
+
+        {batch === "all" && (
+          <div className="border border-line rounded-lg p-4">
+            <p className="text-sm font-medium text-heading mb-1">{t("reunion.batchFeesTitle")}</p>
+            <p className="text-xs text-ink/60 mb-3">{t("reunion.batchFeesHint")}</p>
+            {allBatches.length === 0 ? (
+              <p className="text-xs text-ink/50">{t("reunionPage.loading")}</p>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
+                {allBatches.map((b) => (
+                  <div key={b.batch} className="flex items-center justify-between gap-3">
+                    <span className="text-sm">
+                      {b.batch} <span className="text-xs text-ink/50">({t("reunion.batchMembers").replace("{n}", String(b.count))})</span>
+                    </span>
+                    <input
+                      type="number"
+                      min={0}
+                      value={batchFees[b.batch] ?? ""}
+                      onChange={(e) => setBatchFees((prev) => ({ ...prev, [b.batch]: e.target.value }))}
+                      placeholder={feeAmount || "0"}
+                      className="border border-line rounded px-2 py-1.5 text-sm w-28"
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         <div>
           <label className="block text-sm text-ink/70 mb-1.5">{t("reunion.occasion")}</label>
