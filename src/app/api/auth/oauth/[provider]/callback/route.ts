@@ -51,6 +51,14 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ prov
     if (!existing.approved) {
       return loginErrorRedirect(origin, "pending_approval");
     }
+    // Keep the profile photo in sync with the social account: if the photo
+    // changed there, pick up the new one on this login. A photo the member
+    // uploaded themselves (stored as a data: URL) is never overwritten.
+    const hasOwnUpload = !!existing.photoUrl && existing.photoUrl.startsWith("data:");
+    if (profile.picture && !hasOwnUpload && profile.picture !== existing.photoUrl) {
+      await db.update(students).set({ photoUrl: profile.picture }).where(eq(students.id, existing.id));
+    }
+
     const token = signSession({ role: "student", id: existing.id, name: existing.name });
     // Signed in — land on the home page (same as normal email/password login).
     const res = NextResponse.redirect(new URL("/", origin));
